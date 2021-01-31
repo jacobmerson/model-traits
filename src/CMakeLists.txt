@@ -1,6 +1,6 @@
 
 find_package(fmt REQUIRED)
-add_library(modelTraits bcCategoryNode.cc bcModelTraits.cc)
+add_library(modelTraits bcModelTraits.cc)
 #target_include_directories(modelTraits PRIVATE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>)
 target_include_directories(modelTraits PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 # set spdlog to use externally build fmt library

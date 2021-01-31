@@ -9,13 +9,17 @@
 namespace bc {
 class ModelTraits {
 public:
-  ModelTraits(const std::string &name);
+  template <typename String,
+            std::enable_if_t<std::is_convertible<String, std::string>::value,
+                             int> = 0>
+  ModelTraits(String &&name) : name_(std::forward<String>(name)){};
   /**
    * Adds a case if it doesn't exist and returns a pointer
    * to it's INode. If the case does exist, the pointer to
    * the case is returned.
    */
-  INode *AddCase(const std::string &name);
+  CategoryNode *AddCase(const std::string &name);
+  CategoryNode *GetCase(const std::string &name);
   /**
    * Removes a case from ModelTraits by it's name
    */

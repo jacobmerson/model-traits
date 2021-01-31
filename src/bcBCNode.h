@@ -7,7 +7,17 @@ namespace bc {
 template <typename GID, typename BC> class BCNode : public INode {
 public:
   virtual bool IsBoundaryCondition() const final { return true; }
-  BCNode(const std::string &name) : INode(name){};
+  template <typename String,
+            std::enable_if_t<std::is_convertible<String, std::string>::value,
+                             int> = 0>
+  BCNode(String &&name) : INode(std::forward<String>(name)){};
+  template <typename GSet, typename String,
+            std::enable_if_t<std::is_convertible<String, std::string>::value,
+                             int> = 0>
+  BCNode(String &&name, GSet &&g, BC &&bc)
+      : INode(std::forward<String>(name)),
+        boundary_condition_(std::forward<BC>(bc)),
+        geometry_id_(std::forward<GSet>(g)){};
 
 private:
   BC boundary_condition_;

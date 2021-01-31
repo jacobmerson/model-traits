@@ -4,7 +4,7 @@
 #include <exception>
 
 namespace bc {
-void CategoryNode::AddNode(std::unique_ptr<INode> node) {
+INode *CategoryNode::AddNode(std::unique_ptr<INode> node) {
   auto it = nodes_.find(node->GetName());
   if (it != nodes_.end()) {
     // if the name is already in the map the vector
@@ -16,6 +16,7 @@ void CategoryNode::AddNode(std::unique_ptr<INode> node) {
           node->GetName()));
     } else if (node->IsBoundaryCondition()) {
       it->second.push_back(std::move(node));
+      return it->second.back().get();
     } else {
       throw std::runtime_error(
           fmt::format("Cannot add non-BC node with name {} to BC node list",
@@ -25,7 +26,8 @@ void CategoryNode::AddNode(std::unique_ptr<INode> node) {
     auto name = node->GetName();
     std::vector<std::unique_ptr<INode>> vec{};
     vec.push_back(std::move(node));
-    nodes_.insert(std::make_pair(name, std::move(vec)));
+    auto vals = nodes_.insert(std::make_pair(name, std::move(vec)));
+    return vals.first->second[0].get();
   }
 }
 } // namespace bc

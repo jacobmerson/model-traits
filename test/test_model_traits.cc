@@ -22,6 +22,9 @@ TEST_CASE("add and remove case from ModelTraits", "[traits]") {
   REQUIRE(case1 != case2);
   REQUIRE(case1->IsBoundaryCondition() == false);
   REQUIRE(case2->IsBoundaryCondition() == false);
+  REQUIRE(case1 == model_traits.GetCase("case1"));
+  REQUIRE(case2 == model_traits.GetCase("case2"));
+  REQUIRE(model_traits.GetCase("nonexistent case") == nullptr);
   // check that adding cases works
   REQUIRE(model_traits.GetCases().size() == 2);
   // adding an existing case returns the correct INode

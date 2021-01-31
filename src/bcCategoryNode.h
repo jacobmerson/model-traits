@@ -7,13 +7,26 @@
 #include <vector>
 
 namespace bc {
-// Should this be called a CNode? I feel like
-// having things spelled out makes it slightly
-// more clear
+
+template <typename GID, typename BC> class BCNode;
+
 class CategoryNode : public INode {
 public:
-  CategoryNode(const std::string &name) : INode(name){};
-  void AddNode(std::unique_ptr<INode> node);
+  template <typename String,
+            typename std::enable_if_t<
+                std::is_convertible<String, std::string>::value, int> = 0>
+  CategoryNode(String &&name) : INode(std::forward<String>(name)){};
+  // TODO remove the add node interface
+  // INode* AddNode(std::unique_ptr<INode> node);
+  template <typename String,
+            typename std::enable_if_t<
+                std::is_convertible<String, std::string>::value, int> = 0>
+  CategoryNode *AddCategory(String &&name);
+  template <typename GID, typename BC, typename GSet, typename String,
+            typename std::enable_if_t<
+                std::is_convertible<String, std::string>::value, int> = 0>
+  BCNode<GID, BC> *AddBoundaryCondition(String &&name, GSet &&geometry,
+                                        BC &&boundary_condition);
 
 protected:
   // note we need to constrain this to only allow
@@ -21,4 +34,5 @@ protected:
   std::unordered_map<std::string, std::vector<std::unique_ptr<INode>>> nodes_;
 };
 } // namespace bc
+#include "bcCategoryNode_impl.h"
 #endif

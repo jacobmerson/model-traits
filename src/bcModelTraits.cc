@@ -4,8 +4,7 @@ namespace bc {
 // ModelTraits::ModelTraits(const std::string & modelName, MT* model) {
 //
 //}
-ModelTraits::ModelTraits(const std::string &name) : name_(name){};
-INode *ModelTraits::AddCase(const std::string &case_name) {
+CategoryNode *ModelTraits::AddCase(const std::string &case_name) {
   const auto it = cases_.find(case_name);
   if (it != cases_.end()) {
     return it->second.get();
@@ -13,6 +12,14 @@ INode *ModelTraits::AddCase(const std::string &case_name) {
     auto res = cases_.insert(
         it, {case_name, std::make_unique<CategoryNode>(case_name)});
     return res->second.get();
+  }
+}
+CategoryNode *ModelTraits::GetCase(const std::string &case_name) {
+  const auto it = cases_.find(case_name);
+  if (it != cases_.end()) {
+    return it->second.get();
+  } else {
+    return nullptr;
   }
 }
 bool ModelTraits::RemoveCase(const std::string &name) {
