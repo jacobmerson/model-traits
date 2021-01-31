@@ -16,8 +16,6 @@ public:
             typename std::enable_if_t<
                 std::is_convertible<String, std::string>::value, int> = 0>
   CategoryNode(String &&name) : INode(std::forward<String>(name)){};
-  // TODO remove the add node interface
-  // INode* AddNode(std::unique_ptr<INode> node);
   template <typename String,
             typename std::enable_if_t<
                 std::is_convertible<String, std::string>::value, int> = 0>
