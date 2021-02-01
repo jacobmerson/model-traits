@@ -4,7 +4,6 @@
 class TestModelTraits : public bc::ModelTraits {
 public:
   TestModelTraits(const std::string &name) : bc::ModelTraits(name){};
-  const auto &GetCases() const { return cases_; }
   const auto &GetName() const { return name_; }
 };
 
@@ -13,7 +12,7 @@ TEST_CASE("add and remove case from ModelTraits", "[traits]") {
   REQUIRE(model_traits.GetName() == "mytraits");
 
   // ensure that original size of cases is zero
-  REQUIRE(model_traits.GetCases().size() == 0);
+  REQUIRE(model_traits.NumCases() == 0);
 
   auto case1 = model_traits.AddCase("case1");
   auto case2 = model_traits.AddCase("case2");
@@ -26,20 +25,17 @@ TEST_CASE("add and remove case from ModelTraits", "[traits]") {
   REQUIRE(case2 == model_traits.GetCase("case2"));
   REQUIRE(model_traits.GetCase("nonexistent case") == nullptr);
   // check that adding cases works
-  REQUIRE(model_traits.GetCases().size() == 2);
-  // adding an existing case returns the correct INode
-  REQUIRE(model_traits.AddCase("case1") == case1);
-  // ensure that we correctly have the cases we added
-  REQUIRE(model_traits.GetCases().count("case1") == 1);
-  REQUIRE(model_traits.GetCases().count("case2") == 1);
+  REQUIRE(model_traits.NumCases() == 2);
+  // adding an existing case throws an error
+  REQUIRE_THROWS(model_traits.AddCase("case1"));
   // ensure that we don't contain random cases
-  REQUIRE(model_traits.GetCases().count("case3") == 0);
-  REQUIRE(model_traits.GetCases().count("case4") == 0);
+  REQUIRE(model_traits.GetCase("case3") == nullptr);
+  REQUIRE(model_traits.GetCase("case4") == nullptr);
 
-  REQUIRE(model_traits.RemoveCase("case1") == true);
-  REQUIRE(model_traits.GetCases().count("case1") == 0);
-  REQUIRE(model_traits.GetCases().size() == 1);
-  REQUIRE(model_traits.RemoveCase("case1") == false);
-  REQUIRE(model_traits.RemoveCase("case2") == true);
-  REQUIRE(model_traits.RemoveCase("case4") == false);
+  REQUIRE(model_traits.RemoveCase("case1") != nullptr);
+  REQUIRE(model_traits.GetCase("case1") == nullptr);
+  REQUIRE(model_traits.NumCases() == 1);
+  REQUIRE(model_traits.RemoveCase("case1") == nullptr);
+  REQUIRE(model_traits.RemoveCase("case2") != nullptr);
+  REQUIRE(model_traits.RemoveCase("case4") == nullptr);
 }

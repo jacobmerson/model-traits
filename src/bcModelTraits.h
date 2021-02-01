@@ -18,16 +18,29 @@ public:
    * to it's INode. If the case does exist, the pointer to
    * the case is returned.
    */
-  CategoryNode *AddCase(const std::string &name);
-  CategoryNode *GetCase(const std::string &name);
+  template <typename String,
+            typename std::enable_if_t<
+                std::is_convertible<String, std::string>::value, int> = 0>
+  CategoryNode *AddCase(String &&name) {
+    return static_cast<CategoryNode *>(cases_.AddNode(
+        std::make_unique<CategoryNode>(std::forward<String>(name))));
+  }
+  CategoryNode *GetCase(const std::string &name) {
+    return static_cast<CategoryNode *>(cases_.FindNode(name));
+  }
   /**
    * Removes a case from ModelTraits by it's name
    */
-  bool RemoveCase(const std::string &name);
+  std::unique_ptr<CategoryNode> RemoveCase(const std::string &name) {
+    // return std::move(static_cast<std::unique_ptr<CategoryNode>>();
+    return std::move(std::unique_ptr<CategoryNode>(
+        static_cast<CategoryNode *>(cases_.RemoveNode(name).release())));
+  }
+  int NumCases() { return cases_.Size(); }
 
 protected:
   std::string name_;
-  std::unordered_map<std::string, std::unique_ptr<CategoryNode>> cases_;
+  NodeSet<> cases_;
 };
 
 /*

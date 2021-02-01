@@ -25,17 +25,15 @@ TEST_CASE("add to category node", "[node]") {
     REQUIRE_NOTHROW(node1 = cn.AddCategory("category 2"));
     REQUIRE_NOTHROW(node2 = cn.AddCategory("category 3"));
     REQUIRE(node1 != node2);
-    // trying to add two category nodes with the same name
-    // gives the pointer to the category node
-    REQUIRE_NOTHROW(node2 = cn.AddCategory("category 2"));
-    REQUIRE(node1 == node2);
+    // trying to add two category nodes with the same name throws
+    REQUIRE_THROWS(node2 = cn.AddCategory("category 2"));
     // cannot add a bc with the same name as the category
     REQUIRE_THROWS(cn.AddBoundaryCondition<int, BC>("category 2", 1, BC{}));
 
     REQUIRE_NOTHROW(node1 = cn.AddBoundaryCondition<int, BC>("bc 1", 1, BC{}));
     REQUIRE_NOTHROW(node2 = cn.AddBoundaryCondition<int, BC>("bc 2", 1, BC{}));
     REQUIRE(node1 != node2);
-    REQUIRE_NOTHROW(node2 = cn.AddBoundaryCondition<int, BC>("bc 1", 1, BC{}));
+    REQUIRE_THROWS(node2 = cn.AddBoundaryCondition<int, BC>("bc 1", 1, BC{}));
     // adding a boundary secondary boundary condition with the same name
     // adds a new node, and therefore it should not be the same node as
     // the previous insterted bc node with the same name
@@ -44,7 +42,7 @@ TEST_CASE("add to category node", "[node]") {
   SECTION("bc first") {
     REQUIRE_NOTHROW(cn.AddBoundaryCondition<int, BC>("bc 1", 1, BC{}));
     REQUIRE_NOTHROW(cn.AddBoundaryCondition<int, BC>("bc 2", 1, BC{}));
-    REQUIRE_NOTHROW(cn.AddBoundaryCondition<int, BC>("bc 2", 1, BC{}));
+    REQUIRE_THROWS(cn.AddBoundaryCondition<int, BC>("bc 2", 1, BC{}));
     REQUIRE_NOTHROW(cn.AddBoundaryCondition<int, BC>("category 2", 1, BC{}));
 
     REQUIRE_THROWS(cn.AddCategory("category 2"));
