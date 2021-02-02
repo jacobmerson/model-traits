@@ -7,3 +7,6 @@ target_link_libraries(test_model_traits Catch2::Catch2WithMain modelTraits)
 
 add_executable(generic_test generic_test.cc)
 target_link_libraries(generic_test modelTraits)
+
+add_executable(read_yaml test_reader.cc)
+target_link_libraries(read_yaml modelTraits bcBackendYamlCpp)

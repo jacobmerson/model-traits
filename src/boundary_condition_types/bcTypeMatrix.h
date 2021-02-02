@@ -5,6 +5,7 @@
 namespace bc {
 class MatrixBC {
 public:
+  MatrixBC() = default;
   // not noexcept because copying d in the parameter can throw
   MatrixBC(std::vector<std::vector<ScalarType>> d) : data_(std::move(d)){};
   MatrixBC(std::vector<std::vector<ScalarType>> &&d) noexcept

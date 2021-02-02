@@ -5,6 +5,7 @@
 namespace bc {
 class VectorBC {
 public:
+  VectorBC() = default;
   // not noexcept because copying d in the parameter can throw
   VectorBC(std::vector<ScalarType> d) : data_(std::move(d)){};
   VectorBC(std::vector<ScalarType> &&d) noexcept : data_(std::move(d)){};

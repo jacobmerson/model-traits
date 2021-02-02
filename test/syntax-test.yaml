@@ -1,0 +1,53 @@
+model traits:
+  name: "basic model setup"
+  cases:
+    - name: "case 1"
+      # this is here because in the general case
+      # we might have a geometry type that allows
+      # for setting both the dimension, and id
+      # an example of what we might want tom impliment
+      # geometry:
+      #   vertices: [19,39,49]
+      #   faces: [132], ...
+      # the boundary condition geometry set will take a struct
+      # with a dimension and id rather than just an id
+      model traits:
+        geometry type: int
+        category 1:
+          boundary conditions:
+            - name: "scalar bc"
+              geometry: [1,2,3,4,1002]
+              type: scalar
+              value: 1.2387
+            - name: "bool bc"
+              geometry: [30,21]
+              type: bool
+              value: false
+            - name: "string bc"
+              geometry: [40]
+              type: string
+              value: "a string"
+            - name: "vector bc"
+              geometry: [40,50]
+              type: vector
+              value: [12.200, 49,4389,199,12]
+            - name: "matrix bc"
+              geometry: [60,70]
+              type: matrix
+              # 3x3 matrix example
+              value: [[1,2,3],[4,5,6],[7,8,9]]
+          category 2:
+            boundary conditions:
+              - name: "load1"
+                geometry: [1,2,3,4,1002]
+                type: scalar
+                value: 10.0
+        boundary conditions:
+          - name: "top level BC"
+            type: bool
+            geometry: [78]
+            value: false
+          - name: "top level BC2"
+            type: bool
+            geometry: [78]
+            value: false

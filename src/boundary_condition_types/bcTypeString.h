@@ -3,6 +3,7 @@
 #include <string>
 namespace bc {
 struct StringBC {
+  StringBC() = default;
   // not noexcept because copying d in the parameter can throw
   StringBC(std::string d) : data(std::move(d)){};
   StringBC(std::string &&d) noexcept : data(std::move(d)){};

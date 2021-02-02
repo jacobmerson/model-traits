@@ -4,6 +4,7 @@
 
 namespace bc {
 struct ScalarBC {
+  ScalarBC() = default;
   ScalarBC(ScalarType d) noexcept : data(d){};
   operator double() const noexcept { return data; }
   operator double &() noexcept { return data; }
