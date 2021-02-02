@@ -63,6 +63,13 @@ public:
     return it->get();
   };
   int Size() { return nodes_.size(); }
+  // iterators
+  using iterator = typename Container::iterator;
+  using const_iterator = typename Container::const_iterator;
+  iterator begin() noexcept { return nodes_.begin(); }
+  const_iterator begin() const noexcept { return nodes_.begin(); }
+  iterator end() noexcept { return nodes_.end(); }
+  const_iterator end() const noexcept { return nodes_.end(); }
 
 private:
   auto FindNodeIt(const std::string &name) {

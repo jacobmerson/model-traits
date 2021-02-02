@@ -34,10 +34,6 @@ TEST_CASE("add to category node", "[node]") {
     REQUIRE_NOTHROW(node2 = cn.AddBoundaryCondition<int, BC>("bc 2", 1, BC{}));
     REQUIRE(node1 != node2);
     REQUIRE_THROWS(node2 = cn.AddBoundaryCondition<int, BC>("bc 1", 1, BC{}));
-    // adding a boundary secondary boundary condition with the same name
-    // adds a new node, and therefore it should not be the same node as
-    // the previous insterted bc node with the same name
-    REQUIRE(node1 != node2);
   }
   SECTION("bc first") {
     REQUIRE_NOTHROW(cn.AddBoundaryCondition<int, BC>("bc 1", 1, BC{}));

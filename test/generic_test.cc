@@ -12,7 +12,7 @@ int main(int argc, char **argv) {
   auto o = case1->AddCategory("output");
   auto loads = ss->AddCategory("loads");
   auto bc1 = loads->AddBoundaryCondition<int, Tensor>(
-      "loads", std::initializer_list<int>{1, 3, 4, 5}, Tensor{});
-
+      "load BC", std::initializer_list<int>{1, 3, 4, 5}, Tensor{});
+  fmt::print("{}\n", model_traits);
   return 0;
 }

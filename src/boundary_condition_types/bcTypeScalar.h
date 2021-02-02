@@ -5,6 +5,9 @@
 namespace bc {
 struct ScalarBC {
   ScalarBC(ScalarType d) noexcept : data(d){};
+  operator double() const noexcept { return data; }
+  operator double &() noexcept { return data; }
+  operator const double &() const noexcept { return data; }
   ScalarType data;
 };
 } // namespace bc

@@ -9,11 +9,11 @@ public:
   MatrixBC(std::vector<std::vector<ScalarType>> d) : data_(std::move(d)){};
   MatrixBC(std::vector<std::vector<ScalarType>> &&d) noexcept
       : data_(std::move(d)){};
-  const ScalarType &operator[](std::size_t row,
+  const ScalarType &operator()(std::size_t row,
                                std::size_t col) const noexcept {
     return data_[row][col];
   }
-  ScalarType &operator[](std::size_t row, std::size_t col) noexcept {
+  ScalarType &operator()(std::size_t row, std::size_t col) noexcept {
     return data_[row][col];
   }
 

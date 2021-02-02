@@ -6,7 +6,7 @@
 namespace bc {
 template <typename GID, typename BC> class BCNode : public INode {
 public:
-  virtual bool IsBoundaryCondition() const final { return true; }
+  virtual bool IsBoundaryCondition() const noexcept final { return true; }
   template <typename String,
             std::enable_if_t<std::is_convertible<String, std::string>::value,
                              int> = 0>
