@@ -3,7 +3,7 @@
 #include "bcBackendYamlCpp.h"
 #include <yaml-cpp/yaml.h>
 //#include "bcConvert.h"
-#include "bcTypes.h"
+#include "bcBC.h"
 
 // conversions from yaml to/from the BC datatypes
 namespace YAML {

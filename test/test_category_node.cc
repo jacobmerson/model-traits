@@ -1,7 +1,7 @@
+#include "bcBC.h"
 #include "bcBCNode.h"
 #include "bcCategoryNode.h"
 #include "bcTypedefs.h"
-#include "bcTypes.h"
 #include "catch2/catch_test_macros.hpp"
 // boundary condition struct
 // struct BC {};

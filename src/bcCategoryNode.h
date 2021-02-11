@@ -1,10 +1,10 @@
 #ifndef BC_CATEGORY_NODE_H__
 #define BC_CATEGORY_NODE_H__
+#include "bcBC.h"
 #include "bcBCNode.h"
 #include "bcConvert.h"
 #include "bcINode.h"
 #include "bcNodeSet.h"
-#include "bcTypes.h"
 #include <memory>
 #include <string>
 #include <unordered_map>

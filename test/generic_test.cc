@@ -1,6 +1,6 @@
+#include "bcBC.h"
 #include "bcCategoryNode.h"
 #include "bcModelTraits.h"
-#include "bcTypes.h"
 #include "fmt/format.h"
 
 int main(int, char **) {
