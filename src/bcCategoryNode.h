@@ -3,6 +3,7 @@
 #include "bcBC.h"
 #include "bcBCNode.h"
 #include "bcConvert.h"
+#include "bcGeometrySet.h"
 #include "bcINode.h"
 #include "bcNodeSet.h"
 #include <memory>
@@ -14,27 +15,27 @@ namespace bc {
 
 class CategoryNode : public INode, public ConvertFunctions<CategoryNode> {
 public:
-  template <typename String,
-            typename std::enable_if_t<
-                std::is_convertible<String, std::string>::value, int> = 0>
-  CategoryNode(String &&name) : INode(std::forward<String>(name)) {}
-  template <typename String,
-            typename std::enable_if_t<
-                std::is_convertible<String, std::string>::value, int> = 0>
-  CategoryNode *AddCategory(String &&name) {
-    return static_cast<CategoryNode *>(nodes_.AddNode(
-        std::make_unique<CategoryNode>(std::forward<String>(name))));
+  CategoryNode(const std::string &name) : INode(name) {}
+  CategoryNode(std::string &&name) : INode(std::move(name)) {}
+  CategoryNode *AddCategory(std::string name) {
+    return static_cast<CategoryNode *>(
+        nodes_.AddNode(std::make_unique<CategoryNode>(std::move(name))));
   }
-  template <typename BC, typename GID = OrdinalType, typename GSet,
-            typename String,
-            typename std::enable_if_t<
-                std::is_convertible<String, std::string>::value, int> = 0>
-  BCNode<GID, BC> *AddBoundaryCondition(String &&name, GSet &&geometry,
-                                        BC &&boundary_condition) {
-    return static_cast<BCNode<GID, BC> *>(
-        nodes_.AddNode(std::make_unique<BCNode<GID, BC>>(
-            std::forward<String>(name), std::forward<GSet>(geometry),
-            std::forward<BC>(boundary_condition))));
+
+  /*
+  BCNode *AddBoundaryCondition(std::string name, std::unique_ptr<IGeometrySet>
+  geometry, std::unique_ptr<IBoundaryCondition> boundary_condition) { return
+  static_cast<BCNode*>( nodes_.AddNode(std::make_unique<BCNode>(
+            std::move(name), std::move(geometry),
+            std::move(boundary_condition))));
+  }
+  */
+  template <typename Geom, typename BC>
+  BCNode *AddBoundaryCondition(std::string name, Geom &&geometry,
+                               BC &&boundary_condition) {
+    return static_cast<BCNode *>(nodes_.AddNode(std::make_unique<BCNode>(
+        std::move(name), std::make_unique<Geom>(std::forward<Geom>(geometry)),
+        std::make_unique<BC>(std::forward<BC>(boundary_condition)))));
   }
 
   virtual void accept(NodeVisitor &v) final { v.visit(*this); }

@@ -5,16 +5,16 @@
 #include <vector>
 
 namespace bc {
-struct BC {};
+struct IBoundaryCondition {};
 
-struct BoolBC : public BC {
+struct BoolBC : public IBoundaryCondition {
   BoolBC() = default;
   BoolBC(bool d) noexcept : data(d){};
   operator bool() const noexcept { return data; }
   operator bool &() noexcept { return data; }
   bool data;
 };
-class MatrixBC : public BC {
+class MatrixBC : public IBoundaryCondition {
 public:
   MatrixBC() = default;
   // not noexcept because copying d in the parameter can throw
@@ -32,7 +32,7 @@ public:
 private:
   std::vector<std::vector<ScalarType>> data_;
 };
-struct ScalarBC : public BC {
+struct ScalarBC : public IBoundaryCondition {
   ScalarBC() = default;
   ScalarBC(ScalarType d) noexcept : data(d){};
   operator double() const noexcept { return data; }
@@ -40,7 +40,7 @@ struct ScalarBC : public BC {
   operator const double &() const noexcept { return data; }
   ScalarType data;
 };
-struct StringBC : public BC {
+struct StringBC : public IBoundaryCondition {
   StringBC() = default;
   // not noexcept because copying d in the parameter can throw
   StringBC(std::string d) : data(std::move(d)){};
@@ -49,7 +49,7 @@ struct StringBC : public BC {
   operator const std::string &() const noexcept { return data; }
   std::string data;
 };
-class VectorBC : public BC {
+class VectorBC : public IBoundaryCondition {
 public:
   VectorBC() = default;
   // not noexcept because copying d in the parameter can throw

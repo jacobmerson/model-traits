@@ -1,6 +1,7 @@
 #ifndef BC_NODE_SET_H__
 #define BC_NODE_SET_H__
 #include "bcINode.h"
+#include "bcUtility.h"
 #include <algorithm>
 #include <fmt/format.h>
 #include <memory>
@@ -8,12 +9,6 @@
 
 namespace bc {
 
-/*
- * This is here so that we can use the template, template parameters
- * with the defaults for vector and unordered map. This workaround
- * is not needed in c++17 and up.
- */
-template <typename T> using BC_VEC_WORKAROUND = std::vector<T>;
 /*
  * The node set collection is templated because depending on the number of nodes
  * within each level, performance may be significantly better by using a vector,

@@ -15,21 +15,25 @@ void ParseBoundaryConditions(const YAML::Node &yaml_node,
   for (auto &&bc : yaml_node) {
     auto name = bc["name"].as<std::string>();
     auto type = bc["type"].as<std::string>();
-    auto geometry_vec = bc["geometry"].as<std::vector<int>>();
-    std::unordered_set<int> geometry(std::begin(geometry_vec),
-                                     std::end(geometry_vec));
+    auto geometry = bc["geometry"].as<std::vector<int>>();
+    // currently we use begin/end because it's generic for whatever type the
+    // geometry set is however, we can reduce the inefficiency by creating a
+    // GeometrySet converter function
     if (type == "scalar") {
       auto value = bc["value"].as<ScalarBC>();
-      parent_node->AddBoundaryCondition(std::move(name), std::move(geometry),
-                                        std::move(value));
+      parent_node->AddBoundaryCondition(
+          std::move(name), GeometrySet<>(geometry.begin(), geometry.end()),
+          std::move(value));
     } else if (type == "bool") {
       auto value = bc["value"].as<BoolBC>();
-      parent_node->AddBoundaryCondition(std::move(name), std::move(geometry),
-                                        std::move(value));
+      parent_node->AddBoundaryCondition(
+          std::move(name), GeometrySet<>(geometry.begin(), geometry.end()),
+          std::move(value));
     } else if (type == "string") {
       auto value = bc["value"].as<StringBC>();
-      parent_node->AddBoundaryCondition(std::move(name), std::move(geometry),
-                                        std::move(value));
+      parent_node->AddBoundaryCondition(
+          std::move(name), GeometrySet<>(geometry.begin(), geometry.end()),
+          std::move(value));
     } else if (type == "vector") {
       // auto value = bc["value"].as<VectorBC>();
       fmt::print("matrix not converting yet skipping\n");
