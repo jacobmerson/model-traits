@@ -13,7 +13,7 @@
 
 namespace bc {
 
-class CategoryNode : public INode, public ConvertFunctions<CategoryNode> {
+class CategoryNode : public INode, public Convertible<CategoryNode> {
 public:
   CategoryNode(const std::string &name) : INode(name) {}
   CategoryNode(std::string &&name) : INode(std::move(name)) {}

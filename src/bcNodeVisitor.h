@@ -1,7 +1,5 @@
 #ifndef BC_NODE_VISITOR_H__
 #define BC_NODE_VISITOR_H__
-#include "bcBC.h"
-#include "bcTypedefs.h"
 
 namespace bc {
 struct CategoryNode;

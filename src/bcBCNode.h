@@ -1,13 +1,14 @@
 #ifndef BC_BC_NODE_H__
 #define BC_BC_NODE_H__
 #include "bcBC.h"
+#include "bcConvert.h"
 #include "bcGeometrySet.h"
 #include "bcINode.h"
 #include <memory>
 #include <unordered_set>
 
 namespace bc {
-class BCNode : public INode {
+class BCNode : public INode, public Convertible<BCNode> {
   using geom_ptr_t = std::unique_ptr<IGeometrySet>;
   using bc_ptr_t = std::unique_ptr<IBoundaryCondition>;
 

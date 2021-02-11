@@ -1,5 +1,6 @@
 #ifndef BC_GEOMETRY_H__
 #define BC_GEOMETRY_H__
+#include "bcConvert.h"
 #include "bcTypedefs.h"
 #include "bcUtility.h"
 #include <unordered_set>
@@ -15,7 +16,8 @@ struct IGeometrySet {};
  */
 template <typename Geometry = OrdinalType,
           template <typename> class Cont = BC_VEC_WORKAROUND>
-class GeometrySet : public IGeometrySet {
+class GeometrySet : public IGeometrySet,
+                    public Convertible<GeometrySet<Geometry, Cont>> {
 public:
   using Container = Cont<Geometry>;
   template <typename... Args>

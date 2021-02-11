@@ -4,7 +4,7 @@ namespace bc {
 
 template <typename T, typename Backend> struct convert;
 
-template <typename BaseClass> struct ConvertFunctions {
+template <typename BaseClass> struct Convertible {
   template <typename T> T to() const {
     return convert<BaseClass, T>::decode(static_cast<const BaseClass &>(*this));
   }
