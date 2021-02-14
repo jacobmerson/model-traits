@@ -1,15 +1,65 @@
 #ifndef BC_CONVERT_H__
 #define BC_CONVERT_H__
+#include <type_traits>
 namespace bc {
 
-template <typename T, typename Backend> struct convert;
+// specialize this struct for your backend and types.
+// for each valid conversion set the type alias to
+// the backend type for a given BC type. For example
+// see bcBackendYamlCppConvert.h
+template <typename T, typename Backend> struct BackendTypeMap {};
+
+template <typename T, typename T2, typename Backend = void> struct convert {};
+
+// helper template to return a void type no matter the number of template args
+template <typename...> using VoidT = void;
+template <typename T, typename Backend, typename = void>
+struct BackendHasType : std::false_type {};
+template <typename T, typename Backend>
+struct BackendHasType<T, Backend,
+                      VoidT<typename BackendTypeMap<T, Backend>::type>>
+    : std::true_type {};
+
+// an abstract backend struct that all backends derive from
+// this is used to enable conversion to/from backends as
+// well as
+struct Backend {};
 
 template <typename BaseClass> struct Convertible {
-  template <typename T> T to() const {
+  template <typename T,
+            typename = std::enable_if_t<!BackendHasType<BaseClass, T>::value>>
+  T to() const {
+    static_assert(
+        !std::is_base_of<Backend, T>::value,
+        "instantiation type for BaseClass is missing from the BackendTypeMap");
     return convert<BaseClass, T>::decode(static_cast<const BaseClass &>(*this));
   }
-  template <typename T> static BaseClass from(const T &other) {
+  template <typename T,
+            typename = std::enable_if_t<BackendHasType<BaseClass, T>::value>>
+  typename BackendTypeMap<BaseClass, T>::type to() const {
+    static_assert(std::is_base_of<Backend, T>::value,
+                  "Backend (T) not inherited from Backend");
+    return convert<BaseClass, typename BackendTypeMap<BaseClass, T>::type,
+                   T>::decode(static_cast<const BaseClass &>(*this));
+  }
+
+  template <typename T,
+            typename = std::enable_if_t<!BackendHasType<BaseClass, T>::value>>
+  static BaseClass from(const T &other) {
+    static_assert(
+        !std::is_base_of<Backend, T>::value,
+        "instantiation type for BaseClass is missing from the BackendTypeMap");
     return convert<BaseClass, T>::encode(other);
+  }
+
+  template <typename T,
+            typename = std::enable_if_t<BackendHasType<BaseClass, T>::value>>
+  static BaseClass
+  from(const typename BackendTypeMap<BaseClass, T>::type &other) {
+    static_assert(std::is_base_of<Backend, T>::value,
+                  "Backend (T) not inherited from Backend");
+    return convert<BaseClass, typename BackendTypeMap<BaseClass, T>::type,
+                   T>::encode(other);
   }
 };
 

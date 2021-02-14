@@ -4,18 +4,13 @@
 #include "bcModelTraitsIO.h"
 
 namespace bc {
-struct YAML_CPP {};
+struct YAML : Backend {};
 
 template <>
-void WriteToStream<YAML_CPP>(const ModelTraits *model_traits,
-                             /*
-                             template <>
-                             void WriteToStream<YAML_CPP>(const ModelTraits
-                             *model_traits, std::ostream &stream) {}
-                             */
-                             std::ostream &stream);
+void WriteToStream<YAML>(const ModelTraits *model_traits, std::ostream &stream);
 template <>
-std::unique_ptr<ModelTraits> ReadFromStream<YAML_CPP>(std::istream &stream);
+std::unique_ptr<ModelTraits> ReadFromStream<YAML>(std::istream &stream);
+
 } // namespace bc
 
 #endif

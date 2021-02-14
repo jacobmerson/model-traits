@@ -6,13 +6,13 @@
 #include <vector>
 
 namespace bc {
-template <typename> class GenericBC;
+template <typename> struct GenericBC;
 using BoolBC = GenericBC<bool>;
 using ScalarBC = GenericBC<ScalarType>;
 using StringBC = GenericBC<std::string>;
 using IntBC = GenericBC<OrdinalType>;
-class MatrixBC;
-class VectorBC;
+struct MatrixBC;
+struct VectorBC;
 
 struct BCVisitor {
   virtual void visit(BoolBC &) = 0;
@@ -34,8 +34,7 @@ struct IBoundaryCondition {
   virtual ~IBoundaryCondition() = default;
 };
 
-class MatrixBC : public IBoundaryCondition, public Convertible<MatrixBC> {
-public:
+struct MatrixBC : public IBoundaryCondition, public Convertible<MatrixBC> {
   MatrixBC() = default;
   // not noexcept because copying d in the parameter can throw
   MatrixBC(std::vector<std::vector<ScalarType>> d) : data_(std::move(d)){};
@@ -50,33 +49,28 @@ public:
   }
   void accept(BCVisitor &v) final { v.visit(*this); }
 
-private:
   std::vector<std::vector<ScalarType>> data_;
 };
-class VectorBC : public IBoundaryCondition, public Convertible<VectorBC> {
-public:
+struct VectorBC : public IBoundaryCondition, public Convertible<VectorBC> {
   VectorBC() = default;
   // not noexcept because copying d in the parameter can throw
-  VectorBC(std::vector<ScalarType> d) : data_(std::move(d)){};
+  VectorBC(const std::vector<ScalarType> &d) : data_(d){};
   VectorBC(std::vector<ScalarType> &&d) noexcept : data_(std::move(d)){};
   ScalarType &operator()(std::size_t i) noexcept { return data_[i]; }
   const ScalarType &operator()(std::size_t i) const noexcept {
     return data_[i];
   }
   void accept(BCVisitor &v) final { v.visit(*this); }
-
-private:
   std::vector<ScalarType> data_;
 };
 
 template <typename T>
-class GenericBC : public IBoundaryCondition, public Convertible<GenericBC<T>> {
-public:
+struct GenericBC : public IBoundaryCondition, public Convertible<GenericBC<T>> {
   GenericBC() = default;
-  GenericBC(T d) noexcept : data(d){};
-  operator T &() noexcept { return data; }
-  operator const T &() const noexcept { return data; }
-  T data;
+  GenericBC(T d) noexcept : data_(d){};
+  operator T &() noexcept { return data_; }
+  operator const T &() const noexcept { return data_; }
+  T data_;
   void accept(BCVisitor &v) final { v.visit(*this); }
 };
 
