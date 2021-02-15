@@ -9,20 +9,26 @@
 
 namespace bc {
 class BCNode : public INode, public Convertible<BCNode> {
-  using geom_ptr_t = std::unique_ptr<IGeometrySet>;
-  using bc_ptr_t = std::unique_ptr<IBoundaryCondition>;
+  using GeomPtrT = std::shared_ptr<IGeometrySet>;
+  using BCPtrT = std::shared_ptr<IBoundaryCondition>;
 
 public:
-  virtual bool IsBoundaryCondition() const noexcept final { return true; }
-  BCNode(std::string name, geom_ptr_t g, bc_ptr_t bc)
-      : INode(std::move(name)), boundary_condition_(std::move(bc)),
-        geometry_(std::move(g)) {}
+  BCNode(const std::string &name, GeomPtrT g, BCPtrT bc) : INode(name) {
+    bcs_.emplace_back(g, bc);
+  }
+  void AddBoundaryCondition(GeomPtrT g, BCPtrT bc) {
+    bcs_.emplace_back(g, bc);
+  };
 
-  virtual void accept(NodeVisitor &v) final { v.visit(*this); }
+  // FIXME rename this? It's a bit confusing that
+  // it shares a name with GetBoundaryConditions in bcCategoryNode
+  // which gets the boundary condition nodes
+  const auto &GetBoundaryConditions() { return bcs_; }
 
 private:
-  std::unique_ptr<IBoundaryCondition> boundary_condition_;
-  std::unique_ptr<IGeometrySet> geometry_;
+  // each name can have multiple BC's associated with them as long as each
+  // BC is classified on a unique set of geometric entities.
+  std::vector<std::pair<GeomPtrT, BCPtrT>> bcs_;
 };
 } // namespace bc
 

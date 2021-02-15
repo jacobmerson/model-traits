@@ -18,14 +18,16 @@ namespace bc {
  * algorithms, it's reccomended that you specialize the add, find, and remove
  * functions
  */
-template <template <typename> class Cont = BC_VEC_WORKAROUND> class NodeSet {
+template <typename T = INode,
+          template <typename> class Cont = BC_VEC_WORKAROUND>
+class NodeSet {
 public:
   /*
    * Add a new node to the set.
    */
-  using Container = Cont<std::unique_ptr<INode>>;
+  using Container = Cont<std::unique_ptr<T>>;
   // the default implementation works for containers with push_back
-  INode *AddNode(std::unique_ptr<INode> node) {
+  T *AddNode(std::unique_ptr<T> node) {
     if (!FindNode(node->GetName())) {
       nodes_.push_back(std::move(node));
       return nodes_.back().get();
@@ -39,11 +41,11 @@ public:
    * Note that this removes the whole tree attached to the node as well.
    * I.e., it does not relink any nodes that the named node contains
    */
-  std::unique_ptr<INode> RemoveNode(const std::string &name) {
+  std::unique_ptr<T> RemoveNode(const std::string &name) {
     auto it = FindNodeIt(name);
     // return a nullptr if the node doesn't exist;
     if (it == std::end(nodes_)) {
-      return std::unique_ptr<INode>(nullptr);
+      return std::unique_ptr<T>(nullptr);
     }
     // grab the pointer that we will erase from the container
     auto ptr = std::move(*it);
@@ -53,7 +55,7 @@ public:
   /*
    * Get a non-owning pointer to the node with the given name
    */
-  INode *FindNode(const std::string &name) {
+  T *FindNode(const std::string &name) {
     auto it = FindNodeIt(name);
     if (it == std::end(nodes_))
       return nullptr;

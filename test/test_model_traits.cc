@@ -19,8 +19,6 @@ TEST_CASE("add and remove case from ModelTraits", "[traits]") {
   // enusure that we are adding a new case
   // each time we add case
   REQUIRE(case1 != case2);
-  REQUIRE(case1->IsBoundaryCondition() == false);
-  REQUIRE(case2->IsBoundaryCondition() == false);
   REQUIRE(case1 == model_traits.GetCase("case1"));
   REQUIRE(case2 == model_traits.GetCase("case2"));
   REQUIRE(model_traits.GetCase("nonexistent case") == nullptr);

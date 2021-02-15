@@ -22,11 +22,11 @@ public:
             typename std::enable_if_t<
                 std::is_convertible<String, std::string>::value, int> = 0>
   CategoryNode *AddCase(String &&name) {
-    return static_cast<CategoryNode *>(cases_.AddNode(
-        std::make_unique<CategoryNode>(std::forward<String>(name))));
+    return cases_.AddNode(
+        std::make_unique<CategoryNode>(std::forward<String>(name)));
   }
   CategoryNode *GetCase(const std::string &name) {
-    return static_cast<CategoryNode *>(cases_.FindNode(name));
+    return cases_.FindNode(name);
   }
   /**
    * Removes a case from ModelTraits by it's name
@@ -37,11 +37,12 @@ public:
         static_cast<CategoryNode *>(cases_.RemoveNode(name).release())));
   }
   int NumCases() { return cases_.Size(); }
+  const std::string &GetName() const noexcept { return name_; }
 
   friend fmt::formatter<ModelTraits>;
 
 protected:
-  NodeSet<> cases_;
+  NodeSet<CategoryNode, BC_VEC_WORKAROUND> cases_;
   std::string name_;
 };
 

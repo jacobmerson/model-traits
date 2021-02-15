@@ -14,38 +14,48 @@
 namespace bc {
 
 class CategoryNode : public INode, public Convertible<CategoryNode> {
+  using NodeSetT = NodeSet<>;
+
 public:
   CategoryNode(const std::string &name) : INode(name) {}
   CategoryNode(std::string &&name) : INode(std::move(name)) {}
   CategoryNode *AddCategory(std::string name) {
-    return static_cast<CategoryNode *>(
-        nodes_.AddNode(std::make_unique<CategoryNode>(std::move(name))));
+    return categories_.AddNode(std::make_unique<CategoryNode>(std::move(name)));
   }
 
-  /*
-  BCNode *AddBoundaryCondition(std::string name, std::unique_ptr<IGeometrySet>
-  geometry, std::unique_ptr<IBoundaryCondition> boundary_condition) { return
-  static_cast<BCNode*>( nodes_.AddNode(std::make_unique<BCNode>(
-            std::move(name), std::move(geometry),
-            std::move(boundary_condition))));
-  }
-  */
   template <typename Geom, typename BC>
   BCNode *AddBoundaryCondition(std::string name, Geom &&geometry,
                                BC &&boundary_condition) {
-    return static_cast<BCNode *>(nodes_.AddNode(std::make_unique<BCNode>(
-        std::move(name), std::make_unique<Geom>(std::forward<Geom>(geometry)),
-        std::make_unique<BC>(std::forward<BC>(boundary_condition)))));
+    auto nd = boundary_conditions_.FindNode(name);
+    // if the boundary condition with a given name already exists
+    if (nd) {
+      nd->AddBoundaryCondition(
+          std::make_shared<Geom>(std::forward<Geom>(geometry)),
+          std::make_shared<BC>(std::forward<BC>(boundary_condition)));
+      return nd;
+    } else {
+      return boundary_conditions_.AddNode(std::make_unique<BCNode>(
+          std::move(name), std::make_shared<Geom>(std::forward<Geom>(geometry)),
+          std::make_shared<BC>(std::forward<BC>(boundary_condition))));
+    }
   }
 
-  virtual void accept(NodeVisitor &v) final { v.visit(*this); }
+  // FIXME rename this? Not sure what to call it, but it's confusing
+  // that it shares a name with GetBoundaryConditions in BCNode
+  const auto &GetBoundaryConditions() { return boundary_conditions_; }
+  const auto &GetCategories() { return categories_; }
 
   friend fmt::formatter<CategoryNode>;
 
 protected:
-  NodeSet<> nodes_;
+  // currently both categories, and boundary_conditions are
+  // stored with the vector backend. This is a reasonable assumption
+  // with small numbers of nodes
+  NodeSet<CategoryNode, BC_VEC_WORKAROUND> categories_;
+  NodeSet<BCNode, BC_VEC_WORKAROUND> boundary_conditions_;
 };
 } // namespace bc
+/*
 template <> struct fmt::formatter<bc::CategoryNode> {
   int level = 0;
   int spaces = 2;
@@ -67,4 +77,5 @@ template <> struct fmt::formatter<bc::CategoryNode> {
     return out;
   }
 };
+*/
 #endif
