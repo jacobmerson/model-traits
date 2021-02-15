@@ -7,6 +7,7 @@
 // using BC = bc::BoolBC;
 //
 using bc::BoolBC;
+using bc::DimGeometrySet;
 using bc::GeometrySet;
 
 TEST_CASE("add to category node", "[node]") {
@@ -21,8 +22,8 @@ TEST_CASE("add to category node", "[node]") {
     // trying to add two category nodes with the same name throws
     REQUIRE_THROWS(node2 = cn.AddCategory("category 2"));
     // cannot add a bc with the same name as the category
-    REQUIRE_THROWS(
-        cn.AddBoundaryCondition("category 2", GeometrySet<>(1), BoolBC{}));
+    REQUIRE_THROWS(cn.AddBoundaryCondition(
+        "category 2", DimGeometrySet<>(bc::DimGeometry(1, 1)), BoolBC{}));
 
     REQUIRE_NOTHROW(
         node1 = cn.AddBoundaryCondition("bc 1", GeometrySet<>(1), BoolBC{}));

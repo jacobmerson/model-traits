@@ -8,6 +8,13 @@
 namespace bc {
 struct IGeometrySet {};
 
+// FIXME Better name?
+struct DimGeometry {
+  DimGeometry(OrdinalType d, OrdinalType g) : dim_(d), GID_(g) {}
+  OrdinalType dim_;
+  OrdinalType GID_;
+};
+
 /*
  * Note this class is templated, so geometry can be stored as Ordinal types
  * or something more complex, like a struct that stores a dimension id, and
@@ -20,8 +27,11 @@ class GeometrySet : public IGeometrySet,
                     public Convertible<GeometrySet<Geometry, Cont>> {
 public:
   using Container = Cont<Geometry>;
-  template <typename... Args>
-  GeometrySet(Args &&... args) : geometry_(std::forward<Args>(args)...) {}
+  GeometrySet(const Geometry &g) { geometry_.push_back(g); }
+  GeometrySet(Geometry &&g) { geometry_.push_back(std::move(g)); }
+  // FIXME need to constrain this template
+  template <typename InputIt>
+  GeometrySet(InputIt first, InputIt last) : geometry_(first, last) {}
   using iterator = typename Container::iterator;
   using const_iterator = typename Container::const_iterator;
   iterator begin() noexcept { return geometry_.begin(); }
@@ -32,6 +42,10 @@ public:
 private:
   Container geometry_;
 };
+
+// FIXME Better name?
+template <template <typename> class Cont = BC_VEC_WORKAROUND>
+using DimGeometrySet = GeometrySet<DimGeometry, Cont>;
 
 } // namespace bc
 #endif
