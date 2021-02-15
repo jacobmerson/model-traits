@@ -6,13 +6,32 @@
 #include <unordered_set>
 
 namespace bc {
-struct IGeometrySet {};
 
 // FIXME Better name?
 struct DimGeometry {
   DimGeometry(OrdinalType d, OrdinalType g) : dim_(d), GID_(g) {}
   OrdinalType dim_;
   OrdinalType GID_;
+};
+
+struct IGeometrySet;
+
+template <typename, template <typename> class> class GeometrySet;
+
+struct GeometrySetVisitor {
+  virtual void visit(GeometrySet<OrdinalType, BC_VEC_WORKAROUND> &) = 0;
+  virtual void visit(GeometrySet<DimGeometry, BC_VEC_WORKAROUND> &) = 0;
+  virtual ~GeometrySetVisitor() = default;
+};
+
+struct IGeometrySet {
+  virtual void accept(GeometrySetVisitor &v) = 0;
+  IGeometrySet() = default;
+  virtual ~IGeometrySet() = default;
+  IGeometrySet(const IGeometrySet &) = default;
+  IGeometrySet(IGeometrySet &&) = default;
+  IGeometrySet &operator=(const IGeometrySet &) = default;
+  IGeometrySet &operator=(IGeometrySet &&) = default;
 };
 
 /*
@@ -38,11 +57,11 @@ public:
   const_iterator begin() const noexcept { return geometry_.begin(); }
   iterator end() noexcept { return geometry_.end(); }
   const_iterator end() const noexcept { return geometry_.end(); }
+  virtual void accept(GeometrySetVisitor &v) final { v.visit(*this); }
 
 private:
   Container geometry_;
 };
-
 // FIXME Better name?
 template <template <typename> class Cont = BC_VEC_WORKAROUND>
 using DimGeometrySet = GeometrySet<DimGeometry, Cont>;
