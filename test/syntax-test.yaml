@@ -19,6 +19,10 @@ model traits:
               geometry: [1,2,3,4,1002]
               type: scalar
               value: 1.2387
+            - name: "scalar bc"
+              geometry: [100]
+              type: scalar
+              value: 1290
             - name: "bool bc"
               geometry: [30,21]
               type: bool

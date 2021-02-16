@@ -26,23 +26,45 @@ struct BackendHasType<T, Backend,
 struct Backend {};
 
 template <typename BaseClass> struct Convertible {
+  // to function which allows us to pass in the type by reference
+  template <typename T,
+            typename = std::enable_if_t<!BackendHasType<BaseClass, T>::value>>
+  void to(T &val) const {
+    static_assert(
+        !std::is_base_of<Backend, T>::value,
+        "instantiation type for BaseClass is missing from the BackendTypeMap");
+    convert<BaseClass, T>::decode(static_cast<const BaseClass &>(*this), val);
+  }
+  template <typename T,
+            typename = std::enable_if_t<BackendHasType<BaseClass, T>::value>>
+  void to(typename BackendTypeMap<BaseClass, T>::type &val) const {
+    static_assert(std::is_base_of<Backend, T>::value,
+                  "Backend (T) not inherited from Backend");
+    convert<BaseClass, typename BackendTypeMap<BaseClass, T>::type, T>::decode(
+        static_cast<const BaseClass &>(*this), val);
+  }
   template <typename T,
             typename = std::enable_if_t<!BackendHasType<BaseClass, T>::value>>
   T to() const {
     static_assert(
         !std::is_base_of<Backend, T>::value,
         "instantiation type for BaseClass is missing from the BackendTypeMap");
-    return convert<BaseClass, T>::decode(static_cast<const BaseClass &>(*this));
+    T val;
+    convert<BaseClass, T>::decode(static_cast<const BaseClass &>(*this), val);
+    return val;
   }
   template <typename T,
             typename = std::enable_if_t<BackendHasType<BaseClass, T>::value>>
   typename BackendTypeMap<BaseClass, T>::type to() const {
     static_assert(std::is_base_of<Backend, T>::value,
                   "Backend (T) not inherited from Backend");
-    return convert<BaseClass, typename BackendTypeMap<BaseClass, T>::type,
-                   T>::decode(static_cast<const BaseClass &>(*this));
+    typename BackendTypeMap<BaseClass, T>::type val;
+    convert<BaseClass, typename BackendTypeMap<BaseClass, T>::type, T>::decode(
+        static_cast<const BaseClass &>(*this), val);
+    return val;
   }
 
+  // from functions
   template <typename T,
             typename = std::enable_if_t<!BackendHasType<BaseClass, T>::value>>
   static BaseClass from(const T &other) {

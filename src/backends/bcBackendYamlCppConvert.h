@@ -60,9 +60,7 @@ template <typename T> struct BackendTypeMap<T, YAML> {
 // that you want to have modified behavior.
 template <typename Backend> struct convert<BoolBC, ::YAML::Node, Backend> {
   static BoolBC encode(const ::YAML::Node &nd) { return BoolBC(nd.as<bool>()); }
-  static ::YAML::Node decode(const BoolBC &bc) {
-    ::YAML::Node nd;
-    // nd["name"] = bc.GetName();
+  static ::YAML::Node decode(const BoolBC &bc, ::YAML::Node &nd) {
     nd["type"] = "bool";
     nd["value"] = bc.data_;
     return nd;
@@ -76,8 +74,7 @@ template <typename Backend> struct convert<MatrixBC, ::YAML::Node, Backend> {
     }
     return MatrixBC(matrix);
   }
-  static ::YAML::Node decode(const MatrixBC &bc) {
-    ::YAML::Node nd;
+  static ::YAML::Node decode(const MatrixBC &bc, ::YAML::Node &nd) {
     nd.SetStyle(::YAML::EmitterStyle::Flow);
     nd["type"] = "matrix";
     auto val = nd["value"];
@@ -91,8 +88,7 @@ template <typename Backend> struct convert<ScalarBC, ::YAML::Node, Backend> {
   static ScalarBC encode(const ::YAML::Node &nd) {
     return ScalarBC(nd.as<ScalarType>());
   }
-  static ::YAML::Node decode(const ScalarBC &bc) {
-    ::YAML::Node nd;
+  static ::YAML::Node decode(const ScalarBC &bc, ::YAML::Node &nd) {
     nd["type"] = "scalar";
     nd["value"] = bc.data_;
     return nd;
@@ -102,8 +98,7 @@ template <typename Backend> struct convert<IntBC, ::YAML::Node, Backend> {
   static IntBC encode(const ::YAML::Node &nd) {
     return IntBC(nd.as<OrdinalType>());
   }
-  static ::YAML::Node decode(const IntBC &bc) {
-    ::YAML::Node nd;
+  static ::YAML::Node decode(const IntBC &bc, ::YAML::Node &nd) {
     nd["type"] = "int";
     nd["value"] = bc.data_;
     return nd;
@@ -113,8 +108,7 @@ template <typename Backend> struct convert<StringBC, ::YAML::Node, Backend> {
   static StringBC encode(const ::YAML::Node &nd) {
     return StringBC(nd.as<std::string>());
   }
-  static ::YAML::Node decode(const StringBC &bc) {
-    ::YAML::Node nd;
+  static ::YAML::Node decode(const StringBC &bc, ::YAML::Node &nd) {
     nd["type"] = "string";
     nd["value"] = bc.data_;
     return nd;
@@ -124,8 +118,7 @@ template <typename Backend> struct convert<VectorBC, ::YAML::Node, Backend> {
   static VectorBC encode(const ::YAML::Node &nd) {
     return VectorBC(nd.as<std::vector<ScalarType>>());
   }
-  static ::YAML::Node decode(const VectorBC &bc) {
-    ::YAML::Node nd;
+  static ::YAML::Node decode(const VectorBC &bc, ::YAML::Node &nd) {
     nd.SetStyle(::YAML::EmitterStyle::Flow);
     nd["type"] = "vector";
     nd["value"] = bc.data_;
@@ -141,8 +134,7 @@ struct convert<GeometrySet<OrdinalType, BC_VEC_WORKAROUND>, ::YAML::Node,
     auto vec = nd.as<std::vector<OrdinalType>>();
     return SetT(vec.begin(), vec.end());
   }
-  static ::YAML::Node decode(const SetT &g) {
-    ::YAML::Node nd;
+  static ::YAML::Node decode(const SetT &g, ::YAML::Node &nd) {
     auto gnd = nd["geometry"];
     gnd.SetStyle(::YAML::EmitterStyle::Flow);
     for (auto &gid : g) {
@@ -162,26 +154,24 @@ struct convert<GeometrySet<DimGeometry, BC_VEC_WORKAROUND>, ::YAML::Node,
     }
     return SetT(vec.begin(), vec.end());
   }
-  static ::YAML::Node decode(const SetT &g) {
-    ::YAML::Node nd;
+  static void decode(const SetT &g, ::YAML::Node &nd) {
     auto gnd = nd["geometry"];
     gnd.SetStyle(::YAML::EmitterStyle::Flow);
     for (auto &dg : g) {
       gnd.push_back(std::make_pair(dg.dim_, dg.GID_));
     }
-    return nd;
   }
 };
 
 // convert the "nodes"
 struct YamlExportBCVisitor : public BCVisitor {
   YamlExportBCVisitor(::YAML::Node &nd) : nd_(nd) {}
-  void visit(BoolBC &bc) final { nd_.push_back(bc.to<YAML>()); };
-  void visit(MatrixBC &bc) final { nd_.push_back(bc.to<YAML>()); };
-  void visit(ScalarBC &bc) final { nd_.push_back(bc.to<YAML>()); };
-  void visit(IntBC &bc) final { nd_.push_back(bc.to<YAML>()); };
-  void visit(StringBC &bc) final { nd_.push_back(bc.to<YAML>()); };
-  void visit(VectorBC &bc) final { nd_.push_back(bc.to<YAML>()); };
+  void visit(BoolBC &bc) final { bc.to<YAML>(nd_); };
+  void visit(MatrixBC &bc) final { bc.to<YAML>(nd_); };
+  void visit(ScalarBC &bc) final { bc.to<YAML>(nd_); };
+  void visit(IntBC &bc) final { bc.to<YAML>(nd_); };
+  void visit(StringBC &bc) final { bc.to<YAML>(nd_); };
+  void visit(VectorBC &bc) final { bc.to<YAML>(nd_); };
 
   ::YAML::Node &nd_;
 };
@@ -189,22 +179,26 @@ struct YamlExportBCVisitor : public BCVisitor {
 struct YamlExportGeomVisitor : public GeometrySetVisitor {
   YamlExportGeomVisitor(::YAML::Node &nd) : nd_(nd) {}
   virtual void visit(GeometrySet<OrdinalType, BC_VEC_WORKAROUND> &g) {
-    // nd_.push_back(g.to<YAML>());
-    // nd_=g.to<YAML>();
+    g.to<YAML>(nd_);
   }
   virtual void visit(GeometrySet<DimGeometry, BC_VEC_WORKAROUND> &g) {
-    // nd_.push_back(g.to<YAML>());
-    // nd_=g.to<YAML>();
+    g.to<YAML>(nd_);
   }
-
   ::YAML::Node &nd_;
 };
 
 template <typename Backend> struct convert<BCNode, ::YAML::Node, Backend> {
   static BCNode encode(const ::YAML::Node &nd) { return BCNode{}; }
-  static ::YAML::Node decode(const BCNode &bcn) {
-    ::YAML::Node nd;
-    nd["name"] = bcn.GetName();
+  static ::YAML::Node decode(const BCNode &bcn, ::YAML::Node &nd) {
+    for (auto &bc : bcn.GetBoundaryConditions()) {
+      ::YAML::Node local;
+      local["name"] = bcn.GetName();
+      YamlExportBCVisitor bc_visitor(local);
+      YamlExportGeomVisitor geom_visitor(local);
+      bc.second->accept(bc_visitor);
+      bc.first->accept(geom_visitor);
+      nd.push_back(local);
+    }
     return nd;
   }
 };
@@ -212,24 +206,13 @@ template <typename Backend> struct convert<BCNode, ::YAML::Node, Backend> {
 template <typename Backend>
 struct convert<CategoryNode, ::YAML::Node, Backend> {
   static CategoryNode encode(const ::YAML::Node &nd) { return CategoryNode{}; }
-  static ::YAML::Node decode(const CategoryNode &cn) {
-    ::YAML::Node nd;
+  static ::YAML::Node decode(const CategoryNode &cn, ::YAML::Node &nd) {
+    auto bcn = nd["boundary conditions"];
+    for (const auto &bc : cn.GetBoundaryConditions()) {
+      bc->to<YAML>(bcn);
+    }
     for (const auto &cat : cn.GetCategories()) {
       nd[cat->GetName()] = cat->to<YAML>();
-    }
-    auto bcn = nd["boundary conditions"];
-    YamlExportBCVisitor bc_visitor(bcn);
-    for (const auto &bc : cn.GetBoundaryConditions()) {
-      for (auto &bcg : bc->GetBoundaryConditions()) {
-        bcg.second->accept(bc_visitor);
-        // kinda hackish but we want the geometry,
-        // and the other BC data in the same list element
-        // this somewhat indicates taht decode should also
-        // take a ref to the decoded type. FIXME
-        auto last_nd = bcn[bcn.size() - 1];
-        YamlExportGeomVisitor geom_visitor(last_nd);
-        bcg.first->accept(geom_visitor);
-      }
     }
     return nd;
   }
@@ -240,8 +223,7 @@ template <typename Backend> struct convert<ModelTraits, ::YAML::Node, Backend> {
     return ModelTraits{};
   }
   */
-  static ::YAML::Node decode(const ModelTraits &mt) {
-    ::YAML::Node nd;
+  static ::YAML::Node decode(const ModelTraits &mt, ::YAML::Node &nd) {
     auto mtn = nd["model traits"];
     mtn["name"] = mt.GetName();
     auto casesn = mtn["cases"];
