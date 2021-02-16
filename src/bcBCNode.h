@@ -23,7 +23,8 @@ public:
   // FIXME rename this? It's a bit confusing that
   // it shares a name with GetBoundaryConditions in bcCategoryNode
   // which gets the boundary condition nodes
-  const auto &GetBoundaryConditions() { return bcs_; }
+  auto &GetBoundaryConditions() noexcept { return bcs_; }
+  const auto &GetBoundaryConditions() const noexcept { return bcs_; }
 
 private:
   // each name can have multiple BC's associated with them as long as each

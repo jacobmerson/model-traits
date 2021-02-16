@@ -56,6 +56,10 @@ public:
    * Get a non-owning pointer to the node with the given name
    */
   T *FindNode(const std::string &name) {
+    return const_cast<T *>(
+        static_cast<const NodeSet<T, Cont> &>(*this).FindNode(name));
+  };
+  const T *FindNode(const std::string &name) const {
     auto it = FindNodeIt(name);
     if (it == std::end(nodes_))
       return nullptr;
@@ -72,6 +76,10 @@ public:
 
 private:
   auto FindNodeIt(const std::string &name) {
+    return std::find_if(std::begin(nodes_), std::end(nodes_),
+                        [&name](auto &nd) { return nd->GetName() == name; });
+  }
+  auto FindNodeIt(const std::string &name) const {
     return std::find_if(std::begin(nodes_), std::end(nodes_),
                         [&name](auto &nd) { return nd->GetName() == name; });
   }

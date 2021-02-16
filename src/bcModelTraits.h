@@ -7,25 +7,25 @@
 #include <unordered_map>
 
 namespace bc {
-class ModelTraits {
+class ModelTraits : public Convertible<ModelTraits> {
 public:
-  template <typename String,
-            std::enable_if_t<std::is_convertible<String, std::string>::value,
-                             int> = 0>
-  ModelTraits(String &&name) : name_(std::forward<String>(name)) {}
+  ModelTraits(const std::string &name) : name_(name) {}
+  ModelTraits(std::string &&name) : name_(std::move(name)) {}
   /**
    * Adds a case if it doesn't exist and returns a pointer
    * to it's INode. If the case does exist, the pointer to
    * the case is returned.
    */
-  template <typename String,
-            typename std::enable_if_t<
-                std::is_convertible<String, std::string>::value, int> = 0>
-  CategoryNode *AddCase(String &&name) {
-    return cases_.AddNode(
-        std::make_unique<CategoryNode>(std::forward<String>(name)));
+  CategoryNode *AddCase(const std::string &name) {
+    return cases_.AddNode(std::make_unique<CategoryNode>(name));
+  }
+  CategoryNode *AddCase(std::string &&name) {
+    return cases_.AddNode(std::make_unique<CategoryNode>(std::move(name)));
   }
   CategoryNode *GetCase(const std::string &name) {
+    return cases_.FindNode(name);
+  }
+  const CategoryNode *GetCase(const std::string &name) const {
     return cases_.FindNode(name);
   }
   /**
@@ -36,6 +36,8 @@ public:
     return std::move(std::unique_ptr<CategoryNode>(
         static_cast<CategoryNode *>(cases_.RemoveNode(name).release())));
   }
+  const auto &GetCases() const { return cases_; }
+  auto &GetCases() { return cases_; }
   int NumCases() { return cases_.Size(); }
   const std::string &GetName() const noexcept { return name_; }
 

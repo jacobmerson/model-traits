@@ -12,7 +12,7 @@ model traits:
       # the boundary condition geometry set will take a struct
       # with a dimension and id rather than just an id
       model traits:
-        geometry type: int
+        #geometry type: int
         category 1:
           boundary conditions:
             - name: "scalar bc"
@@ -45,7 +45,7 @@ model traits:
         boundary conditions:
           - name: "top level BC"
             type: bool
-            geometry: [78]
+            geometry: [78,56,11]
             value: false
           - name: "top level BC2"
             type: bool

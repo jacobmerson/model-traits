@@ -42,8 +42,10 @@ public:
 
   // FIXME rename this? Not sure what to call it, but it's confusing
   // that it shares a name with GetBoundaryConditions in BCNode
-  const auto &GetBoundaryConditions() { return boundary_conditions_; }
-  const auto &GetCategories() { return categories_; }
+  auto &GetBoundaryConditions() { return boundary_conditions_; }
+  const auto &GetBoundaryConditions() const { return boundary_conditions_; }
+  auto &GetCategories() { return categories_; }
+  const auto &GetCategories() const { return categories_; }
 
   friend fmt::formatter<CategoryNode>;
 

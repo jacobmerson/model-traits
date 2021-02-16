@@ -7,10 +7,11 @@
 #include <yaml-cpp/yaml.h>
 #include "bcBackendYamlCppConvert.h"
 // clang-format on
+#include "bcModelTraits.h"
 
 namespace bc {
 
-void ParseBoundaryConditions(const YAML::Node &yaml_node,
+void ParseBoundaryConditions(const ::YAML::Node &yaml_node,
                              CategoryNode *parent_node) {
   for (auto &&bc : yaml_node) {
     auto name = bc["name"].as<std::string>();
@@ -47,7 +48,7 @@ void ParseBoundaryConditions(const YAML::Node &yaml_node,
   }
 }
 
-void ParseCaseHelper(const YAML::Node &yaml_node, CategoryNode *parent_node) {
+void ParseCaseHelper(const ::YAML::Node &yaml_node, CategoryNode *parent_node) {
   for (auto &&c : yaml_node) {
     auto key = c.first.as<std::string>();
     // if(c.first.as<std::string>() == "boundary conditions")
@@ -59,7 +60,7 @@ void ParseCaseHelper(const YAML::Node &yaml_node, CategoryNode *parent_node) {
   }
 }
 
-void ParseCase(const YAML::Node &yaml_case, ModelTraits *model_traits) {
+void ParseCase(const ::YAML::Node &yaml_case, ModelTraits *model_traits) {
   auto model_case = model_traits->AddCase(yaml_case["name"].as<std::string>());
   auto &case_traits = yaml_case["model traits"];
   auto &geometry_type = case_traits["geometry_type"];
@@ -69,7 +70,7 @@ void ParseCase(const YAML::Node &yaml_case, ModelTraits *model_traits) {
   ParseCaseHelper(case_traits, model_case);
 }
 
-std::unique_ptr<ModelTraits> LoadFromYamlNode(const YAML::Node &base_node) {
+std::unique_ptr<ModelTraits> LoadFromYamlNode(const ::YAML::Node &base_node) {
   auto model_traits =
       std::make_unique<ModelTraits>(base_node["name"].as<std::string>());
   for (auto &cs : base_node["cases"]) {
@@ -79,9 +80,21 @@ std::unique_ptr<ModelTraits> LoadFromYamlNode(const YAML::Node &base_node) {
 }
 
 template <>
-std::unique_ptr<ModelTraits> ReadFromStream<YAML_CPP>(std::istream &stream) {
-  auto node = YAML::Load(stream);
+std::unique_ptr<ModelTraits> ReadFromStream<YAML>(std::istream &stream) {
+  auto node = ::YAML::Load(stream);
   return LoadFromYamlNode(node["model traits"]);
+}
+
+template <>
+void WriteToStream<YAML>(const ModelTraits *model_traits,
+                         std::ostream &stream) {
+  ::YAML::Emitter e;
+
+  auto n = model_traits->to<YAML>();
+  // auto cs = model_traits->GetCase("case 1");
+  // auto n = cs->to<YAML>();
+  e << n;
+  fmt::print(stream, "{}\n", e.c_str());
 }
 
 } // namespace bc
