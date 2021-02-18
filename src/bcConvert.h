@@ -13,6 +13,8 @@ template <typename T, typename T2, typename Backend = void> struct convert {};
 
 // helper template to return a void type no matter the number of template args
 template <typename...> using VoidT = void;
+// the BackendHasType template has a true value typedef is the
+// backend type has a typedef for the type T and false otherwise
 template <typename T, typename Backend, typename = void>
 struct BackendHasType : std::false_type {};
 template <typename T, typename Backend>
@@ -33,16 +35,21 @@ template <typename BaseClass> struct Convertible {
     static_assert(
         !std::is_base_of<Backend, T>::value,
         "instantiation type for BaseClass is missing from the BackendTypeMap");
-    convert<BaseClass, T>::decode(static_cast<const BaseClass &>(*this), val);
+    convert<BaseClass, T>::decode(static_cast<const BaseClass &>(*this), val,
+                                  nullptr);
   }
+  // conversion function which works for "io backends"
   template <typename T,
             typename = std::enable_if_t<BackendHasType<BaseClass, T>::value>>
-  void to(typename BackendTypeMap<BaseClass, T>::type &val) const {
+  void to(typename BackendTypeMap<BaseClass, T>::type &val,
+          T *backend = nullptr) const {
     static_assert(std::is_base_of<Backend, T>::value,
                   "Backend (T) not inherited from Backend");
     convert<BaseClass, typename BackendTypeMap<BaseClass, T>::type, T>::decode(
-        static_cast<const BaseClass &>(*this), val);
+        static_cast<const BaseClass &>(*this), val, backend);
   }
+  // to functions which don't take the type by reference.
+  // these default construct the conversion type and return the converted object
   template <typename T,
             typename = std::enable_if_t<!BackendHasType<BaseClass, T>::value>>
   T to() const {
@@ -50,38 +57,43 @@ template <typename BaseClass> struct Convertible {
         !std::is_base_of<Backend, T>::value,
         "instantiation type for BaseClass is missing from the BackendTypeMap");
     T val;
-    convert<BaseClass, T>::decode(static_cast<const BaseClass &>(*this), val);
+    convert<BaseClass, T>::decode(static_cast<const BaseClass &>(*this), val,
+                                  nullptr);
     return val;
   }
+  // to function for a backend type
   template <typename T,
             typename = std::enable_if_t<BackendHasType<BaseClass, T>::value>>
-  typename BackendTypeMap<BaseClass, T>::type to() const {
+  typename BackendTypeMap<BaseClass, T>::type to(T *backend = nullptr) const {
     static_assert(std::is_base_of<Backend, T>::value,
                   "Backend (T) not inherited from Backend");
     typename BackendTypeMap<BaseClass, T>::type val;
     convert<BaseClass, typename BackendTypeMap<BaseClass, T>::type, T>::decode(
-        static_cast<const BaseClass &>(*this), val);
+        static_cast<const BaseClass &>(*this), val, backend);
     return val;
   }
 
   // from functions
+  // Base case for generic types
   template <typename T,
             typename = std::enable_if_t<!BackendHasType<BaseClass, T>::value>>
   static BaseClass from(const T &other) {
     static_assert(
         !std::is_base_of<Backend, T>::value,
         "instantiation type for BaseClass is missing from the BackendTypeMap");
-    return convert<BaseClass, T>::encode(other);
+    return convert<BaseClass, T>::encode(other, nullptr);
   }
 
+  // Case for when T is a backend type
   template <typename T,
             typename = std::enable_if_t<BackendHasType<BaseClass, T>::value>>
   static BaseClass
-  from(const typename BackendTypeMap<BaseClass, T>::type &other) {
+  from(const typename BackendTypeMap<BaseClass, T>::type &other,
+       T *backend = nullptr) {
     static_assert(std::is_base_of<Backend, T>::value,
                   "Backend (T) not inherited from Backend");
     return convert<BaseClass, typename BackendTypeMap<BaseClass, T>::type,
-                   T>::encode(other);
+                   T>::encode(other, backend);
   }
 };
 

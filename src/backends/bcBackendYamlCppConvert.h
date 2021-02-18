@@ -21,22 +21,24 @@ template <typename T> struct BackendTypeMap<T, YAML> {
 // all you need to do is specialize the conversion functions
 // that you want to have modified behavior.
 template <typename Backend> struct convert<BoolBC, ::YAML::Node, Backend> {
-  static BoolBC encode(const ::YAML::Node &nd) { return BoolBC(nd.as<bool>()); }
-  static ::YAML::Node decode(const BoolBC &bc, ::YAML::Node &nd) {
+  static BoolBC encode(const ::YAML::Node &nd, Backend *) {
+    return BoolBC(nd.as<bool>());
+  }
+  static ::YAML::Node decode(const BoolBC &bc, ::YAML::Node &nd, Backend *) {
     nd["type"] = "bool";
     nd["value"] = bc.data_;
     return nd;
   }
 };
 template <typename Backend> struct convert<MatrixBC, ::YAML::Node, Backend> {
-  static MatrixBC encode(const ::YAML::Node &nd) {
+  static MatrixBC encode(const ::YAML::Node &nd, Backend *) {
     std::vector<std::vector<ScalarType>> matrix;
     for (const auto &row : nd) {
       matrix.push_back(row.as<std::vector<ScalarType>>());
     }
     return MatrixBC(matrix);
   }
-  static ::YAML::Node decode(const MatrixBC &bc, ::YAML::Node &nd) {
+  static ::YAML::Node decode(const MatrixBC &bc, ::YAML::Node &nd, Backend *) {
     nd["type"] = "matrix";
     auto val = nd["value"];
     val.SetStyle(::YAML::EmitterStyle::Flow);
@@ -47,40 +49,40 @@ template <typename Backend> struct convert<MatrixBC, ::YAML::Node, Backend> {
   }
 };
 template <typename Backend> struct convert<ScalarBC, ::YAML::Node, Backend> {
-  static ScalarBC encode(const ::YAML::Node &nd) {
+  static ScalarBC encode(const ::YAML::Node &nd, Backend *) {
     return ScalarBC(nd.as<ScalarType>());
   }
-  static ::YAML::Node decode(const ScalarBC &bc, ::YAML::Node &nd) {
+  static ::YAML::Node decode(const ScalarBC &bc, ::YAML::Node &nd, Backend *) {
     nd["type"] = "scalar";
     nd["value"] = bc.data_;
     return nd;
   }
 };
 template <typename Backend> struct convert<IntBC, ::YAML::Node, Backend> {
-  static IntBC encode(const ::YAML::Node &nd) {
+  static IntBC encode(const ::YAML::Node &nd, Backend *) {
     return IntBC(nd.as<OrdinalType>());
   }
-  static ::YAML::Node decode(const IntBC &bc, ::YAML::Node &nd) {
+  static ::YAML::Node decode(const IntBC &bc, ::YAML::Node &nd, Backend *) {
     nd["type"] = "int";
     nd["value"] = bc.data_;
     return nd;
   }
 };
 template <typename Backend> struct convert<StringBC, ::YAML::Node, Backend> {
-  static StringBC encode(const ::YAML::Node &nd) {
+  static StringBC encode(const ::YAML::Node &nd, Backend *) {
     return StringBC(nd.as<std::string>());
   }
-  static ::YAML::Node decode(const StringBC &bc, ::YAML::Node &nd) {
+  static ::YAML::Node decode(const StringBC &bc, ::YAML::Node &nd, Backend *) {
     nd["type"] = "string";
     nd["value"] = bc.data_;
     return nd;
   }
 };
 template <typename Backend> struct convert<VectorBC, ::YAML::Node, Backend> {
-  static VectorBC encode(const ::YAML::Node &nd) {
+  static VectorBC encode(const ::YAML::Node &nd, Backend *) {
     return VectorBC(nd.as<std::vector<ScalarType>>());
   }
-  static ::YAML::Node decode(const VectorBC &bc, ::YAML::Node &nd) {
+  static ::YAML::Node decode(const VectorBC &bc, ::YAML::Node &nd, Backend *) {
     nd["type"] = "vector";
     auto val = nd["value"];
     val = bc.data_;
@@ -93,11 +95,11 @@ template <typename Backend>
 struct convert<GeometrySet<OrdinalType, BC_VEC_WORKAROUND>, ::YAML::Node,
                Backend> {
   using SetT = GeometrySet<OrdinalType, BC_VEC_WORKAROUND>;
-  static SetT encode(const ::YAML::Node &nd) {
+  static SetT encode(const ::YAML::Node &nd, Backend *) {
     auto vec = nd.as<std::vector<OrdinalType>>();
     return SetT(vec.begin(), vec.end());
   }
-  static ::YAML::Node decode(const SetT &g, ::YAML::Node &nd) {
+  static ::YAML::Node decode(const SetT &g, ::YAML::Node &nd, Backend *) {
     auto gnd = nd["geometry"];
     gnd.SetStyle(::YAML::EmitterStyle::Flow);
     for (auto &gid : g) {
@@ -110,14 +112,14 @@ template <typename Backend>
 struct convert<GeometrySet<DimGeometry, BC_VEC_WORKAROUND>, ::YAML::Node,
                Backend> {
   using SetT = GeometrySet<DimGeometry, BC_VEC_WORKAROUND>;
-  static SetT encode(const ::YAML::Node &nd) {
+  static SetT encode(const ::YAML::Node &nd, Backend *) {
     std::vector<DimGeometry> vec;
     for (auto &g : nd) {
       vec.emplace_back(g[0], g[1]);
     }
     return SetT(vec.begin(), vec.end());
   }
-  static void decode(const SetT &g, ::YAML::Node &nd) {
+  static void decode(const SetT &g, ::YAML::Node &nd, Backend *) {
     auto gnd = nd["geometry"];
     gnd.SetStyle(::YAML::EmitterStyle::Flow);
     for (auto &dg : g) {
@@ -152,7 +154,7 @@ struct YamlExportGeomVisitor : public GeometrySetVisitor {
 
 template <typename Backend> struct convert<BCNode, ::YAML::Node, Backend> {
   // static BCNode encode(const ::YAML::Node &nd) { return BCNode{}; }
-  static ::YAML::Node decode(const BCNode &bcn, ::YAML::Node &nd) {
+  static ::YAML::Node decode(const BCNode &bcn, ::YAML::Node &nd, Backend *) {
     for (auto &bc : bcn.GetBoundaryConditions()) {
       ::YAML::Node local;
       local["name"] = bcn.GetName();
@@ -170,7 +172,8 @@ template <typename Backend>
 struct convert<CategoryNode, ::YAML::Node, Backend> {
   // static CategoryNode encode(const ::YAML::Node &nd) { return CategoryNode{};
   // }
-  static ::YAML::Node decode(const CategoryNode &cn, ::YAML::Node &nd) {
+  static ::YAML::Node decode(const CategoryNode &cn, ::YAML::Node &nd,
+                             Backend *) {
     auto bcn = nd["boundary conditions"];
     for (const auto &bc : cn.GetBoundaryConditions()) {
       bc->to<YAML>(bcn);
@@ -182,7 +185,8 @@ struct convert<CategoryNode, ::YAML::Node, Backend> {
   }
 };
 template <typename Backend> struct convert<ModelTraits, ::YAML::Node, Backend> {
-  static ::YAML::Node decode(const ModelTraits &mt, ::YAML::Node &nd) {
+  static ::YAML::Node decode(const ModelTraits &mt, ::YAML::Node &nd,
+                             Backend *) {
     auto mtn = nd["model traits"];
     mtn["name"] = mt.GetName();
     auto casesn = mtn["cases"];
