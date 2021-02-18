@@ -6,34 +6,6 @@
 #include "bcBC.h"
 #include <exception>
 
-// conversions from yaml to/from the BC datatypes
-namespace YAML {
-template <> struct convert<bc::BoolBC> {
-  static Node encode(const bc::BoolBC &rhs) {
-    return convert<bool>::encode(rhs);
-  }
-  static bool decode(const Node &node, bc::BoolBC &rhs) {
-    return convert<bool>::decode(node, rhs);
-  }
-};
-template <> struct convert<bc::ScalarBC> {
-  static Node encode(const bc::ScalarBC &rhs) {
-    return convert<double>::encode(rhs);
-  }
-  static bool decode(const Node &node, bc::ScalarBC &rhs) {
-    return convert<double>::decode(node, rhs);
-  }
-};
-template <> struct convert<bc::StringBC> {
-  static Node encode(const bc::StringBC &rhs) {
-    return convert<std::string>::encode(rhs);
-  }
-  static bool decode(const Node &node, bc::StringBC &rhs) {
-    return convert<std::string>::decode(node, rhs);
-  }
-};
-} // namespace YAML
-
 namespace bc {
 // Is there a better way to get this compile time
 // type map defined for the convert function to use?
@@ -42,16 +14,6 @@ namespace bc {
 template <typename T> struct BackendTypeMap<T, YAML> {
   using type = ::YAML::Node;
 };
-/* Example with concrete types. Left here as an example of how you can
- * set the types for a backend which uses different output types for
- * each boundary condition/node type
- *template <> struct BackendTypeMap<BoolBC,YAML>{using type = ::YAML::Node;};
- *template <> struct BackendTypeMap<MatrixBC,YAML>{using type = ::YAML::Node;};
- *template <> struct BackendTypeMap<ScalarBC,YAML>{using type = ::YAML::Node;};
- *template <> struct BackendTypeMap<IntBC,YAML>{using type = ::YAML::Node;};
- *template <> struct BackendTypeMap<StringBC,YAML>{using type = ::YAML::Node;};
- *template <> struct BackendTypeMap<VectorBC,YAML>{using type = ::YAML::Node;};
- */
 
 // These are the default conversions for a ::YAML::Node, so
 // we leave the backend as generic, however if you wanted to
@@ -75,9 +37,9 @@ template <typename Backend> struct convert<MatrixBC, ::YAML::Node, Backend> {
     return MatrixBC(matrix);
   }
   static ::YAML::Node decode(const MatrixBC &bc, ::YAML::Node &nd) {
-    nd.SetStyle(::YAML::EmitterStyle::Flow);
     nd["type"] = "matrix";
     auto val = nd["value"];
+    val.SetStyle(::YAML::EmitterStyle::Flow);
     for (const auto &row : bc.data_) {
       val.push_back(row);
     }
@@ -119,9 +81,10 @@ template <typename Backend> struct convert<VectorBC, ::YAML::Node, Backend> {
     return VectorBC(nd.as<std::vector<ScalarType>>());
   }
   static ::YAML::Node decode(const VectorBC &bc, ::YAML::Node &nd) {
-    nd.SetStyle(::YAML::EmitterStyle::Flow);
     nd["type"] = "vector";
-    nd["value"] = bc.data_;
+    auto val = nd["value"];
+    val = bc.data_;
+    val.SetStyle(::YAML::EmitterStyle::Flow);
     return nd;
   }
 };
@@ -188,7 +151,7 @@ struct YamlExportGeomVisitor : public GeometrySetVisitor {
 };
 
 template <typename Backend> struct convert<BCNode, ::YAML::Node, Backend> {
-  static BCNode encode(const ::YAML::Node &nd) { return BCNode{}; }
+  // static BCNode encode(const ::YAML::Node &nd) { return BCNode{}; }
   static ::YAML::Node decode(const BCNode &bcn, ::YAML::Node &nd) {
     for (auto &bc : bcn.GetBoundaryConditions()) {
       ::YAML::Node local;
@@ -205,7 +168,8 @@ template <typename Backend> struct convert<BCNode, ::YAML::Node, Backend> {
 
 template <typename Backend>
 struct convert<CategoryNode, ::YAML::Node, Backend> {
-  static CategoryNode encode(const ::YAML::Node &nd) { return CategoryNode{}; }
+  // static CategoryNode encode(const ::YAML::Node &nd) { return CategoryNode{};
+  // }
   static ::YAML::Node decode(const CategoryNode &cn, ::YAML::Node &nd) {
     auto bcn = nd["boundary conditions"];
     for (const auto &bc : cn.GetBoundaryConditions()) {
@@ -218,11 +182,6 @@ struct convert<CategoryNode, ::YAML::Node, Backend> {
   }
 };
 template <typename Backend> struct convert<ModelTraits, ::YAML::Node, Backend> {
-  /*
-  static ModelTraits encode(const ::YAML::Node &nd) {
-    return ModelTraits{};
-  }
-  */
   static ::YAML::Node decode(const ModelTraits &mt, ::YAML::Node &nd) {
     auto mtn = nd["model traits"];
     mtn["name"] = mt.GetName();

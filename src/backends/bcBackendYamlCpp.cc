@@ -17,30 +17,31 @@ void ParseBoundaryConditions(const ::YAML::Node &yaml_node,
     auto name = bc["name"].as<std::string>();
     auto type = bc["type"].as<std::string>();
     auto geometry = bc["geometry"].as<std::vector<int>>();
-    // currently we use begin/end because it's generic for whatever type the
-    // geometry set is however, we can reduce the inefficiency by creating a
-    // GeometrySet converter function
+    auto geometry_set = GeometrySet<>(geometry.begin(), geometry.end());
     if (type == "scalar") {
-      auto value = bc["value"].as<ScalarBC>();
+      auto value = ScalarBC::from<YAML>(bc["value"]);
       parent_node->AddBoundaryCondition(
-          std::move(name), GeometrySet<>(geometry.begin(), geometry.end()),
-          std::move(value));
+          std::move(name), std::move(geometry_set), std::move(value));
     } else if (type == "bool") {
-      auto value = bc["value"].as<BoolBC>();
+      auto value = BoolBC::from<YAML>(bc["value"]);
       parent_node->AddBoundaryCondition(
-          std::move(name), GeometrySet<>(geometry.begin(), geometry.end()),
-          std::move(value));
+          std::move(name), std::move(geometry_set), std::move(value));
+    } else if (type == "int") {
+      auto value = IntBC::from<YAML>(bc["value"]);
+      parent_node->AddBoundaryCondition(
+          std::move(name), std::move(geometry_set), std::move(value));
     } else if (type == "string") {
-      auto value = bc["value"].as<StringBC>();
+      auto value = StringBC::from<YAML>(bc["value"]);
       parent_node->AddBoundaryCondition(
-          std::move(name), GeometrySet<>(geometry.begin(), geometry.end()),
-          std::move(value));
+          std::move(name), std::move(geometry_set), std::move(value));
     } else if (type == "vector") {
-      // auto value = bc["value"].as<VectorBC>();
-      fmt::print("matrix not converting yet skipping\n");
+      auto value = VectorBC::from<YAML>(bc["value"]);
+      parent_node->AddBoundaryCondition(
+          std::move(name), std::move(geometry_set), std::move(value));
     } else if (type == "matrix") {
-      // auto value = bc["value"].as<MatrixBC>();
-      fmt::print("matrix not converting yet skipping\n");
+      auto value = MatrixBC::from<YAML>(bc["value"]);
+      parent_node->AddBoundaryCondition(
+          std::move(name), std::move(geometry_set), std::move(value));
     } else {
       throw std::runtime_error(
           fmt::format("Boundary condition type {} not implimented.", type));
@@ -83,6 +84,8 @@ template <>
 std::unique_ptr<ModelTraits> ReadFromStream<YAML>(std::istream &stream) {
   auto node = ::YAML::Load(stream);
   return LoadFromYamlNode(node["model traits"]);
+  // auto node = ::YAML::Load(stream);
+  // return std::make_unique<ModelTraits>(ModelTraits::from<YAML>(node));
 }
 
 template <>
