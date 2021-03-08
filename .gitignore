@@ -1,2 +1,7 @@
 build/
 compile_commands.json
+*build*/
+.idea/
+*.smd
+*.x_t
+*.xmt_txt

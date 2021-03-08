@@ -1,9 +1,12 @@
 #ifndef BC_BACKEND_YAML_CPP_CONVERT_H__
 #define BC_BACKEND_YAML_CPP_CONVERT_H__
 #include "bcBackendYamlCpp.h"
+#include "bcTypeTraits.h"
 #include <yaml-cpp/yaml.h>
 //#include "bcConvert.h"
 #include "bcBC.h"
+#include "bcExprtkFunction.h"
+#include "bcNamedFunction.h"
 #include <exception>
 
 namespace bc {
@@ -15,180 +18,134 @@ template <typename T> struct BackendTypeMap<T, YAML> {
   using type = ::YAML::Node;
 };
 
-// These are the default conversions for a ::YAML::Node, so
-// we leave the backend as generic, however if you wanted to
-// create a new backend that also writes to ::YAML::Nodes,
-// all you need to do is specialize the conversion functions
-// that you want to have modified behavior.
-template <typename Backend> struct convert<BoolBC, ::YAML::Node, Backend> {
-  static BoolBC encode(const ::YAML::Node &nd, Backend *) {
-    return BoolBC(nd.as<bool>());
-  }
-  static void decode(const BoolBC &bc, ::YAML::Node &nd, Backend *) {
-    nd["type"] = "bool";
-    nd["value"] = bc.data_;
-  }
-};
-template <typename Backend> struct convert<MatrixBC, ::YAML::Node, Backend> {
-  static MatrixBC encode(const ::YAML::Node &nd, Backend *) {
-    std::vector<std::vector<ScalarType>> matrix;
-    for (const auto &row : nd) {
-      matrix.push_back(row.as<std::vector<ScalarType>>());
-    }
-    return MatrixBC(matrix);
-  }
-  static void decode(const MatrixBC &bc, ::YAML::Node &nd, Backend *) {
-    nd["type"] = "matrix";
-    auto val = nd["value"];
-    val.SetStyle(::YAML::EmitterStyle::Flow);
-    for (const auto &row : bc.data_) {
-      val.push_back(row);
-    }
-  }
-};
-template <typename Backend> struct convert<ScalarBC, ::YAML::Node, Backend> {
-  static ScalarBC encode(const ::YAML::Node &nd, Backend *) {
-    return ScalarBC(nd.as<ScalarType>());
-  }
-  static void decode(const ScalarBC &bc, ::YAML::Node &nd, Backend *) {
-    nd["type"] = "scalar";
-    nd["value"] = bc.data_;
-  }
-};
-template <typename Backend> struct convert<IntBC, ::YAML::Node, Backend> {
-  static IntBC encode(const ::YAML::Node &nd, Backend *) {
-    return IntBC(nd.as<OrdinalType>());
-  }
-  static void decode(const IntBC &bc, ::YAML::Node &nd, Backend *) {
-    nd["type"] = "int";
-    nd["value"] = bc.data_;
-  }
-};
-template <typename Backend> struct convert<StringBC, ::YAML::Node, Backend> {
-  static StringBC encode(const ::YAML::Node &nd, Backend *) {
-    return StringBC(nd.as<std::string>());
-  }
-  static void decode(const StringBC &bc, ::YAML::Node &nd, Backend *) {
-    nd["type"] = "string";
-    nd["value"] = bc.data_;
-  }
-};
-template <typename Backend> struct convert<VectorBC, ::YAML::Node, Backend> {
-  static VectorBC encode(const ::YAML::Node &nd, Backend *) {
-    return VectorBC(nd.as<std::vector<ScalarType>>());
-  }
-  static void decode(const VectorBC &bc, ::YAML::Node &nd, Backend *) {
-    nd["type"] = "vector";
-    auto val = nd["value"];
-    val = bc.data_;
-    val.SetStyle(::YAML::EmitterStyle::Flow);
-  }
-};
-// conversion functions for the geometry
-template <typename Backend>
-struct convert<GeometrySet<OrdinalType, BC_VEC_WORKAROUND>, ::YAML::Node,
-               Backend> {
+// want to use sfinae to avoid needing to write all the function
+// exporters which will largely be identical to each other, so
+// we explicitly specialize the convert struct for YAML
+template <> struct convert<YAML> {
+  // template specialization in cpp file
+  // encoding needs to be a template so we can distinguish between return types
+  template <typename R, std::enable_if_t<!IsFunctionBC<R>::value, bool> = false>
+  static R encode(const ::YAML::Node &, YAML *);
+  // overloads for scalar, vector and tensor functions
+  // SFINAE is used since the method to encode the functions of each type is
+  // identical
+  template <
+      typename R,
+      std::enable_if_t<IsFunctionBC<R>::value && (R::dim == 0), bool> = false>
+  static R encode(const ::YAML::Node & /*nd*/, YAML * /*unused*/);
+  template <
+      typename R,
+      std::enable_if_t<IsFunctionBC<R>::value && (R::dim == 1), bool> = false>
+  static R encode(const ::YAML::Node & /*nd*/, YAML * /*unused*/);
+  template <
+      typename R,
+      std::enable_if_t<IsFunctionBC<R>::value && (R::dim == 2), bool> = false>
+  static R encode(const ::YAML::Node & /*nd*/, YAML * /*unused*/);
+
+  using DimSetT = GeometrySet<DimGeometry, BC_VEC_WORKAROUND>;
   using SetT = GeometrySet<OrdinalType, BC_VEC_WORKAROUND>;
-  static SetT encode(const ::YAML::Node &nd, Backend *) {
-    auto vec = nd.as<std::vector<OrdinalType>>();
-    return SetT(vec.begin(), vec.end());
-  }
-  static void decode(const SetT &g, ::YAML::Node &nd, Backend *) {
-    auto gnd = nd["geometry"];
-    gnd.SetStyle(::YAML::EmitterStyle::Flow);
-    for (auto &gid : g) {
-      gnd.push_back(gid);
-    }
-  }
-};
-template <typename Backend>
-struct convert<GeometrySet<DimGeometry, BC_VEC_WORKAROUND>, ::YAML::Node,
-               Backend> {
-  using SetT = GeometrySet<DimGeometry, BC_VEC_WORKAROUND>;
-  static SetT encode(const ::YAML::Node &nd, Backend *) {
-    std::vector<DimGeometry> vec;
-    for (auto &g : nd) {
-      vec.emplace_back(g[0], g[1]);
-    }
-    return SetT(vec.begin(), vec.end());
-  }
-  static void decode(const SetT &g, ::YAML::Node &nd, Backend *) {
-    auto gnd = nd["geometry"];
-    gnd.SetStyle(::YAML::EmitterStyle::Flow);
-    for (auto &dg : g) {
-      gnd.push_back(std::make_pair(dg.dim_, dg.GID_));
-    }
-  }
+
+  static void decode(const BoolBC &, ::YAML::Node &, YAML *);
+  static void decode(const MatrixBC &, ::YAML::Node &, YAML *);
+  static void decode(const ScalarBC &, ::YAML::Node &, YAML *);
+  static void decode(const IntBC &, ::YAML::Node &, YAML *);
+  static void decode(const StringBC &, ::YAML::Node &, YAML *);
+  static void decode(const VectorBC &, ::YAML::Node &, YAML *);
+  static void decode(const SetT &, ::YAML::Node &, YAML *);
+  static void decode(const DimSetT &, ::YAML::Node &, YAML *);
+  static void decode(const BCNode &bcn, ::YAML::Node &, YAML *);
+  static void decode(const CategoryNode &, ::YAML::Node &, YAML *);
+  static void decode(const ModelTraits &, ::YAML::Node &, YAML *);
+
+  template <typename T,
+            std::enable_if_t<IsNamedFunction<T>::value, bool> = false>
+  static void decode(const GenericBC<T, 0> & /*bc*/, ::YAML::Node & /*nd*/,
+                     YAML * /*unused*/);
+
+  template <typename T,
+            std::enable_if_t<IsNamedFunction<T>::value, bool> = false>
+  static void decode(const GenericBC<T, 1> & /*bc*/, ::YAML::Node & /*nd*/,
+                     YAML * /*unused*/);
+
+  template <typename T,
+            std::enable_if_t<IsNamedFunction<T>::value, bool> = false>
+  static void decode(const GenericBC<T, 2> & /*bc*/, ::YAML::Node & /*nd*/,
+                     YAML * /*unused*/);
 };
 
-// convert the "nodes"
-struct YamlExportBCVisitor : public BCVisitor {
-  YamlExportBCVisitor(::YAML::Node &nd) : nd_(nd) {}
-  void visit(BoolBC &bc) final { bc.to<YAML>(nd_); };
-  void visit(MatrixBC &bc) final { bc.to<YAML>(nd_); };
-  void visit(ScalarBC &bc) final { bc.to<YAML>(nd_); };
-  void visit(IntBC &bc) final { bc.to<YAML>(nd_); };
-  void visit(StringBC &bc) final { bc.to<YAML>(nd_); };
-  void visit(VectorBC &bc) final { bc.to<YAML>(nd_); };
-
-  ::YAML::Node &nd_;
-};
-
-struct YamlExportGeomVisitor : public GeometrySetVisitor {
-  YamlExportGeomVisitor(::YAML::Node &nd) : nd_(nd) {}
-  virtual void visit(GeometrySet<OrdinalType, BC_VEC_WORKAROUND> &g) {
-    g.to<YAML>(nd_);
+template <typename T, std::enable_if_t<IsNamedFunction<T>::value, bool>>
+void convert<YAML>::decode(const GenericBC<T, 0> &bc, ::YAML::Node &nd,
+                           YAML * /*unused*/) {
+  auto eqn_name = to_string(bc);
+  auto count = std::count(begin(eqn_name), end(eqn_name), '$');
+  // if there are any variables in the name denoted by "$" it's an expression
+  // otherwise it is a function type, like a lambda of some sort.
+  nd["type"] = count > 1 ? "expression" : "function";
+  nd["value"] = std::move(eqn_name);
+  nd["num variables"] = T::ArgsCount();
+}
+template <typename T, std::enable_if_t<IsNamedFunction<T>::value, bool>>
+void convert<YAML>::decode(const GenericBC<T, 1> &bc, ::YAML::Node &nd,
+                           YAML * /*unused*/) {
+  auto count = 0;
+  auto val = nd["value"];
+  val.SetStyle(::YAML::EmitterStyle::Flow);
+  for (size_t i = 0; i < bc.size(); ++i) {
+    auto eqn_name = to_string(bc(i));
+    count += std::count(begin(eqn_name), end(eqn_name), '$');
+    val.push_back(std::move(eqn_name));
   }
-  virtual void visit(GeometrySet<DimGeometry, BC_VEC_WORKAROUND> &g) {
-    g.to<YAML>(nd_);
+  nd["type"] = count > 1 ? "vector expression" : "vector function";
+  nd["num variables"] = T::ArgsCount();
+}
+template <typename T, std::enable_if_t<IsNamedFunction<T>::value, bool>>
+void convert<YAML>::decode(const GenericBC<T, 2> &bc, ::YAML::Node &nd,
+                           YAML * /*unused*/) {
+  auto count = 0;
+  auto val = nd["value"];
+  val.SetStyle(::YAML::EmitterStyle::Flow);
+  for (int i = 0; i < bc.nrows(); ++i) {
+    std::vector<std::string> row;
+    row.reserve(bc.ncols());
+    for (int j = 0; j < bc.ncols(); ++j) {
+      auto eqn_name = to_string(bc(i, j));
+      count += std::count(begin(eqn_name), end(eqn_name), '$');
+      row.push_back(std::move(eqn_name));
+    }
+    val.push_back(row);
   }
-  ::YAML::Node &nd_;
-};
+  nd["type"] = count > 1 ? "matrix expression" : "matrix function";
+  nd["num variables"] = T::ArgsCount();
+}
 
-template <typename Backend> struct convert<BCNode, ::YAML::Node, Backend> {
-  // static BCNode encode(const ::YAML::Node &nd) { return BCNode{}; }
-  static void decode(const BCNode &bcn, ::YAML::Node &nd, Backend *) {
-    for (auto &bc : bcn.GetBoundaryConditions()) {
-      ::YAML::Node local;
-      local["name"] = bcn.GetName();
-      YamlExportBCVisitor bc_visitor(local);
-      YamlExportGeomVisitor geom_visitor(local);
-      bc.second->accept(bc_visitor);
-      bc.first->accept(geom_visitor);
-      nd.push_back(local);
+template <typename R,
+          std::enable_if_t<IsFunctionBC<R>::value && (R::dim == 0), bool>>
+R convert<YAML>::encode(const ::YAML::Node &nd, YAML * /*unused*/) {
+  return R{ExprtkFunction<R::type::ArgsCount()>{nd.as<std::string>()}};
+}
+template <typename R,
+          std::enable_if_t<IsFunctionBC<R>::value && (R::dim == 1), bool>>
+R convert<YAML>::encode(const ::YAML::Node &nd, YAML * /*unused*/) {
+  std::vector<typename R::type> functions;
+  for (const auto &v : nd) {
+    functions.emplace_back(
+        ExprtkFunction<R::type::ArgsCount()>{v.as<std::string>()});
+  }
+  return R{std::move(functions)};
+}
+template <typename R,
+          std::enable_if_t<IsFunctionBC<R>::value && (R::dim == 2), bool>>
+R convert<YAML>::encode(const ::YAML::Node &nd, YAML * /*unused*/) {
+  std::vector<std::vector<typename R::type>> functions;
+  for (const auto &row : nd) {
+    functions.emplace_back();
+    for (const auto &val : row) {
+      functions.back().emplace_back(
+          ExprtkFunction<R::type::ArgsCount()>{val.as<std::string>()});
     }
   }
-};
-
-template <typename Backend>
-struct convert<CategoryNode, ::YAML::Node, Backend> {
-  // static CategoryNode encode(const ::YAML::Node &nd) { return CategoryNode{};
-  // }
-  static void decode(const CategoryNode &cn, ::YAML::Node &nd,
-                             Backend *) {
-    auto bcn = nd["boundary conditions"];
-    for (const auto &bc : cn.GetBoundaryConditions()) {
-      bc->to<YAML>(bcn);
-    }
-    for (const auto &cat : cn.GetCategories()) {
-      nd[cat->GetName()] = cat->to<YAML>();
-    }
-  }
-};
-template <typename Backend> struct convert<ModelTraits, ::YAML::Node, Backend> {
-  static void decode(const ModelTraits &mt, ::YAML::Node &nd,
-                             Backend *) {
-    auto mtn = nd["model traits"];
-    mtn["name"] = mt.GetName();
-    auto casesn = mtn["cases"];
-    for (const auto &cs : mt.GetCases()) {
-      ::YAML::Node local;
-      local["name"] = cs->GetName();
-      local["model traits"] = cs->to<YAML>();
-      casesn.push_back(local);
-    }
-  }
-};
+  return R{std::move(functions)};
+}
 
 } // namespace bc
 

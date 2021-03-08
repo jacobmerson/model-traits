@@ -11,6 +11,10 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wshadow -Wnon-virtual-dtor -Wpedantic")
 endif()
 
+# Let CMake know where to find custom FindFoo.cmake files
+set(CMAKE_MODULE_PATH
+  ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/")
+
 
 # RPATHS stuff...this is important to make spack happy in all situations
 # enable @rpath in the install name for any shared library being built
@@ -34,6 +38,7 @@ IF("${isSystemDir}" STREQUAL "-1")
 ENDIF("${isSystemDir}" STREQUAL "-1")
 
 
+option(ENABLE_SIMMETRIX "Build with Simmetrix support" OFF)
 
 add_subdirectory(tpl)
 add_subdirectory(src)

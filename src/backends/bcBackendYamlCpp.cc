@@ -3,13 +3,46 @@
 #include <fmt/ostream.h>
 // clang-format off
 // it's currently important that bcBackendYamlCppConvert.h
-// get's loaded after yaml-cpp
+// gets loaded after yaml-cpp
 #include <yaml-cpp/yaml.h>
 #include "bcBackendYamlCppConvert.h"
 // clang-format on
 #include "bcModelTraits.h"
 
 namespace bc {
+
+template <typename T, int dim>
+void AddExpression(const ::YAML::Node &bc, CategoryNode *parent_node,
+                   std::string &&name, GeometrySet<> &&geometry_set) {
+  auto num_variables = bc["num variables"].as<int>();
+  switch (num_variables) {
+  case 1:
+    parent_node->AddBoundaryCondition(
+        std::move(name), std::move(geometry_set),
+        FunctionBC<T, 1, dim>::template from<YAML>(bc["value"]));
+    break;
+  case 2:
+    parent_node->AddBoundaryCondition(
+        std::move(name), std::move(geometry_set),
+        FunctionBC<T, 2, dim>::template from<YAML>(bc["value"]));
+    break;
+  case 3:
+    parent_node->AddBoundaryCondition(
+        std::move(name), std::move(geometry_set),
+        FunctionBC<T, 3, dim>::template from<YAML>(bc["value"]));
+    break;
+  case 4:
+    parent_node->AddBoundaryCondition(
+        std::move(name), std::move(geometry_set),
+        FunctionBC<T, 4, dim>::template from<YAML>(bc["value"]));
+    break;
+    // in the default case, the boundary condition is added as a dynamic type
+  default:
+    throw std::runtime_error(
+        "Equations are only implemented with up to 4 arguments");
+    break;
+  }
+}
 
 void ParseBoundaryConditions(const ::YAML::Node &yaml_node,
                              CategoryNode *parent_node) {
@@ -42,9 +75,18 @@ void ParseBoundaryConditions(const ::YAML::Node &yaml_node,
       auto value = MatrixBC::from<YAML>(bc["value"]);
       parent_node->AddBoundaryCondition(
           std::move(name), std::move(geometry_set), std::move(value));
+    } else if (type == "expression") {
+      AddExpression<ScalarType, 0>(bc, parent_node, std::move(name),
+                                   std::move(geometry_set));
+    } else if (type == "vector expression") {
+      AddExpression<ScalarType, 1>(bc, parent_node, std::move(name),
+                                   std::move(geometry_set));
+    } else if (type == "matrix expression") {
+      AddExpression<ScalarType, 2>(bc, parent_node, std::move(name),
+                                   std::move(geometry_set));
     } else {
       throw std::runtime_error(
-          fmt::format("Boundary condition type {} not implimented.", type));
+          fmt::format("Boundary condition type {} not implemented.", type));
     }
   }
 }
@@ -91,6 +133,9 @@ std::unique_ptr<ModelTraits> ReadFromStream<YAML>(std::istream &stream) {
 template <>
 void WriteToStream<YAML>(const ModelTraits *model_traits,
                          std::ostream &stream) {
+  if (model_traits == nullptr) {
+    return;
+  }
   ::YAML::Emitter e;
 
   auto n = model_traits->to<YAML>();

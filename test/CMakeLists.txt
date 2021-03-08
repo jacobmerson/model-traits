@@ -9,8 +9,15 @@ add_executable(generic_test generic_test.cc)
 target_link_libraries(generic_test modelTraits)
 
 add_executable(read_yaml test_reader.cc)
-target_link_libraries(read_yaml modelTraits bcBackendYamlCpp)
+target_link_libraries(read_yaml modelTraits bcIOBackend)
 
 find_package(fmt REQUIRED)
 add_executable(exprtk_test exprtk_test.cc)
-target_link_libraries(exprtk_test exprtk fmt::fmt)
+target_link_libraries(exprtk_test modelTraits fmt::fmt)
+
+if (ENABLE_SIMMETRIX)
+    find_package(SIMMODSUITE MODULE REQUIRED)
+    add_executable(test_sim sim_test.cc)
+    target_link_libraries(test_sim PRIVATE modelTraits fmt::fmt ${SIMMODSUITE_LIBS})
+    target_include_directories(test_sim PRIVATE ${SIMMODSUITE_INCLUDE_DIR})
+endif ()
