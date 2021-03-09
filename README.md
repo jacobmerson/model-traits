@@ -16,6 +16,5 @@ multiple read-write backends.
 
 ## Backends
 * yaml: under development
-* simmodsuite: under developement, however due to licensing restrictions
-  this backend will be kept in a separate location. If you are interested
-  in using the Simmetrix backend, please contact me (@jacobmerson).
+* simmodsuite: under development, however due to licensing restrictions this backend will be kept in a separate
+  location. If you are interested in using the Simmetrix backend, please contact me (@jacobmerson).

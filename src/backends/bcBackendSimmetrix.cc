@@ -3,10 +3,8 @@
 #include "bcExprtkFunction.h"
 #include "bcGeometrySet.h"
 #include "bcSimWrapper.h"
-#include <SimAttDef.h>
 #include <SimAttribute.h>
 #include <SimError.h>
-#include <SimErrorCodes.h>
 #include <SimModel.h>
 #include <SimUtil.h>
 #include <algorithm>
@@ -19,7 +17,35 @@
 namespace bc {
 enum class SimEquationType { Space, Time, SpaceTime, None };
 
-SimEquationType GetEquationType(const std::string &expression) {
+template <typename T, int dim>
+static void AddExpression(pAttInfo bc, CategoryNode *parent_node,
+                          std::string &&name, DimGeometrySet<> &&geometry_set,
+                          SimEquationType eqn_type) {
+  switch (eqn_type) {
+  case SimEquationType::Space:
+    parent_node->AddBoundaryCondition(
+        std::move(name), std::move(geometry_set),
+        FunctionBC<T, 3, dim>::template from<SIMMETRIX>(bc));
+    break;
+  case SimEquationType::Time:
+    parent_node->AddBoundaryCondition(
+        std::move(name), std::move(geometry_set),
+        FunctionBC<T, 1, dim>::template from<SIMMETRIX>(bc));
+    break;
+  case SimEquationType::SpaceTime:
+    parent_node->AddBoundaryCondition(
+        std::move(name), std::move(geometry_set),
+        FunctionBC<T, 4, dim>::template from<SIMMETRIX>(bc));
+    break;
+  case SimEquationType::None:
+    parent_node->AddBoundaryCondition(
+        std::move(name), std::move(geometry_set),
+        GenericBC<T, dim>::template from<SIMMETRIX>(bc));
+    break;
+  }
+}
+
+static SimEquationType GetEquationType(const std::string &expression) {
   using std::find;
   bool has_spatial = false;
   bool has_temporal = false;
@@ -40,16 +66,18 @@ SimEquationType GetEquationType(const std::string &expression) {
   }
   if (has_spatial && has_temporal) {
     return SimEquationType::SpaceTime;
-  } else if (has_spatial) {
-    return SimEquationType::Space;
-  } else if (has_temporal) {
-    return SimEquationType::Time;
-  } else {
-    return SimEquationType::None;
   }
+  if (has_spatial) {
+    return SimEquationType::Space;
+  }
+  if (has_temporal) {
+    return SimEquationType::Time;
+  }
+  return SimEquationType::None;
 }
 
-SimEquationType GetEquationType(const std::vector<std::string> &expressions) {
+static SimEquationType
+GetEquationType(const std::vector<std::string> &expressions) {
   bool has_spatial = false;
   bool has_temporal = false;
   for (const auto &eqn : expressions) {
@@ -67,18 +95,14 @@ SimEquationType GetEquationType(const std::vector<std::string> &expressions) {
   // if has space && time already returned in loop
   if (has_spatial) {
     return SimEquationType::Space;
-  } else if (has_temporal) {
-    return SimEquationType::Time;
-  } else {
-    return SimEquationType::None;
   }
+  if (has_temporal) {
+    return SimEquationType::Time;
+  }
+  return SimEquationType::None;
 }
 
-template <>
-void WriteToFile<SIMMETRIX>(const ModelTraits *model_traits,
-                            const std::string &filename);
-
-DimGeometrySet<> GetGeomFromModelAssoc(pModelAssoc ma) {
+static DimGeometrySet<> GetGeomFromModelAssoc(pModelAssoc ma) {
   if (ma == nullptr) {
     return DimGeometrySet<>{};
   }
@@ -92,7 +116,7 @@ DimGeometrySet<> GetGeomFromModelAssoc(pModelAssoc ma) {
     static_assert(Gvertex == 0 && Gedge == 1 && Gface == 2 && Gregion == 3 &&
                       Gmodel == 9,
                   "gType enums must convert to expected dimensions.");
-    if (ModelItem_isGEntity(model_item)) {
+    if (ModelItem_isGEntity(model_item) != 0) {
       geom.emplace_back(item_type, GEN_tag(static_cast<pGEntity>(model_item)));
     } else {
       fmt::print("Adding model items that are not geometric entities is not "
@@ -103,202 +127,109 @@ DimGeometrySet<> GetGeomFromModelAssoc(pModelAssoc ma) {
   return {geom.begin(), geom.end()};
 }
 
-void AddBoundaryCondition(CategoryNode *parent_node, pAttInfo sim_node,
-                          pModelAssoc ma) {
+static void AddBoundaryCondition(CategoryNode *parent_node, pAttInfo sim_node,
+                                 pModelAssoc ma) {
   auto rep_type = AttNode_repType(static_cast<pANode>(sim_node));
   SimString name = AttNode_infoType(static_cast<pANode>(sim_node));
   auto geom = GetGeomFromModelAssoc(ma);
   if (rep_type == Att_int) {
-    if (AttInfoInt_isExpression(static_cast<pAttInfoInt>(sim_node))) {
+    if (AttInfoInt_isExpression(static_cast<pAttInfoInt>(sim_node)) != 0) {
       SimString e = AttInfoInt_expression(static_cast<pAttInfoInt>(sim_node));
       auto exp = std::string(e);
       auto equation_type = GetEquationType(exp);
-      switch (equation_type) {
-      case SimEquationType::Space:
-        parent_node->AddBoundaryCondition(
-            std::string(name), std::move(geom),
-            IntFunctionBC<3>{ExprtkFunction<3>{std::move(exp)}});
-        break;
-      case SimEquationType::Time:
-        parent_node->AddBoundaryCondition(
-            std::string(name), std::move(geom),
-            IntFunctionBC<1>{ExprtkFunction<1>{std::move(exp)}});
-        break;
-      case SimEquationType::SpaceTime:
-        parent_node->AddBoundaryCondition(
-            std::string(name), std::move(geom),
-            IntFunctionBC<4>{ExprtkFunction<4>{std::move(exp)}});
-        break;
-      case SimEquationType::None:
-        parent_node->AddBoundaryCondition(std::string(name), std::move(geom),
-                                          IntBC{std::stoi(exp)});
-        break;
-      }
-
+      AddExpression<OrdinalType, 0>(sim_node, parent_node, std::string(name),
+                                    std::move(geom), equation_type);
     } else {
-      auto value = IntBC::from<SIMMETRIX>(static_cast<pAttInfoInt>(sim_node));
+      auto value = IntBC::from<SIMMETRIX>(sim_node);
       parent_node->AddBoundaryCondition(std::string(name), std::move(geom),
                                         std::move(value));
     }
   } else if (rep_type == Att_string) {
-    if (AttInfoString_isExpression(static_cast<pAttInfoString>(sim_node))) {
+    if (AttInfoString_isExpression(static_cast<pAttInfoString>(sim_node)) !=
+        0) {
       throw std::runtime_error("String Expressions Not Currently Supported");
-    } else {
-      auto value =
-          StringBC::from<SIMMETRIX>(static_cast<pAttInfoString>(sim_node));
-      parent_node->AddBoundaryCondition(std::string(name), std::move(geom),
-                                        std::move(value));
     }
+    auto value = StringBC::from<SIMMETRIX>(sim_node);
+    parent_node->AddBoundaryCondition(std::string(name), std::move(geom),
+                                      std::move(value));
   } else if (rep_type == Att_double) {
-    if (AttInfoDouble_isExpression(static_cast<pAttInfoDouble>(sim_node))) {
+    if (AttInfoDouble_isExpression(static_cast<pAttInfoDouble>(sim_node)) !=
+        0) {
       SimString e =
           AttInfoDouble_expression(static_cast<pAttInfoDouble>(sim_node));
       auto exp = std::string(e);
       auto equation_type = GetEquationType(exp);
-      switch (equation_type) {
-      case SimEquationType::Space:
-        parent_node->AddBoundaryCondition(
-            std::string(name), std::move(geom),
-            ScalarFunctionBC<3>{ExprtkFunction<3>{std::move(exp)}});
-        break;
-      case SimEquationType::Time:
-        parent_node->AddBoundaryCondition(
-            std::string(name), std::move(geom),
-            ScalarFunctionBC<1>{ExprtkFunction<1>{std::move(exp)}});
-        break;
-      case SimEquationType::SpaceTime:
-        parent_node->AddBoundaryCondition(
-            std::string(name), std::move(geom),
-            ScalarFunctionBC<4>{ExprtkFunction<4>{std::move(exp)}});
-        break;
-      case SimEquationType::None:
-        parent_node->AddBoundaryCondition(std::string(name), std::move(geom),
-                                          ScalarBC{std::stod(exp)});
-        break;
-      }
+      AddExpression<ScalarType, 0>(sim_node, parent_node, std::string(name),
+                                   std::move(geom), equation_type);
     } else {
-      auto value =
-          ScalarBC::from<SIMMETRIX>(static_cast<pAttInfoDouble>(sim_node));
+      auto value = ScalarBC::from<SIMMETRIX>(sim_node);
       parent_node->AddBoundaryCondition(std::string(name), std::move(geom),
                                         std::move(value));
     }
   } else if (rep_type == Att_tensor0) {
-    if (AttInfoTensor0_isExpression(static_cast<pAttInfoTensor0>(sim_node))) {
+    if (AttInfoTensor0_isExpression(static_cast<pAttInfoTensor0>(sim_node)) !=
+        0) {
       SimString e =
           AttInfoTensor0_expression(static_cast<pAttInfoTensor0>(sim_node));
       auto exp = std::string(e);
       auto equation_type = GetEquationType(exp);
-      switch (equation_type) {
-      case SimEquationType::Space:
-        parent_node->AddBoundaryCondition(
-            std::string(name), std::move(geom),
-            ScalarFunctionBC<3>{ExprtkFunction<3>{std::move(exp)}});
-        break;
-      case SimEquationType::Time:
-        parent_node->AddBoundaryCondition(
-            std::string(name), std::move(geom),
-            ScalarFunctionBC<1>{ExprtkFunction<1>{std::move(exp)}});
-        break;
-      case SimEquationType::SpaceTime:
-        parent_node->AddBoundaryCondition(
-            std::string(name), std::move(geom),
-            ScalarFunctionBC<4>{ExprtkFunction<4>{std::move(exp)}});
-        break;
-      case SimEquationType::None:
-        parent_node->AddBoundaryCondition(std::string(name), std::move(geom),
-                                          ScalarBC{std::stod(exp)});
-        break;
-      }
+      AddExpression<ScalarType, 0>(sim_node, parent_node, std::string(name),
+                                   std::move(geom), equation_type);
     } else {
-      auto value =
-          ScalarBC::from<SIMMETRIX>(static_cast<pAttInfoTensor0>(sim_node));
+      auto value = ScalarBC::from<SIMMETRIX>(sim_node);
       parent_node->AddBoundaryCondition(std::string(name), std::move(geom),
                                         std::move(value));
     }
   } else if (rep_type == Att_tensor1) {
-    auto tensor_att = static_cast<pAttInfoTensor1>(sim_node);
-    if (AttInfoTensor1_hasComponentExpressions(tensor_att)) {
+    auto *tensor_att = static_cast<pAttInfoTensor1>(sim_node);
+    if (AttInfoTensor1_hasComponentExpressions(tensor_att) != 0) {
       // put the equations into a vector
       auto size = AttInfoTensor1_dimension(tensor_att);
       std::vector<std::string> equations;
       equations.reserve(size);
       for (int i = 0; i < size; ++i) {
-        if (AttInfoTensor1_isExpression(tensor_att, i)) {
+        if (AttInfoTensor1_isExpression(tensor_att, i) != 0) {
           SimString eqn = AttInfoTensor1_expression(tensor_att, i);
-          equations.push_back(std::string(eqn));
+          equations.emplace_back(eqn);
         } else {
           equations.push_back(
               std::to_string(AttInfoTensor1_value(tensor_att, i)));
         }
       }
       auto equation_type = GetEquationType(equations);
-      BCNode *bc_node = nullptr;
-      switch (equation_type) {
-      case SimEquationType::Space:
-        bc_node = parent_node->AddBoundaryCondition(
-            std::string(name), std::move(geom), VectorFunctionBC<3>{size});
-        break;
-      case SimEquationType::Time:
-        bc_node = parent_node->AddBoundaryCondition(
-            std::string(name), std::move(geom), VectorFunctionBC<1>{size});
-        break;
-      case SimEquationType::SpaceTime:
-        bc_node = parent_node->AddBoundaryCondition(
-            std::string(name), std::move(geom), VectorFunctionBC<4>{size});
-        break;
-      case SimEquationType::None:
-        bc_node = parent_node->AddBoundaryCondition(
-            std::string(name), std::move(geom), VectorBC{size});
-        break;
-      }
-      auto bc = bc_node->GetBoundaryConditions().back().second;
-      for (int i = 0; i < size; ++i) {
-        switch (equation_type) {
-        case SimEquationType::Space:
-          (*std::dynamic_pointer_cast<VectorFunctionBC<3>>(bc))(i) =
-              ExprtkFunction<3>{std::move(equations[i])};
-          break;
-        case SimEquationType::Time:
-          (*std::dynamic_pointer_cast<VectorFunctionBC<1>>(bc))(i) =
-              ExprtkFunction<1>{std::move(equations[i])};
-          break;
-        case SimEquationType::SpaceTime:
-          (*std::dynamic_pointer_cast<VectorFunctionBC<4>>(bc))(i) =
-              ExprtkFunction<4>{std::move(equations[i])};
-          break;
-        case SimEquationType::None:
-          (*std::dynamic_pointer_cast<VectorBC>(bc))(i) =
-              std::stod(equations[i]);
-          break;
-        }
-      }
+      AddExpression<ScalarType, 1>(sim_node, parent_node, std::string(name),
+                                   std::move(geom), equation_type);
     } else {
-      auto value =
-          VectorBC::from<SIMMETRIX>(static_cast<pAttInfoTensor1>(sim_node));
+      auto value = VectorBC::from<SIMMETRIX>(sim_node);
       parent_node->AddBoundaryCondition(std::string(name), std::move(geom),
                                         std::move(value));
     }
   } else if (rep_type == Att_tensor2) {
-    auto tensor_att = static_cast<pAttInfoTensor2>(sim_node);
+    auto *tensor_att = static_cast<pAttInfoTensor2>(sim_node);
+    SimEquationType equation_type;
     bool is_expression = [&]() {
+      bool isExpression = false;
       int dim = AttInfoTensor2_dimension(tensor_att);
+      std::vector<std::string> equations;
       for (int i = 0; i < dim; ++i) {
         for (int j = 0; j < dim; ++j) {
-          if (AttInfoTensor2_isExpression(tensor_att, i, j)) {
-            return true;
+          if (AttInfoTensor2_isExpression(tensor_att, i, j) != 0) {
+            equations.emplace_back(
+                SimString(AttInfoTensor2_expression(tensor_att, i, j)));
+            isExpression = true;
           }
         }
       }
-      return false;
+      equation_type = GetEquationType(equations);
+      return isExpression;
     }();
     if (is_expression) {
-      throw std::runtime_error("Tensor2 Expressions Not Currently Supported");
-    } else {
-      auto value =
-          MatrixBC::from<SIMMETRIX>(static_cast<pAttInfoTensor2>(sim_node));
-      parent_node->AddBoundaryCondition(std::string(name), std::move(geom),
-                                        std::move(value));
+      AddExpression<ScalarType, 2>(sim_node, parent_node, std::string(name),
+                                   std::move(geom), equation_type);
     }
+    auto value = MatrixBC::from<SIMMETRIX>(sim_node);
+    parent_node->AddBoundaryCondition(std::string(name), std::move(geom),
+                                      std::move(value));
   } else {
     fmt::print("Cannot add a boundary condition with the AttRepType of {}. "
                "Skipping it.\n",
@@ -310,7 +241,7 @@ void AddBoundaryCondition(CategoryNode *parent_node, pAttInfo sim_node,
  * Returns true if the simmetrix AttRepType should
  * be used as a BC node in model traits
  */
-bool AttRepTypeIsBC(AttRepType rep_type) {
+static bool AttRepTypeIsBC(AttRepType rep_type) {
   return (rep_type == Att_int || rep_type == Att_string ||
           rep_type == Att_double || rep_type == Att_tensor0 ||
           rep_type == Att_tensor1 || rep_type == Att_tensor2);
@@ -319,22 +250,22 @@ bool AttRepTypeIsBC(AttRepType rep_type) {
  * Returns true if the simmetrix AttRepType should
  * be used as a category node in model traits
  */
-bool AttRepTypeIsCategory(AttRepType rep_type) {
+static bool AttRepTypeIsCategory(AttRepType rep_type) {
   return (rep_type == Att_void || rep_type == Att_case);
 }
 
 // the simmetrix attribute node should be used as a const node
 // but since the simmetrix api doesn't take const AttNode*, we
 // cannot explicitly use that definition here
-void ParseNode(CategoryNode *parent_node, pANode sim_node, pACase cs,
-               pModelAssoc model_association) {
+static void ParseNode(CategoryNode *parent_node, pANode sim_node, pACase cs,
+                      pModelAssoc model_association) {
   auto rep_type = AttNode_repType(sim_node);
   SimString name = AttNode_infoType(sim_node);
   if (rep_type == Att_case) {
     // get the model from the parent case and set it on the new case node
     // if the model is not set on the case, then various functions such as
     // AMA_modelItems exhibit undefined behaviors
-    auto model = AttCase_loadedModel(cs);
+    auto *model = AttCase_loadedModel(cs);
     cs = static_cast<pACase>(sim_node);
     AttCase_setModel(cs, model);
   }
@@ -343,7 +274,8 @@ void ParseNode(CategoryNode *parent_node, pANode sim_node, pACase cs,
   if (model_associations.Size() > 1) {
     throw std::runtime_error(
         "Only expect simmetrix nodes to have a single model association");
-  } else if (model_associations.Size() == 1) {
+  }
+  if (model_associations.Size() == 1) {
     model_association = model_associations[0];
   }
   if (AttRepTypeIsBC(rep_type)) {
@@ -356,7 +288,7 @@ void ParseNode(CategoryNode *parent_node, pANode sim_node, pACase cs,
   }
   // process children
   SimList<pANode> children = AttNode_children(sim_node);
-  for (auto child : children) {
+  for (auto *child : children) {
     ParseNode(parent_node, child, cs, model_association);
   }
 }
@@ -378,15 +310,14 @@ ReadFromFile<SIMMETRIX>(const std::string &filename) {
     // since the attribute manager comes from the model it will
     // be deleted when the model gets deleted. For this reason,
     // we do not use an RAII wrapper for this instance of the Att manager
-    auto mngr = GM_attManager(model);
+    auto *manager = GM_attManager(model);
 
-    SimList<pANode> cases = AMAN_cases(mngr);
+    SimList<pANode> cases = AMAN_cases(manager);
     SimString last_image_class;
     std::unique_ptr<ModelTraits> mt;
     // take the cs by value since it is a pointer type
-    auto cs = (pACase)cases[3];
-    // for(auto cs: cases)
-    {
+    // auto cs = (pACase)cases[3];
+    for (auto *cs : cases) {
       auto num_parents = AttNode_NumberOfParents(cs);
       SimString info_type = AttNode_infoType(cs);
       //// root cases have no parents
@@ -404,7 +335,7 @@ ReadFromFile<SIMMETRIX>(const std::string &filename) {
         SimString name = AttNode_name(cs);
         auto reptype = AttNode_repType(cs);
         assert(reptype == Att_case);
-        auto mt_case = mt->AddCase(std::string(name));
+        auto *mt_case = mt->AddCase(std::string(name));
         last_image_class = std::move(image_class);
         SimList<pANode> children = AttNode_children(cs);
         AttCase_setModel(static_cast<pACase>(cs), model);
@@ -416,7 +347,7 @@ ReadFromFile<SIMMETRIX>(const std::string &filename) {
         }
         pModelAssoc model_association =
             model_associations.Size() == 0 ? nullptr : model_associations[0];
-        for (auto child : children) {
+        for (auto *child : children) {
           ParseNode(mt_case, child, static_cast<pACase>(cs), model_association);
         }
       }

@@ -29,7 +29,7 @@ struct FuncCreator<R, T, N, true, Args...> {
 };
 } // namespace detail
 /*
- * Uses recusive template construction to create the type for a
+ * Uses recursive template construction to create the type for a
  * function with the return type R and N arguments of type T
  */
 template <typename R, typename T, int N>

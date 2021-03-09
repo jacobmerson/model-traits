@@ -33,7 +33,7 @@ std::unique_ptr<ModelTraits> ReadFromFile(const std::string &filename) {
 template <typename Backend>
 void WriteToFile(const ModelTraits *model_traits, const std::string &filename) {
   std::ofstream fstream{filename};
-  WriteToStream<Backend>(fstream);
+  WriteToStream<Backend>(model_traits, fstream);
 }
 
 } // namespace bc

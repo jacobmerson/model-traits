@@ -13,17 +13,22 @@ public:
   using GeomPtrT = std::shared_ptr<IGeometrySet>;
   using BCPtrT = std::shared_ptr<IBoundaryCondition>;
   BCNode(const std::string &name, GeomPtrT g, BCPtrT bc) : INode(name) {
-    bcs_.emplace_back(g, bc);
+    bcs_.emplace_back(std::move(g), std::move(bc));
   }
   void AddBoundaryCondition(GeomPtrT g, BCPtrT bc) {
-    bcs_.emplace_back(g, bc);
+    bcs_.emplace_back(std::move(g), std::move(bc));
   };
 
   // FIXME rename this? It's a bit confusing that
   // it shares a name with GetBoundaryConditions in bcCategoryNode
   // which gets the boundary condition nodes
-  auto &GetBoundaryConditions() noexcept { return bcs_; }
-  const auto &GetBoundaryConditions() const noexcept { return bcs_; }
+  std::vector<std::pair<GeomPtrT, BCPtrT>> &GetBoundaryConditions() noexcept {
+    return bcs_;
+  }
+  const std::vector<std::pair<GeomPtrT, BCPtrT>> &
+  GetBoundaryConditions() const noexcept {
+    return bcs_;
+  }
 
 private:
   // each name can have multiple BC's associated with them as long as each
