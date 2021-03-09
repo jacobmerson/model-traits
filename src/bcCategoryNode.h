@@ -19,25 +19,40 @@ class CategoryNode : public INode, public Convertible<CategoryNode> {
 public:
   CategoryNode(const std::string &name) : INode(name) {}
   CategoryNode(std::string &&name) : INode(std::move(name)) {}
+  // FIXME rename to AddOrFindCategory
   CategoryNode *AddCategory(std::string name) {
+    auto nd = categories_.FindNode(name);
+    if (nd) {
+      return nd;
+    }
     return categories_.AddNode(std::make_unique<CategoryNode>(std::move(name)));
   }
 
-  template <typename Geom, typename BC>
-  BCNode *AddBoundaryCondition(std::string name, Geom &&geometry,
-                               BC &&boundary_condition) {
+  BCNode *
+  AddBoundaryCondition(const std::string &name,
+                       std::shared_ptr<IGeometrySet> geometry,
+                       std::shared_ptr<IBoundaryCondition> boundary_condition) {
     auto nd = boundary_conditions_.FindNode(name);
     // if the boundary condition with a given name already exists
     if (nd) {
-      nd->AddBoundaryCondition(
-          std::make_shared<Geom>(std::forward<Geom>(geometry)),
-          std::make_shared<BC>(std::forward<BC>(boundary_condition)));
+      nd->AddBoundaryCondition(geometry, boundary_condition);
       return nd;
     } else {
-      return boundary_conditions_.AddNode(std::make_unique<BCNode>(
-          std::move(name), std::make_shared<Geom>(std::forward<Geom>(geometry)),
-          std::make_shared<BC>(std::forward<BC>(boundary_condition))));
+      return boundary_conditions_.AddNode(
+          std::make_unique<BCNode>(name, geometry, boundary_condition));
     }
+  }
+
+  template <typename Geom, typename BC>
+  BCNode *AddBoundaryCondition(const std::string &name, Geom &&geometry,
+                               BC &&boundary_condition) {
+
+    return AddBoundaryCondition(
+        name,
+        std::static_pointer_cast<IGeometrySet>(
+            std::make_shared<Geom>(std::forward<Geom>(geometry))),
+        std::static_pointer_cast<IBoundaryCondition>(
+            std::make_shared<BC>(std::forward<BC>(boundary_condition))));
   }
 
   // FIXME rename this? Not sure what to call it, but it's confusing

@@ -2,15 +2,10 @@
 #define BC_MODEL_TRAITS_IO_H__
 
 #include "bcModelTraits.h"
+#include <fstream>
 
 namespace bc {
 /*
-// Eventually I would like to add these convenience functions where
-// the user can register new backends and these functions will choose the
-// correct backend at runtime...actually, this might not be the right choice
-// because the user may want to read from one backend and write in another
-std::unique_ptr<ModelTraits> ReadFromFile(const std::string& filename);
-void WriteToFile(const std::string& filename);
 */
 
 /**
@@ -29,14 +24,18 @@ std::unique_ptr<ModelTraits> ReadFromStream(std::istream &stream);
 template <typename Backend>
 void WriteToStream(const ModelTraits *model_traits, std::ostream &stream);
 
-/**
- * Write a text representation of the ModelTraits to
- * the specified stream.
- * @param [in] model_traits the ModelTraits object to write to stream
- * @param [inout] the stream to write to. i.e. std::cout
- */
-// void WriteTextToStream(const ModelTraits *model_traits, std::ostream
-// &stream);
+template <typename Backend>
+std::unique_ptr<ModelTraits> ReadFromFile(const std::string &filename) {
+  std::ifstream fstream{filename};
+  return ReadFromStream<Backend>(fstream);
+}
+
+template <typename Backend>
+void WriteToFile(const ModelTraits *model_traits, const std::string &filename) {
+  std::ofstream fstream{filename};
+  WriteToStream<Backend>(model_traits, fstream);
+}
+
 } // namespace bc
 
 #endif

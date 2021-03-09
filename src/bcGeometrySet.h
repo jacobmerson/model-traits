@@ -46,6 +46,7 @@ class GeometrySet : public IGeometrySet,
                     public Convertible<GeometrySet<Geometry, Cont>> {
 public:
   using Container = Cont<Geometry>;
+  GeometrySet() = default;
   GeometrySet(const Geometry &g) { geometry_.push_back(g); }
   GeometrySet(Geometry &&g) { geometry_.push_back(std::move(g)); }
   // FIXME need to constrain this template
