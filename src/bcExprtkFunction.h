@@ -40,7 +40,13 @@ public:
    * if there are more variables in the equation than NumVar an exception
    * will be thrown
    */
-  explicit ExprtkFunction(std::string eqn);
+  explicit ExprtkFunction(std::string);
+  // copy and move construction requires recreating the expression from string
+  ExprtkFunction(const ExprtkFunction &);
+  ExprtkFunction &operator=(const ExprtkFunction &);
+  ExprtkFunction(ExprtkFunction &&) noexcept;
+  ExprtkFunction &operator=(ExprtkFunction &&) noexcept;
+  ~ExprtkFunction() noexcept;
   template <typename... Args> T operator()(Args... args) {
     static_assert(sizeof...(args) == NumVar,
                   "operator() must be called with the same number of arguments "
@@ -50,20 +56,18 @@ public:
     vars_ = {std::move(args)...};
     return GetValue();
   }
-  T GetValue();
   constexpr auto GetNumArgs() noexcept { return NumVar; }
   friend std::string to_string(const ExprtkFunction &f) {
     return f.expression_string_;
   }
 
 private:
+  T GetValue();
   std::string expression_string_;
-  // we use a const shared ptr for COW behavior of the expression
-  // a ptr type is used for the expression so we can move the exprtk headers
-  // to the cpp file. This is important because exprtk is very expensive to
-  // include
-  std::shared_ptr<const expression_t> expression_;
-  std::array<T, NumVar> vars_;
+  // vector is used so that the values are stored on the stack,
+  // and moving can be done without re-parsing the equation
+  std::vector<T> vars_;
+  std::unique_ptr<expression_t> expression_;
 };
 // dynamic size
 template <int NumVar, typename T> class ExprtkFunction<NumVar, T, false> {
@@ -80,7 +84,13 @@ public:
    * expression in alphabetical order. For example if the expression string is
    * 5*z+6*x*y+t, calling the function will use the order t,x,y,z
    */
-  explicit ExprtkFunction(std::string eqn);
+  explicit ExprtkFunction(std::string);
+  // copy and move construction requires recreating the expression from string
+  ExprtkFunction(const ExprtkFunction &);
+  ExprtkFunction &operator=(const ExprtkFunction &);
+  ExprtkFunction(ExprtkFunction &&) noexcept;
+  ExprtkFunction &operator=(ExprtkFunction &&) noexcept;
+  ~ExprtkFunction() noexcept;
 
   /*
    * Operator to call the underlying expression. This call is not type safe for
@@ -104,12 +114,12 @@ public:
 
 private:
   std::string expression_string_;
+  std::vector<T> vars_;
   // we use a const shared ptr for COW behavior of the expression
   // a ptr type is used for the expression so we can move the exprtk headers
   // to the cpp file. This is important because exprtk is very expensive to
   // include
-  std::shared_ptr<const expression_t> expression_;
-  std::vector<T> vars_;
+  std::unique_ptr<expression_t> expression_;
 };
 
 } // namespace bc

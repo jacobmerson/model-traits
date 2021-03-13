@@ -20,6 +20,11 @@ public:
 
 // Undefined base NamedFunction class needed for template specialization
 template <typename> class NamedFunction;
+
+// type trait to check if a given type is a named function type
+template <typename T> struct IsNamedFunction : public std::false_type {};
+template <typename T>
+struct IsNamedFunction<NamedFunction<T>> : public std::true_type {};
 /*
  * NamedFunction is a type erased class that holds a callable function, and
  * provides the to_string utility for that function type. It can be constructed
@@ -37,6 +42,15 @@ public:
 
   NamedFunction() noexcept = default;
 
+  // need to have bot the const and non-const overloads of the copy
+  // constructor so that they override the forwarding argument constructor
+  NamedFunction(NamedFunction &) = default;
+  NamedFunction(const NamedFunction &) = default;
+  NamedFunction(NamedFunction &&) noexcept = default;
+  NamedFunction &operator=(NamedFunction &) = default;
+  NamedFunction &operator=(const NamedFunction &) = default;
+  NamedFunction &operator=(NamedFunction &&) = default;
+  ~NamedFunction() noexcept = default;
   // constructor takes a callable object that has to_string defined for its type
   template <typename Func, typename std::enable_if<
                                std::is_constructible<FunctionT, Func>::value &&
@@ -114,11 +128,6 @@ private:
   FunctionT func_;
   NameFunctionT name_;
 };
-
-// type trait to check if a given type is a named function type
-template <typename T> struct IsNamedFunction : public std::false_type {};
-template <typename T>
-struct IsNamedFunction<NamedFunction<T>> : public std::true_type {};
 
 } // namespace bc
 
