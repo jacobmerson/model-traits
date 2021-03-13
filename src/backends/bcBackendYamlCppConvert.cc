@@ -184,7 +184,7 @@ void convert<YAML>::decode(const BCNode &bcn, ::YAML::Node &nd,
 void convert<YAML>::decode(const CategoryNode &cn, ::YAML::Node &nd,
                            YAML * /*unused*/) {
   auto bcn = nd["boundary conditions"];
-  for (const auto &bc : cn.GetBoundaryConditions()) {
+  for (const auto &bc : cn.GetBoundaryConditionNodes()) {
     bc->to<YAML>(bcn);
   }
   for (const auto &cat : cn.GetCategories()) {
