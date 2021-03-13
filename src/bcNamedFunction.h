@@ -28,7 +28,7 @@ struct IsNamedFunction<NamedFunction<T>> : public std::true_type {};
 /*
  * NamedFunction is a type erased class that holds a callable function, and
  * provides the to_string utility for that function type. It can be constructed
- * from any callable object that has the to_string function implimented for its
+ * from any callable object that has the to_string function implemented for its
  * type. It also can be constructed from a std::string and a callable object
  * which is convenient for construction from lambda functions. Finally, you can
  * construct with a callable object for the name.
