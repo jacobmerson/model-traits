@@ -3,7 +3,7 @@
 #include <functional>
 #include <string>
 
-namespace bc {
+namespace mt {
 /*
  * trait to check if the type can be converted to a string using
  * the to_string free function.
@@ -129,6 +129,6 @@ private:
   NameFunctionT name_;
 };
 
-} // namespace bc
+} // namespace mt
 
 #endif

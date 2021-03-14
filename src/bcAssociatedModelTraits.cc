@@ -2,7 +2,7 @@
 #include <algorithm>
 #include <fmt/format.h>
 
-namespace bc {
+namespace mt {
 
 template <typename Geom>
 void AssociatedModelTraits<Geom>::AddGeometry(

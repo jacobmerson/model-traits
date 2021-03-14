@@ -12,8 +12,8 @@ auto myfunc(
 }
 
 int main(int, char **argv) {
-  bc::ExprtkFunction<4> f("x^2+y", {"x", "y", "z", "t"});
-  bc::ExprtkFunction<4> f2("x^2+y", {"x", "y"});
+  mt::ExprtkFunction<4> f("x^2+y", {"x", "y", "z", "t"});
+  mt::ExprtkFunction<4> f2("x^2+y", {"x", "y"});
   auto v = f(std::atof(argv[1]), std::atof(argv[2]), std::atof(argv[3]),
              std::atof(argv[4]));
   fmt::print("{}, {}, {}\n", to_string(f), v, myfunc(f));

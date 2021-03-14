@@ -7,7 +7,7 @@
 #include <memory>
 #include <unordered_set>
 
-namespace bc {
+namespace mt {
 class BCNode : public INode, public Convertible<BCNode> {
 public:
   using GeomPtrT = std::shared_ptr<IGeometrySet>;
@@ -32,6 +32,6 @@ private:
   // BC is classified on a unique set of geometric entities.
   std::vector<std::pair<GeomPtrT, BCPtrT>> bcs_;
 };
-} // namespace bc
+} // namespace mt
 
 #endif

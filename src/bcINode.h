@@ -6,7 +6,7 @@
 #include <string>
 #include <type_traits>
 
-namespace bc {
+namespace mt {
 
 class INode {
 public:
@@ -28,7 +28,7 @@ protected:
   std::string name_;
 };
 
-} // namespace bc
+} // namespace mt
 
 constexpr auto parse_mt_nodes(fmt::format_parse_context &ctx, int &level,
                               int &spaces) {
@@ -54,7 +54,7 @@ constexpr auto parse_mt_nodes(fmt::format_parse_context &ctx, int &level,
 }
 template <typename T>
 struct fmt::formatter<
-    T, std::enable_if_t<std::is_base_of<bc::INode, T>::value, char>> {
+    T, std::enable_if_t<std::is_base_of<mt::INode, T>::value, char>> {
   int level = 0;
   int spaces = 2;
   constexpr auto parse(format_parse_context &ctx) {

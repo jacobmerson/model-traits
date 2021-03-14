@@ -9,7 +9,7 @@
 #include "bcNamedFunction.h"
 #include <exception>
 
-namespace bc {
+namespace mt {
 // Is there a better way to get this compile time
 // type map defined for the convert function to use?
 // Granted for YAML it is easy because everything goes
@@ -59,17 +59,17 @@ template <> struct convert<YAML> {
 
   template <typename T,
             std::enable_if_t<IsNamedFunction<T>::value, bool> = false>
-  static void decode(const GenericBC<T, 0> & /*bc*/, ::YAML::Node & /*nd*/,
+  static void decode(const GenericBC<T, 0> & /*mt*/, ::YAML::Node & /*nd*/,
                      YAML * /*unused*/);
 
   template <typename T,
             std::enable_if_t<IsNamedFunction<T>::value, bool> = false>
-  static void decode(const GenericBC<T, 1> & /*bc*/, ::YAML::Node & /*nd*/,
+  static void decode(const GenericBC<T, 1> & /*mt*/, ::YAML::Node & /*nd*/,
                      YAML * /*unused*/);
 
   template <typename T,
             std::enable_if_t<IsNamedFunction<T>::value, bool> = false>
-  static void decode(const GenericBC<T, 2> & /*bc*/, ::YAML::Node & /*nd*/,
+  static void decode(const GenericBC<T, 2> & /*mt*/, ::YAML::Node & /*nd*/,
                      YAML * /*unused*/);
 };
 
@@ -147,6 +147,6 @@ R convert<YAML>::encode(const ::YAML::Node &nd, YAML * /*unused*/) {
   return R{std::move(functions)};
 }
 
-} // namespace bc
+} // namespace mt
 
 #endif

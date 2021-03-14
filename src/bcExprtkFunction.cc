@@ -2,7 +2,7 @@
 #include "exprtk.hpp"
 #include <exception>
 #include <fmt/format.h>
-namespace bc {
+namespace mt {
 
 /*
  * Removes the char to_remove from the string
@@ -247,4 +247,4 @@ template class ExprtkFunction<3, ScalarType>;
 template class ExprtkFunction<4, ScalarType>;
 // dynamic sized functions
 template class ExprtkFunction<-1, ScalarType>;
-} // namespace bc
+} // namespace mt

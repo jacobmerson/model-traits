@@ -3,7 +3,7 @@
 #include <unordered_set>
 #include <vector>
 
-namespace bc {
+namespace mt {
 /*
  * This is here so that we can use the template, template parameters
  * with the defaults for vector and unordered map. This workaround
@@ -11,6 +11,6 @@ namespace bc {
  */
 template <typename T> using BC_VEC_WORKAROUND = std::vector<T>;
 template <typename T> using BC_USET_WORKAROUND = std::unordered_set<T>;
-} // namespace bc
+} // namespace mt
 
 #endif

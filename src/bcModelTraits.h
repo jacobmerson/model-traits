@@ -6,7 +6,7 @@
 #include <string>
 #include <unordered_map>
 
-namespace bc {
+namespace mt {
 /**
  * ModelTraits object is the root object that stores any boundary conditions, or
  * other attributes that may be stored on a model.
@@ -62,20 +62,20 @@ protected:
   std::string name_;
 };
 
-} // namespace bc
+} // namespace mt
 
-template <> struct fmt::formatter<bc::ModelTraits> {
+template <> struct fmt::formatter<mt::ModelTraits> {
   int level = 0;
   int spaces = 2;
   constexpr auto parse(format_parse_context &ctx) {
     return parse_mt_nodes(ctx, level, spaces);
   };
   template <typename FormatContext>
-  auto format(const bc::ModelTraits &mt, FormatContext &ctx) {
+  auto format(const mt::ModelTraits &mt, FormatContext &ctx) {
     auto out =
         format_to(ctx.out(), "{:>{}}{}\n", "-", level * spaces, mt.name_);
     for (auto &cs : mt.cases_) {
-      auto ptr = dynamic_cast<bc::CategoryNode *>(cs.get());
+      auto ptr = dynamic_cast<mt::CategoryNode *>(cs.get());
       auto fmt_string = fmt::format("{{:{}.{}t}}", level + 1, spaces);
       if (ptr) {
         out = format_to(out, fmt_string, *ptr);

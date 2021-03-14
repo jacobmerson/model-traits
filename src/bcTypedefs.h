@@ -3,9 +3,9 @@
 #include <string>
 #include <type_traits>
 
-namespace bc {
+namespace mt {
 using ScalarType = double;
 using OrdinalType = int;
 
-} // namespace bc
+} // namespace mt
 #endif

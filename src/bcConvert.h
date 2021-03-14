@@ -1,14 +1,13 @@
 #ifndef BC_CONVERT_H__
 #define BC_CONVERT_H__
 #include <type_traits>
-namespace bc {
+namespace mt {
 
 // you can optionally specialize the BackendTypeMap for your backend types
-// If you specialize this struct, it will use the mapped type as the default type
-// for when you call the by value to conversion. i.e. this enables you to call:
-// auto n = model_traits.to<YAML>();
-// rather than:
-// auto n = model_traits.to<YAML, ::YAML::Node>();
+// If you specialize this struct, it will use the mapped type as the default
+// type for when you call the by value to conversion. i.e. this enables you to
+// call: auto n = model_traits.to<YAML>(); rather than: auto n =
+// model_traits.to<YAML, ::YAML::Node>();
 template <typename T, typename Backend> struct BackendTypeMap {};
 
 template <typename Backend = void> struct convert {};
@@ -42,7 +41,7 @@ template <typename BaseClass> struct Convertible {
   }
 };
 
-} // namespace bc
+} // namespace mt
 
 // adding new types to the readers/writers just requires writing a
 // convert struct with the appropriate types.

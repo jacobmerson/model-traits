@@ -9,7 +9,7 @@
 // clang-format on
 #include "bcModelTraits.h"
 
-namespace bc {
+namespace mt {
 
 template <typename T, int dim>
 static void AddExpression(const ::YAML::Node &bc, CategoryNode *parent_node,
@@ -109,7 +109,7 @@ static void ParseCase(const ::YAML::Node &yaml_case,
   auto &case_traits = yaml_case["model traits"];
   auto &geometry_type = case_traits["geometry_type"];
   if (geometry_type && geometry_type.as<std::string>() != "int") {
-    throw std::runtime_error("only integer bc types are currently supported");
+    throw std::runtime_error("only integer mt types are currently supported");
   }
   ParseCaseHelper(case_traits, model_case);
 }
@@ -144,4 +144,4 @@ void WriteToStream(const ModelTraits *model_traits, std::ostream &stream,
   fmt::print(stream, "{}\n", e.c_str());
 }
 
-} // namespace bc
+} // namespace mt

@@ -17,7 +17,7 @@ namespace exprtk {
 template <typename T> class expression;
 }
 
-namespace bc {
+namespace mt {
 
 // base template
 template <int NumVar = 4, typename T = ScalarType, bool = (NumVar >= 0)>
@@ -122,5 +122,5 @@ private:
   std::unique_ptr<expression_t> expression_;
 };
 
-} // namespace bc
+} // namespace mt
 #endif

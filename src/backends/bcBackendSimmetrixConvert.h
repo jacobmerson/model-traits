@@ -6,7 +6,7 @@
 #include "bcSimWrapper.h"
 #include <SimAttribute.h>
 
-namespace bc {
+namespace mt {
 template <> struct convert<SIMMETRIX> {
   // template <typename R, typename T> static R encode(const T &, SIMMETRIX *);
 
@@ -96,6 +96,6 @@ R convert<SIMMETRIX>::encode(pAttInfo att, SIMMETRIX * /*unused*/) {
   }
   return R{std::move(functions)};
 }
-} // namespace bc
+} // namespace mt
 
 #endif

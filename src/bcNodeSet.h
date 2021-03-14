@@ -7,7 +7,7 @@
 #include <memory>
 #include <type_traits>
 
-namespace bc {
+namespace mt {
 
 /*
  * The node set collection is templated because depending on the number of nodes
@@ -86,6 +86,6 @@ private:
   Container nodes_;
 };
 
-} // namespace bc
+} // namespace mt
 
 #endif

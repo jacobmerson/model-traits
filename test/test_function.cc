@@ -6,9 +6,9 @@
 #include <catch2/catch_approx.hpp>
 #include <catch2/catch_test_macros.hpp>
 
-using bc::ExprtkFunction;
-using bc::NamedFunction;
 using Catch::Approx;
+using mt::ExprtkFunction;
+using mt::NamedFunction;
 
 TEST_CASE("static exprtk function", "[exprtk][function]") {
   SECTION("single variable") {

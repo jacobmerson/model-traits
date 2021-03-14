@@ -6,13 +6,13 @@
 #include <catch2/catch_test_macros.hpp>
 #include <iostream>
 
-using bc::AssociatedModelTraits;
-using bc::BoolBC;
-using bc::DimGeometry;
-using bc::GeometrySet;
-using bc::IntBC;
-using bc::ModelTraits;
-using bc::OrdinalType;
+using mt::AssociatedModelTraits;
+using mt::BoolBC;
+using mt::DimGeometry;
+using mt::GeometrySet;
+using mt::IntBC;
+using mt::ModelTraits;
+using mt::OrdinalType;
 
 TEST_CASE("Associate Traits", "[associated]") {
   ModelTraits model_traits{"test"};
@@ -64,7 +64,7 @@ TEST_CASE("Associate Traits", "[associated]") {
     REQUIRE(bc1_int != nullptr);
     REQUIRE(bc2_bool != nullptr);
     REQUIRE(bc2_int != nullptr);
-    // the top level geometry should not see the bc inside of a category
+    // the top level geometry should not see the mt inside of a category
     REQUIRE(g19->FindBoundaryCondition("base boundary condition 1") == nullptr);
     REQUIRE(g19->FindBoundaryCondition("base boundary condition 2") == nullptr);
 

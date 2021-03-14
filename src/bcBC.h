@@ -10,7 +10,7 @@
 #include <stdexcept>
 #include <vector>
 
-namespace bc {
+namespace mt {
 
 template <typename, int = 0> class GenericBC;
 using BoolBC = GenericBC<bool>;
@@ -196,6 +196,6 @@ static_assert(IsFunctionBC<FunctionBC<double, 1, 0>>::value,
 static_assert(!IsFunctionBC<int>::value,
               "IsFunctionBC should return false for non FunctionBC types");
 
-} // namespace bc
+} // namespace mt
 
 #endif

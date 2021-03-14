@@ -5,7 +5,7 @@
 #include "bcGeometrySet.h" // DimGeometry
 #include "unordered_map"
 #include <vector>
-namespace bc {
+namespace mt {
 class AssociatedCategoryNode {
 public:
   explicit AssociatedCategoryNode(std::string name) : name_(std::move(name)) {}
@@ -75,6 +75,6 @@ private:
                    std::shared_ptr<const IBoundaryCondition>);
 };
 
-} // namespace bc
+} // namespace mt
 
 #endif

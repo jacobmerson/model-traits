@@ -11,7 +11,7 @@
 #include <unordered_map>
 #include <vector>
 
-namespace bc {
+namespace mt {
 
 class CategoryNode : public INode, public Convertible<CategoryNode> {
   using BCSetT = NodeSet<BCNode, BC_VEC_WORKAROUND>;
@@ -72,19 +72,19 @@ protected:
   CategorySetT categories_;
   BCSetT boundary_conditions_;
 };
-} // namespace bc
+} // namespace mt
 /*
-template <> struct fmt::formatter<bc::CategoryNode> {
+template <> struct fmt::formatter<mt::CategoryNode> {
   int level = 0;
   int spaces = 2;
   constexpr auto parse(format_parse_context &ctx) {
     return parse_mt_nodes(ctx, level, spaces);
   };
   template <typename FormatContext>
-  auto format(const bc::CategoryNode &cn, FormatContext &ctx) {
+  auto format(const mt::CategoryNode &cn, FormatContext &ctx) {
     auto out = format_to(ctx.out(), "{:>{}}{}", "-", level * spaces, cn.name_);
     for (auto &nd : cn.nodes_) {
-      auto CN_ptr = dynamic_cast<bc::CategoryNode *>(nd.get());
+      auto CN_ptr = dynamic_cast<mt::CategoryNode *>(nd.get());
       auto fmt_string = fmt::format("\n{{:{}.{}t}}", level + 1, spaces);
       if (CN_ptr) {
         out = format_to(out, fmt_string, *CN_ptr);

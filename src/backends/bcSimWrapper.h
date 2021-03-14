@@ -13,7 +13,7 @@
 #include <iterator>
 #include <type_traits>
 
-namespace bc {
+namespace mt {
 template <typename T> class SimList {
   static_assert(std::is_pointer<T>::value, "Sim list must be pointer type");
 
@@ -223,5 +223,5 @@ private:
   pGModel model_;
 };
 
-} // namespace bc
+} // namespace mt
 #endif

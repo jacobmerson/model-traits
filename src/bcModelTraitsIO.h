@@ -4,7 +4,7 @@
 #include "bcModelTraits.h"
 #include <fstream>
 
-namespace bc {
+namespace mt {
 /*
  */
 
@@ -40,6 +40,6 @@ void WriteToFile(const ModelTraits *model_traits, const std::string &filename,
   WriteToStream<Backend>(model_traits, fstream, backend);
 }
 
-} // namespace bc
+} // namespace mt
 
 #endif

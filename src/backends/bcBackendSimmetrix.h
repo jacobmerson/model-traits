@@ -3,13 +3,13 @@
 #include "bcModelTraits.h"
 #include "bcModelTraitsIO.h"
 
-namespace bc {
+namespace mt {
 struct SIMMETRIX : Backend {};
 
 template <>
 std::unique_ptr<ModelTraits> ReadFromFile(const std::string &filename,
                                           SIMMETRIX *backend);
 
-} // namespace bc
+} // namespace mt
 
 #endif

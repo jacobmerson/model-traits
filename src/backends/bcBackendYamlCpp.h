@@ -3,7 +3,7 @@
 #include "bcModelTraits.h"
 #include "bcModelTraitsIO.h"
 
-namespace bc {
+namespace mt {
 struct YAML : Backend {};
 
 template <>
@@ -13,6 +13,6 @@ template <>
 std::unique_ptr<ModelTraits> ReadFromStream(std::istream &stream,
                                             YAML *backend);
 
-} // namespace bc
+} // namespace mt
 
 #endif

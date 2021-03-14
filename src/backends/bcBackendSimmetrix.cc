@@ -14,7 +14,7 @@
 #include <fmt/format.h>
 #include <type_traits>
 
-namespace bc {
+namespace mt {
 enum class SimEquationType { Space, Time, SpaceTime, None };
 
 template <typename T, int dim>
@@ -366,4 +366,4 @@ std::unique_ptr<ModelTraits> ReadFromFile(const std::string &filename,
 
   return {};
 }
-} // namespace bc
+} // namespace mt

@@ -5,7 +5,7 @@
 #include "bcUtility.h"
 #include <unordered_set>
 
-namespace bc {
+namespace mt {
 
 // FIXME Better name?
 struct DimGeometry {
@@ -87,5 +87,5 @@ private:
 template <template <typename> class Cont = BC_VEC_WORKAROUND>
 using DimGeometrySet = GeometrySet<DimGeometry, Cont>;
 
-} // namespace bc
+} // namespace mt
 #endif

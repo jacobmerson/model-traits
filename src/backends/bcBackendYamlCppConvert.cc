@@ -1,5 +1,5 @@
 #include "bcBackendYamlCppConvert.h"
-namespace bc {
+namespace mt {
 
 struct YamlExportBCVisitor : public BCVisitor {
   explicit YamlExportBCVisitor(::YAML::Node &nd) : nd_(nd) {}
@@ -203,4 +203,4 @@ void convert<YAML>::decode(const ModelTraits &mt, ::YAML::Node &nd,
     cases_node.push_back(local);
   }
 }
-} // namespace bc
+} // namespace mt

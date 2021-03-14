@@ -6,7 +6,7 @@
 #include "bcTypedefs.h"
 #include <SimAttribute.h>
 
-namespace bc {
+namespace mt {
 template <> IntBC convert<SIMMETRIX>::encode(pAttInfo att, SIMMETRIX *) {
   auto int_att = static_cast<pAttInfoInt>(att);
   if (AttInfoInt_isExpression(int_att)) {
@@ -83,4 +83,4 @@ template <> VectorBC convert<SIMMETRIX>::encode(pAttInfo att, SIMMETRIX *) {
   return VectorBC(std::move(values));
 }
 
-} // namespace bc
+} // namespace mt

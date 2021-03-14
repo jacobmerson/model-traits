@@ -1,9 +1,9 @@
 #include "bcModelTraits.h"
 #include "catch2/catch_test_macros.hpp"
 
-class TestModelTraits : public bc::ModelTraits {
+class TestModelTraits : public mt::ModelTraits {
 public:
-  TestModelTraits(const std::string &name) : bc::ModelTraits(name){};
+  TestModelTraits(const std::string &name) : mt::ModelTraits(name){};
   const auto &GetName() const { return name_; }
 };
 

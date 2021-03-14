@@ -1,7 +1,7 @@
 #ifndef BC_FUNCTION_HELPER_H__
 #define BC_FUNCTION_HELPER_H__
 
-namespace bc {
+namespace mt {
 namespace detail {
 template <typename, typename, int, bool, typename... Args> struct FuncCreator;
 
@@ -34,6 +34,6 @@ struct FuncCreator<R, T, N, true, Args...> {
  */
 template <typename R, typename T, int N>
 using FunctionT = typename detail::FuncCreator<R, T, N, false>::type;
-} // namespace bc
+} // namespace mt
 
 #endif
