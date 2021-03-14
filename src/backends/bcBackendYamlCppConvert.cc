@@ -1,42 +1,42 @@
 #include "bcBackendYamlCppConvert.h"
 namespace mt {
 
-struct YamlExportBCVisitor : public BCVisitor {
+struct YamlExportBCVisitor : public MTVisitor {
   explicit YamlExportBCVisitor(::YAML::Node &nd) : nd_(nd) {}
-  void visit(BoolBC &bc) final { bc.to<YAML>(nd_); };
-  void visit(MatrixBC &bc) final { bc.to<YAML>(nd_); };
-  void visit(ScalarBC &bc) final { bc.to<YAML>(nd_); };
-  void visit(IntBC &bc) final { bc.to<YAML>(nd_); };
-  void visit(StringBC &bc) final { bc.to<YAML>(nd_); };
-  void visit(VectorBC &bc) final { bc.to<YAML>(nd_); };
+  void visit(BoolMT &bc) final { bc.to<YAML>(nd_); };
+  void visit(MatrixMT &bc) final { bc.to<YAML>(nd_); };
+  void visit(ScalarMT &bc) final { bc.to<YAML>(nd_); };
+  void visit(IntMT &bc) final { bc.to<YAML>(nd_); };
+  void visit(StringMT &bc) final { bc.to<YAML>(nd_); };
+  void visit(VectorMT &bc) final { bc.to<YAML>(nd_); };
   // equations
-  void visit(BoolFunctionBC<4> &bc) final { bc.to<YAML>(nd_); };
-  void visit(ScalarFunctionBC<4> &bc) final { bc.to<YAML>(nd_); };
-  void visit(StringFunctionBC<4> &bc) final { bc.to<YAML>(nd_); };
-  void visit(IntFunctionBC<4> &bc) final { bc.to<YAML>(nd_); };
-  void visit(VectorFunctionBC<4> &bc) final { bc.to<YAML>(nd_); };
-  void visit(MatrixFunctionBC<4> &bc) final { bc.to<YAML>(nd_); };
+  void visit(BoolFunctionMT<4> &bc) final { bc.to<YAML>(nd_); };
+  void visit(ScalarFunctionMT<4> &bc) final { bc.to<YAML>(nd_); };
+  void visit(StringFunctionMT<4> &bc) final { bc.to<YAML>(nd_); };
+  void visit(IntFunctionMT<4> &bc) final { bc.to<YAML>(nd_); };
+  void visit(VectorFunctionMT<4> &bc) final { bc.to<YAML>(nd_); };
+  void visit(MatrixFunctionMT<4> &bc) final { bc.to<YAML>(nd_); };
   // 3 parameters (3D space)
-  void visit(BoolFunctionBC<3> &bc) final { bc.to<YAML>(nd_); };
-  void visit(ScalarFunctionBC<3> &bc) final { bc.to<YAML>(nd_); };
-  void visit(StringFunctionBC<3> &bc) final { bc.to<YAML>(nd_); };
-  void visit(IntFunctionBC<3> &bc) final { bc.to<YAML>(nd_); };
-  void visit(MatrixFunctionBC<3> &bc) final { bc.to<YAML>(nd_); };
-  void visit(VectorFunctionBC<3> &bc) final { bc.to<YAML>(nd_); };
+  void visit(BoolFunctionMT<3> &bc) final { bc.to<YAML>(nd_); };
+  void visit(ScalarFunctionMT<3> &bc) final { bc.to<YAML>(nd_); };
+  void visit(StringFunctionMT<3> &bc) final { bc.to<YAML>(nd_); };
+  void visit(IntFunctionMT<3> &bc) final { bc.to<YAML>(nd_); };
+  void visit(MatrixFunctionMT<3> &bc) final { bc.to<YAML>(nd_); };
+  void visit(VectorFunctionMT<3> &bc) final { bc.to<YAML>(nd_); };
   // 2 parameters (2D space)
-  void visit(BoolFunctionBC<2> &bc) final { bc.to<YAML>(nd_); };
-  void visit(ScalarFunctionBC<2> &bc) final { bc.to<YAML>(nd_); };
-  void visit(StringFunctionBC<2> &bc) final { bc.to<YAML>(nd_); };
-  void visit(IntFunctionBC<2> &bc) final { bc.to<YAML>(nd_); };
-  void visit(MatrixFunctionBC<2> &bc) final { bc.to<YAML>(nd_); };
-  void visit(VectorFunctionBC<2> &bc) final { bc.to<YAML>(nd_); };
+  void visit(BoolFunctionMT<2> &bc) final { bc.to<YAML>(nd_); };
+  void visit(ScalarFunctionMT<2> &bc) final { bc.to<YAML>(nd_); };
+  void visit(StringFunctionMT<2> &bc) final { bc.to<YAML>(nd_); };
+  void visit(IntFunctionMT<2> &bc) final { bc.to<YAML>(nd_); };
+  void visit(MatrixFunctionMT<2> &bc) final { bc.to<YAML>(nd_); };
+  void visit(VectorFunctionMT<2> &bc) final { bc.to<YAML>(nd_); };
   // 1 parameters (time)
-  void visit(BoolFunctionBC<1> &bc) final { bc.to<YAML>(nd_); };
-  void visit(ScalarFunctionBC<1> &bc) final { bc.to<YAML>(nd_); };
-  void visit(StringFunctionBC<1> &bc) final { bc.to<YAML>(nd_); };
-  void visit(IntFunctionBC<1> &bc) final { bc.to<YAML>(nd_); };
-  void visit(MatrixFunctionBC<1> &bc) final { bc.to<YAML>(nd_); };
-  void visit(VectorFunctionBC<1> &bc) final { bc.to<YAML>(nd_); };
+  void visit(BoolFunctionMT<1> &bc) final { bc.to<YAML>(nd_); };
+  void visit(ScalarFunctionMT<1> &bc) final { bc.to<YAML>(nd_); };
+  void visit(StringFunctionMT<1> &bc) final { bc.to<YAML>(nd_); };
+  void visit(IntFunctionMT<1> &bc) final { bc.to<YAML>(nd_); };
+  void visit(MatrixFunctionMT<1> &bc) final { bc.to<YAML>(nd_); };
+  void visit(VectorFunctionMT<1> &bc) final { bc.to<YAML>(nd_); };
 
 private:
   ::YAML::Node &nd_;
@@ -59,25 +59,25 @@ using SetT = convert<YAML>::SetT;
 using DimSetT = convert<YAML>::DimSetT;
 
 template <>
-BoolBC convert<YAML>::encode(const ::YAML::Node &nd, YAML * /*unused*/) {
-  return BoolBC(nd.as<bool>());
+BoolMT convert<YAML>::encode(const ::YAML::Node &nd, YAML * /*unused*/) {
+  return BoolMT(nd.as<bool>());
 }
 
-void convert<YAML>::decode(const BoolBC &bc, ::YAML::Node &nd,
+void convert<YAML>::decode(const BoolMT &bc, ::YAML::Node &nd,
                            YAML * /*unused*/) {
   nd["type"] = "bool";
   nd["value"] = bc();
 }
 
 template <>
-MatrixBC convert<YAML>::encode(const ::YAML::Node &nd, YAML * /*unused*/) {
+MatrixMT convert<YAML>::encode(const ::YAML::Node &nd, YAML * /*unused*/) {
   std::vector<std::vector<ScalarType>> matrix;
   for (const auto &row : nd) {
     matrix.push_back(row.as<std::vector<ScalarType>>());
   }
-  return MatrixBC(matrix);
+  return MatrixMT(matrix);
 }
-void convert<YAML>::decode(const MatrixBC &bc, ::YAML::Node &nd,
+void convert<YAML>::decode(const MatrixMT &bc, ::YAML::Node &nd,
                            YAML * /*unused*/) {
   nd["type"] = "matrix";
   auto val = nd["value"];
@@ -93,41 +93,41 @@ void convert<YAML>::decode(const MatrixBC &bc, ::YAML::Node &nd,
 }
 
 template <>
-ScalarBC convert<YAML>::encode(const ::YAML::Node &nd, YAML * /*unused*/) {
-  return ScalarBC(nd.as<ScalarType>());
+ScalarMT convert<YAML>::encode(const ::YAML::Node &nd, YAML * /*unused*/) {
+  return ScalarMT(nd.as<ScalarType>());
 }
-void convert<YAML>::decode(const ScalarBC &bc, ::YAML::Node &nd,
+void convert<YAML>::decode(const ScalarMT &bc, ::YAML::Node &nd,
                            YAML * /*unused*/) {
   nd["type"] = "scalar";
   nd["value"] = bc();
 }
 
 template <>
-IntBC convert<YAML>::encode(const ::YAML::Node &nd, YAML * /*unused*/) {
-  return IntBC(nd.as<OrdinalType>());
+IntMT convert<YAML>::encode(const ::YAML::Node &nd, YAML * /*unused*/) {
+  return IntMT(nd.as<OrdinalType>());
 }
-void convert<YAML>::decode(const IntBC &bc, ::YAML::Node &nd,
+void convert<YAML>::decode(const IntMT &bc, ::YAML::Node &nd,
                            YAML * /*unused*/) {
   nd["type"] = "int";
   nd["value"] = bc();
 }
 
 template <>
-StringBC convert<YAML>::encode(const ::YAML::Node &nd, YAML * /*unused*/) {
-  return StringBC(nd.as<std::string>());
+StringMT convert<YAML>::encode(const ::YAML::Node &nd, YAML * /*unused*/) {
+  return StringMT(nd.as<std::string>());
 }
-void convert<YAML>::decode(const StringBC &bc, ::YAML::Node &nd,
+void convert<YAML>::decode(const StringMT &bc, ::YAML::Node &nd,
                            YAML * /*unused*/) {
   nd["type"] = "string";
   nd["value"] = bc();
 }
 
 template <>
-VectorBC convert<YAML>::encode(const ::YAML::Node &nd, YAML * /*unused*/) {
-  return VectorBC(nd.as<std::vector<ScalarType>>());
+VectorMT convert<YAML>::encode(const ::YAML::Node &nd, YAML * /*unused*/) {
+  return VectorMT(nd.as<std::vector<ScalarType>>());
 }
 
-void convert<YAML>::decode(const VectorBC &bc, ::YAML::Node &nd,
+void convert<YAML>::decode(const VectorMT &bc, ::YAML::Node &nd,
                            YAML * /*unused*/) {
   nd["type"] = "vector";
   auto val = nd["value"];

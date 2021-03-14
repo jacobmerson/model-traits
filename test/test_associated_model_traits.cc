@@ -7,10 +7,10 @@
 #include <iostream>
 
 using mt::AssociatedModelTraits;
-using mt::BoolBC;
+using mt::BoolMT;
 using mt::DimGeometry;
 using mt::GeometrySet;
-using mt::IntBC;
+using mt::IntMT;
 using mt::ModelTraits;
 using mt::OrdinalType;
 
@@ -20,18 +20,18 @@ TEST_CASE("Associate Traits", "[associated]") {
 
   SECTION("Associate Ordinal Geometry") {
     case1->AddBoundaryCondition(
-        "top level bool", GeometrySet<OrdinalType>({1, 2, 3}), BoolBC{true});
+        "top level bool", GeometrySet<OrdinalType>({1, 2, 3}), BoolMT{true});
     case1->AddBoundaryCondition("top level int",
-                                GeometrySet<OrdinalType>({1, 2, 3}), IntBC{5});
+                                GeometrySet<OrdinalType>({1, 2, 3}), IntMT{5});
     auto *cat = case1->AddCategory("category 1");
     auto *right = cat->AddCategory("category 3");
     auto *left = cat->AddCategory("category 2");
     left->AddBoundaryCondition("base boundary condition 1",
                                GeometrySet<OrdinalType>({6, 8, 19, 34}),
-                               IntBC{10});
+                               IntMT{10});
     right->AddBoundaryCondition("base boundary condition 2",
                                 GeometrySet<OrdinalType>({6, 8, 19, 34}),
-                                IntBC{17});
+                                IntMT{17});
 
     AssociatedModelTraits<DimGeometry> wrong_assoc{case1};
     REQUIRE(wrong_assoc.NumGeometricEntities() == 0);
@@ -55,11 +55,11 @@ TEST_CASE("Associate Traits", "[associated]") {
     auto *bc1_int = g1->FindBoundaryCondition("top level int");
     auto *bc2_bool = g2->FindBoundaryCondition("top level bool");
     auto *bc2_int = g2->FindBoundaryCondition("top level int");
-    REQUIRE((*dynamic_cast<const BoolBC *>(bc1_bool))() == true);
-    REQUIRE((*dynamic_cast<const BoolBC *>(bc2_bool))() == true);
+    REQUIRE((*dynamic_cast<const BoolMT *>(bc1_bool))() == true);
+    REQUIRE((*dynamic_cast<const BoolMT *>(bc2_bool))() == true);
 
-    REQUIRE((*dynamic_cast<const IntBC *>(bc1_int))() == 5);
-    REQUIRE((*dynamic_cast<const IntBC *>(bc2_int))() == 5);
+    REQUIRE((*dynamic_cast<const IntMT *>(bc1_int))() == 5);
+    REQUIRE((*dynamic_cast<const IntMT *>(bc2_int))() == 5);
     REQUIRE(bc1_bool != nullptr);
     REQUIRE(bc1_int != nullptr);
     REQUIRE(bc2_bool != nullptr);
@@ -81,15 +81,15 @@ TEST_CASE("Associate Traits", "[associated]") {
         category3->FindBoundaryCondition("base boundary condition 2");
     REQUIRE(base_bc_1 != nullptr);
     REQUIRE(base_bc_2 != nullptr);
-    REQUIRE((*dynamic_cast<const IntBC *>(base_bc_1))() == 10);
-    REQUIRE((*dynamic_cast<const IntBC *>(base_bc_2))() == 17);
+    REQUIRE((*dynamic_cast<const IntMT *>(base_bc_1))() == 10);
+    REQUIRE((*dynamic_cast<const IntMT *>(base_bc_2))() == 17);
   }
   SECTION("Associate Dim Geometry") {
 
     case1->AddBoundaryCondition(
-        "top level int", GeometrySet<DimGeometry>({{1, 1}, {1, 2}}), IntBC{7});
+        "top level int", GeometrySet<DimGeometry>({{1, 1}, {1, 2}}), IntMT{7});
     case1->AddBoundaryCondition(
-        "top level int", GeometrySet<DimGeometry>({{2, 1}, {2, 2}}), IntBC{5});
+        "top level int", GeometrySet<DimGeometry>({{2, 1}, {2, 2}}), IntMT{5});
     AssociatedModelTraits<DimGeometry> model_association{case1};
 
     // seven unique geometric entities
@@ -107,21 +107,21 @@ TEST_CASE("Associate Traits", "[associated]") {
 
     auto *bc1 = g1->FindBoundaryCondition("top level int");
     REQUIRE(bc1 != nullptr);
-    const IntBC *bc1_int = dynamic_cast<const IntBC *>(bc1);
+    const IntMT *bc1_int = dynamic_cast<const IntMT *>(bc1);
     REQUIRE(bc1_int != nullptr);
     REQUIRE((*bc1_int)() == 7);
 
     auto *bc2 = g2->FindBoundaryCondition("top level int");
     REQUIRE(bc2 != nullptr);
-    const IntBC *bc2_int = dynamic_cast<const IntBC *>(bc2);
+    const IntMT *bc2_int = dynamic_cast<const IntMT *>(bc2);
     REQUIRE(bc2_int != nullptr);
     REQUIRE((*bc2_int)() == 5);
   }
   SECTION("Repeat BC Fail") {
     case1->AddBoundaryCondition(
-        "top level int", GeometrySet<OrdinalType>({1, 2, 3}), BoolBC{true});
+        "top level int", GeometrySet<OrdinalType>({1, 2, 3}), BoolMT{true});
     case1->AddBoundaryCondition("top level int",
-                                GeometrySet<OrdinalType>({1, 5, 7}), IntBC{5});
+                                GeometrySet<OrdinalType>({1, 5, 7}), IntMT{5});
 
     // multiple boundary conditions with the same name applied to the same
     // geometry fails

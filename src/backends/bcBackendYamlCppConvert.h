@@ -24,33 +24,33 @@ template <typename T> struct BackendTypeMap<T, YAML> {
 template <> struct convert<YAML> {
   // template specialization in cpp file
   // encoding needs to be a template so we can distinguish between return types
-  template <typename R, std::enable_if_t<!IsFunctionBC<R>::value, bool> = false>
+  template <typename R, std::enable_if_t<!IsFunctionMT<R>::value, bool> = false>
   static R encode(const ::YAML::Node &, YAML *);
   // overloads for scalar, vector and tensor functions
   // SFINAE is used since the method to encode the functions of each type is
   // identical
   template <
       typename R,
-      std::enable_if_t<IsFunctionBC<R>::value && (R::dim == 0), bool> = false>
+      std::enable_if_t<IsFunctionMT<R>::value && (R::dim == 0), bool> = false>
   static R encode(const ::YAML::Node & /*nd*/, YAML * /*unused*/);
   template <
       typename R,
-      std::enable_if_t<IsFunctionBC<R>::value && (R::dim == 1), bool> = false>
+      std::enable_if_t<IsFunctionMT<R>::value && (R::dim == 1), bool> = false>
   static R encode(const ::YAML::Node & /*nd*/, YAML * /*unused*/);
   template <
       typename R,
-      std::enable_if_t<IsFunctionBC<R>::value && (R::dim == 2), bool> = false>
+      std::enable_if_t<IsFunctionMT<R>::value && (R::dim == 2), bool> = false>
   static R encode(const ::YAML::Node & /*nd*/, YAML * /*unused*/);
 
   using DimSetT = GeometrySet<DimGeometry, BC_VEC_WORKAROUND>;
   using SetT = GeometrySet<OrdinalType, BC_VEC_WORKAROUND>;
 
-  static void decode(const BoolBC &, ::YAML::Node &, YAML *);
-  static void decode(const MatrixBC &, ::YAML::Node &, YAML *);
-  static void decode(const ScalarBC &, ::YAML::Node &, YAML *);
-  static void decode(const IntBC &, ::YAML::Node &, YAML *);
-  static void decode(const StringBC &, ::YAML::Node &, YAML *);
-  static void decode(const VectorBC &, ::YAML::Node &, YAML *);
+  static void decode(const BoolMT &, ::YAML::Node &, YAML *);
+  static void decode(const MatrixMT &, ::YAML::Node &, YAML *);
+  static void decode(const ScalarMT &, ::YAML::Node &, YAML *);
+  static void decode(const IntMT &, ::YAML::Node &, YAML *);
+  static void decode(const StringMT &, ::YAML::Node &, YAML *);
+  static void decode(const VectorMT &, ::YAML::Node &, YAML *);
   static void decode(const SetT &, ::YAML::Node &, YAML *);
   static void decode(const DimSetT &, ::YAML::Node &, YAML *);
   static void decode(const BCNode &bcn, ::YAML::Node &, YAML *);
@@ -59,22 +59,22 @@ template <> struct convert<YAML> {
 
   template <typename T,
             std::enable_if_t<IsNamedFunction<T>::value, bool> = false>
-  static void decode(const GenericBC<T, 0> & /*mt*/, ::YAML::Node & /*nd*/,
+  static void decode(const GenericMT<T, 0> & /*mt*/, ::YAML::Node & /*nd*/,
                      YAML * /*unused*/);
 
   template <typename T,
             std::enable_if_t<IsNamedFunction<T>::value, bool> = false>
-  static void decode(const GenericBC<T, 1> & /*mt*/, ::YAML::Node & /*nd*/,
+  static void decode(const GenericMT<T, 1> & /*mt*/, ::YAML::Node & /*nd*/,
                      YAML * /*unused*/);
 
   template <typename T,
             std::enable_if_t<IsNamedFunction<T>::value, bool> = false>
-  static void decode(const GenericBC<T, 2> & /*mt*/, ::YAML::Node & /*nd*/,
+  static void decode(const GenericMT<T, 2> & /*mt*/, ::YAML::Node & /*nd*/,
                      YAML * /*unused*/);
 };
 
 template <typename T, std::enable_if_t<IsNamedFunction<T>::value, bool>>
-void convert<YAML>::decode(const GenericBC<T, 0> &bc, ::YAML::Node &nd,
+void convert<YAML>::decode(const GenericMT<T, 0> &bc, ::YAML::Node &nd,
                            YAML * /*unused*/) {
   auto eqn_name = to_string(bc);
   auto count = std::count(begin(eqn_name), end(eqn_name), '$');
@@ -85,7 +85,7 @@ void convert<YAML>::decode(const GenericBC<T, 0> &bc, ::YAML::Node &nd,
   nd["num variables"] = T::ArgsCount();
 }
 template <typename T, std::enable_if_t<IsNamedFunction<T>::value, bool>>
-void convert<YAML>::decode(const GenericBC<T, 1> &bc, ::YAML::Node &nd,
+void convert<YAML>::decode(const GenericMT<T, 1> &bc, ::YAML::Node &nd,
                            YAML * /*unused*/) {
   auto count = 0;
   auto val = nd["value"];
@@ -99,7 +99,7 @@ void convert<YAML>::decode(const GenericBC<T, 1> &bc, ::YAML::Node &nd,
   nd["num variables"] = T::ArgsCount();
 }
 template <typename T, std::enable_if_t<IsNamedFunction<T>::value, bool>>
-void convert<YAML>::decode(const GenericBC<T, 2> &bc, ::YAML::Node &nd,
+void convert<YAML>::decode(const GenericMT<T, 2> &bc, ::YAML::Node &nd,
                            YAML * /*unused*/) {
   auto count = 0;
   auto val = nd["value"];
@@ -119,12 +119,12 @@ void convert<YAML>::decode(const GenericBC<T, 2> &bc, ::YAML::Node &nd,
 }
 
 template <typename R,
-          std::enable_if_t<IsFunctionBC<R>::value && (R::dim == 0), bool>>
+          std::enable_if_t<IsFunctionMT<R>::value && (R::dim == 0), bool>>
 R convert<YAML>::encode(const ::YAML::Node &nd, YAML * /*unused*/) {
   return R{ExprtkFunction<R::type::ArgsCount()>{nd.as<std::string>()}};
 }
 template <typename R,
-          std::enable_if_t<IsFunctionBC<R>::value && (R::dim == 1), bool>>
+          std::enable_if_t<IsFunctionMT<R>::value && (R::dim == 1), bool>>
 R convert<YAML>::encode(const ::YAML::Node &nd, YAML * /*unused*/) {
   std::vector<typename R::type> functions;
   for (const auto &v : nd) {
@@ -134,7 +134,7 @@ R convert<YAML>::encode(const ::YAML::Node &nd, YAML * /*unused*/) {
   return R{std::move(functions)};
 }
 template <typename R,
-          std::enable_if_t<IsFunctionBC<R>::value && (R::dim == 2), bool>>
+          std::enable_if_t<IsFunctionMT<R>::value && (R::dim == 2), bool>>
 R convert<YAML>::encode(const ::YAML::Node &nd, YAML * /*unused*/) {
   std::vector<std::vector<typename R::type>> functions;
   for (const auto &row : nd) {

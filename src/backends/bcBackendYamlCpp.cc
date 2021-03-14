@@ -19,22 +19,22 @@ static void AddExpression(const ::YAML::Node &bc, CategoryNode *parent_node,
   case 1:
     parent_node->AddBoundaryCondition(
         std::move(name), std::move(geometry_set),
-        FunctionBC<T, 1, dim>::template from<YAML>(bc["value"]));
+        FunctionMT<T, 1, dim>::template from<YAML>(bc["value"]));
     break;
   case 2:
     parent_node->AddBoundaryCondition(
         std::move(name), std::move(geometry_set),
-        FunctionBC<T, 2, dim>::template from<YAML>(bc["value"]));
+        FunctionMT<T, 2, dim>::template from<YAML>(bc["value"]));
     break;
   case 3:
     parent_node->AddBoundaryCondition(
         std::move(name), std::move(geometry_set),
-        FunctionBC<T, 3, dim>::template from<YAML>(bc["value"]));
+        FunctionMT<T, 3, dim>::template from<YAML>(bc["value"]));
     break;
   case 4:
     parent_node->AddBoundaryCondition(
         std::move(name), std::move(geometry_set),
-        FunctionBC<T, 4, dim>::template from<YAML>(bc["value"]));
+        FunctionMT<T, 4, dim>::template from<YAML>(bc["value"]));
     break;
     // in the default case, the boundary condition is added as a dynamic type
   default:
@@ -51,27 +51,27 @@ static void ParseBoundaryConditions(const ::YAML::Node &yaml_node,
     auto geometry = bc["geometry"].as<std::vector<int>>();
     auto geometry_set = GeometrySet<>(geometry.begin(), geometry.end());
     if (type == "scalar") {
-      auto value = ScalarBC::from<YAML>(bc["value"]);
+      auto value = ScalarMT::from<YAML>(bc["value"]);
       parent_node->AddBoundaryCondition(name, std::move(geometry_set),
                                         std::move(value));
     } else if (type == "bool") {
-      auto value = BoolBC::from<YAML>(bc["value"]);
+      auto value = BoolMT::from<YAML>(bc["value"]);
       parent_node->AddBoundaryCondition(name, std::move(geometry_set),
                                         std::move(value));
     } else if (type == "int") {
-      auto value = IntBC::from<YAML>(bc["value"]);
+      auto value = IntMT::from<YAML>(bc["value"]);
       parent_node->AddBoundaryCondition(name, std::move(geometry_set),
                                         std::move(value));
     } else if (type == "string") {
-      auto value = StringBC::from<YAML>(bc["value"]);
+      auto value = StringMT::from<YAML>(bc["value"]);
       parent_node->AddBoundaryCondition(name, std::move(geometry_set),
                                         std::move(value));
     } else if (type == "vector") {
-      auto value = VectorBC::from<YAML>(bc["value"]);
+      auto value = VectorMT::from<YAML>(bc["value"]);
       parent_node->AddBoundaryCondition(name, std::move(geometry_set),
                                         std::move(value));
     } else if (type == "matrix") {
-      auto value = MatrixBC::from<YAML>(bc["value"]);
+      auto value = MatrixMT::from<YAML>(bc["value"]);
       parent_node->AddBoundaryCondition(name, std::move(geometry_set),
                                         std::move(value));
     } else if (type == "expression") {

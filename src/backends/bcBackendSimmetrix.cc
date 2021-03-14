@@ -25,22 +25,22 @@ static void AddExpression(pAttInfo bc, CategoryNode *parent_node,
   case SimEquationType::Space:
     parent_node->AddBoundaryCondition(
         std::move(name), std::move(geometry_set),
-        FunctionBC<T, 3, dim>::template from<SIMMETRIX>(bc));
+        FunctionMT<T, 3, dim>::template from<SIMMETRIX>(bc));
     break;
   case SimEquationType::Time:
     parent_node->AddBoundaryCondition(
         std::move(name), std::move(geometry_set),
-        FunctionBC<T, 1, dim>::template from<SIMMETRIX>(bc));
+        FunctionMT<T, 1, dim>::template from<SIMMETRIX>(bc));
     break;
   case SimEquationType::SpaceTime:
     parent_node->AddBoundaryCondition(
         std::move(name), std::move(geometry_set),
-        FunctionBC<T, 4, dim>::template from<SIMMETRIX>(bc));
+        FunctionMT<T, 4, dim>::template from<SIMMETRIX>(bc));
     break;
   case SimEquationType::None:
     parent_node->AddBoundaryCondition(
         std::move(name), std::move(geometry_set),
-        GenericBC<T, dim>::template from<SIMMETRIX>(bc));
+        GenericMT<T, dim>::template from<SIMMETRIX>(bc));
     break;
   }
 }
@@ -140,7 +140,7 @@ static void AddBoundaryCondition(CategoryNode *parent_node, pAttInfo sim_node,
       AddExpression<OrdinalType, 0>(sim_node, parent_node, std::string(name),
                                     std::move(geom), equation_type);
     } else {
-      auto value = IntBC::from<SIMMETRIX>(sim_node);
+      auto value = IntMT::from<SIMMETRIX>(sim_node);
       parent_node->AddBoundaryCondition(std::string(name), std::move(geom),
                                         std::move(value));
     }
@@ -149,7 +149,7 @@ static void AddBoundaryCondition(CategoryNode *parent_node, pAttInfo sim_node,
         0) {
       throw std::runtime_error("String Expressions Not Currently Supported");
     }
-    auto value = StringBC::from<SIMMETRIX>(sim_node);
+    auto value = StringMT::from<SIMMETRIX>(sim_node);
     parent_node->AddBoundaryCondition(std::string(name), std::move(geom),
                                       std::move(value));
   } else if (rep_type == Att_double) {
@@ -162,7 +162,7 @@ static void AddBoundaryCondition(CategoryNode *parent_node, pAttInfo sim_node,
       AddExpression<ScalarType, 0>(sim_node, parent_node, std::string(name),
                                    std::move(geom), equation_type);
     } else {
-      auto value = ScalarBC::from<SIMMETRIX>(sim_node);
+      auto value = ScalarMT::from<SIMMETRIX>(sim_node);
       parent_node->AddBoundaryCondition(std::string(name), std::move(geom),
                                         std::move(value));
     }
@@ -176,7 +176,7 @@ static void AddBoundaryCondition(CategoryNode *parent_node, pAttInfo sim_node,
       AddExpression<ScalarType, 0>(sim_node, parent_node, std::string(name),
                                    std::move(geom), equation_type);
     } else {
-      auto value = ScalarBC::from<SIMMETRIX>(sim_node);
+      auto value = ScalarMT::from<SIMMETRIX>(sim_node);
       parent_node->AddBoundaryCondition(std::string(name), std::move(geom),
                                         std::move(value));
     }
@@ -200,7 +200,7 @@ static void AddBoundaryCondition(CategoryNode *parent_node, pAttInfo sim_node,
       AddExpression<ScalarType, 1>(sim_node, parent_node, std::string(name),
                                    std::move(geom), equation_type);
     } else {
-      auto value = VectorBC::from<SIMMETRIX>(sim_node);
+      auto value = VectorMT::from<SIMMETRIX>(sim_node);
       parent_node->AddBoundaryCondition(std::string(name), std::move(geom),
                                         std::move(value));
     }
@@ -227,7 +227,7 @@ static void AddBoundaryCondition(CategoryNode *parent_node, pAttInfo sim_node,
       AddExpression<ScalarType, 2>(sim_node, parent_node, std::string(name),
                                    std::move(geom), equation_type);
     }
-    auto value = MatrixBC::from<SIMMETRIX>(sim_node);
+    auto value = MatrixMT::from<SIMMETRIX>(sim_node);
     parent_node->AddBoundaryCondition(std::string(name), std::move(geom),
                                       std::move(value));
   } else {

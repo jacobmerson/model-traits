@@ -12,13 +12,13 @@
 
 namespace mt {
 
-template <typename, int = 0> class GenericBC;
-using BoolBC = GenericBC<bool>;
-using ScalarBC = GenericBC<ScalarType>;
-using StringBC = GenericBC<std::string>;
-using IntBC = GenericBC<OrdinalType>;
-using MatrixBC = GenericBC<ScalarType, 2>;
-using VectorBC = GenericBC<ScalarType, 1>;
+template <typename, int = 0> class GenericMT;
+using BoolMT = GenericMT<bool>;
+using ScalarMT = GenericMT<ScalarType>;
+using StringMT = GenericMT<std::string>;
+using IntMT = GenericMT<OrdinalType>;
+using MatrixMT = GenericMT<ScalarType, 2>;
+using VectorMT = GenericMT<ScalarType, 1>;
 
 // typedef to define the function boundary condition types
 // T is the return type of the function, NARG is the number of
@@ -28,80 +28,80 @@ using VectorBC = GenericBC<ScalarType, 1>;
 // dim=1: vector
 // dim=2: matrix
 template <typename T, int NARG, int dim = 0>
-using FunctionBC =
-    GenericBC<NamedFunction<FunctionT<T, ScalarType, NARG>>, dim>;
+using FunctionMT =
+    GenericMT<NamedFunction<FunctionT<T, ScalarType, NARG>>, dim>;
 
 // convenience typedefs for function types
-template <int NARG> using BoolFunctionBC = FunctionBC<bool, NARG, 0>;
-template <int NARG> using ScalarFunctionBC = FunctionBC<ScalarType, NARG, 0>;
-template <int NARG> using StringFunctionBC = FunctionBC<std::string, NARG, 0>;
-template <int NARG> using IntFunctionBC = FunctionBC<OrdinalType, NARG, 0>;
-template <int NARG> using MatrixFunctionBC = FunctionBC<ScalarType, NARG, 2>;
-template <int NARG> using VectorFunctionBC = FunctionBC<ScalarType, NARG, 1>;
+template <int NARG> using BoolFunctionMT = FunctionMT<bool, NARG, 0>;
+template <int NARG> using ScalarFunctionMT = FunctionMT<ScalarType, NARG, 0>;
+template <int NARG> using StringFunctionMT = FunctionMT<std::string, NARG, 0>;
+template <int NARG> using IntFunctionMT = FunctionMT<OrdinalType, NARG, 0>;
+template <int NARG> using MatrixFunctionMT = FunctionMT<ScalarType, NARG, 2>;
+template <int NARG> using VectorFunctionMT = FunctionMT<ScalarType, NARG, 1>;
 
 // TODO: move the visitor to an independent header
 // TODO: decide if the visit functions should have a default empty
 // implementation
-struct BCVisitor {
-  virtual void visit(BoolBC &) = 0;
-  virtual void visit(MatrixBC &) = 0;
-  virtual void visit(ScalarBC &) = 0;
-  virtual void visit(IntBC &) = 0;
-  virtual void visit(StringBC &) = 0;
-  virtual void visit(VectorBC &) = 0;
+struct MTVisitor {
+  virtual void visit(BoolMT &) = 0;
+  virtual void visit(MatrixMT &) = 0;
+  virtual void visit(ScalarMT &) = 0;
+  virtual void visit(IntMT &) = 0;
+  virtual void visit(StringMT &) = 0;
+  virtual void visit(VectorMT &) = 0;
   // equation types
   // 4 parameters (space and time)
-  virtual void visit(BoolFunctionBC<4> &){};
-  virtual void visit(ScalarFunctionBC<4> &){};
-  virtual void visit(StringFunctionBC<4> &){};
-  virtual void visit(IntFunctionBC<4> &){};
-  virtual void visit(MatrixFunctionBC<4> &){};
-  virtual void visit(VectorFunctionBC<4> &){};
+  virtual void visit(BoolFunctionMT<4> &){};
+  virtual void visit(ScalarFunctionMT<4> &){};
+  virtual void visit(StringFunctionMT<4> &){};
+  virtual void visit(IntFunctionMT<4> &){};
+  virtual void visit(MatrixFunctionMT<4> &){};
+  virtual void visit(VectorFunctionMT<4> &){};
   // 3 parameters (3D space)
-  virtual void visit(BoolFunctionBC<3> &){};
-  virtual void visit(ScalarFunctionBC<3> &){};
-  virtual void visit(StringFunctionBC<3> &){};
-  virtual void visit(IntFunctionBC<3> &){};
-  virtual void visit(MatrixFunctionBC<3> &){};
-  virtual void visit(VectorFunctionBC<3> &){};
+  virtual void visit(BoolFunctionMT<3> &){};
+  virtual void visit(ScalarFunctionMT<3> &){};
+  virtual void visit(StringFunctionMT<3> &){};
+  virtual void visit(IntFunctionMT<3> &){};
+  virtual void visit(MatrixFunctionMT<3> &){};
+  virtual void visit(VectorFunctionMT<3> &){};
   // 2 parameters (2D space)
-  virtual void visit(BoolFunctionBC<2> &){};
-  virtual void visit(ScalarFunctionBC<2> &){};
-  virtual void visit(StringFunctionBC<2> &){};
-  virtual void visit(IntFunctionBC<2> &){};
-  virtual void visit(MatrixFunctionBC<2> &){};
-  virtual void visit(VectorFunctionBC<2> &){};
+  virtual void visit(BoolFunctionMT<2> &){};
+  virtual void visit(ScalarFunctionMT<2> &){};
+  virtual void visit(StringFunctionMT<2> &){};
+  virtual void visit(IntFunctionMT<2> &){};
+  virtual void visit(MatrixFunctionMT<2> &){};
+  virtual void visit(VectorFunctionMT<2> &){};
   // 1 parameters (time)
-  virtual void visit(BoolFunctionBC<1> &){};
-  virtual void visit(ScalarFunctionBC<1> &){};
-  virtual void visit(StringFunctionBC<1> &){};
-  virtual void visit(IntFunctionBC<1> &){};
-  virtual void visit(MatrixFunctionBC<1> &){};
-  virtual void visit(VectorFunctionBC<1> &){};
-  virtual ~BCVisitor() = default;
+  virtual void visit(BoolFunctionMT<1> &){};
+  virtual void visit(ScalarFunctionMT<1> &){};
+  virtual void visit(StringFunctionMT<1> &){};
+  virtual void visit(IntFunctionMT<1> &){};
+  virtual void visit(MatrixFunctionMT<1> &){};
+  virtual void visit(VectorFunctionMT<1> &){};
+  virtual ~MTVisitor() = default;
 };
 
-class IBoundaryCondition {
+class IModelTrait {
 public:
-  virtual void accept(BCVisitor &v) = 0;
-  IBoundaryCondition() = default;
-  IBoundaryCondition(const IBoundaryCondition &) = default;
-  IBoundaryCondition(IBoundaryCondition &&) = default;
-  IBoundaryCondition &operator=(const IBoundaryCondition &) = default;
-  IBoundaryCondition &operator=(IBoundaryCondition &&) = default;
-  virtual ~IBoundaryCondition() = default;
+  virtual void accept(MTVisitor &v) = 0;
+  IModelTrait() = default;
+  IModelTrait(const IModelTrait &) = default;
+  IModelTrait(IModelTrait &&) = default;
+  IModelTrait &operator=(const IModelTrait &) = default;
+  IModelTrait &operator=(IModelTrait &&) = default;
+  virtual ~IModelTrait() = default;
 };
 
 template <typename T>
-class GenericBC<T, 2> : public IBoundaryCondition,
-                        public Convertible<GenericBC<T, 2>> {
+class GenericMT<T, 2> : public IModelTrait,
+                        public Convertible<GenericMT<T, 2>> {
 public:
   using type = T;
   static constexpr int dim = 2;
-  GenericBC() noexcept = default;
-  GenericBC(OrdinalType nrows, OrdinalType ncols) : data_(nrows * ncols) {}
+  GenericMT() noexcept = default;
+  GenericMT(OrdinalType nrows, OrdinalType ncols) : data_(nrows * ncols) {}
   // not noexcept because copying d in the parameter can throw
-  explicit GenericBC(std::vector<std::vector<T>> d) {
+  explicit GenericMT(std::vector<std::vector<T>> d) {
     ncols_ = d[0].size();
     data_.reserve(d.size() * ncols_);
     for (std::size_t i = 0; i < d.size(); ++i) {
@@ -120,7 +120,7 @@ public:
   T &operator()(OrdinalType row, OrdinalType col) noexcept {
     return data_[row + col * ncols_];
   }
-  void accept(BCVisitor &v) final { v.visit(*this); }
+  void accept(MTVisitor &v) final { v.visit(*this); }
 
   OrdinalType nrows() const { return data_.size() / ncols_; }
   OrdinalType ncols() const { return ncols_; }
@@ -131,40 +131,39 @@ private:
 };
 
 template <typename T>
-class GenericBC<T, 1> : public IBoundaryCondition,
-                        public Convertible<GenericBC<T, 1>> {
+class GenericMT<T, 1> : public IModelTrait,
+                        public Convertible<GenericMT<T, 1>> {
 public:
   using type = T;
   static constexpr int dim = 1;
-  GenericBC() noexcept = default;
-  GenericBC(OrdinalType size) : data_(size){};
+  GenericMT() noexcept = default;
+  GenericMT(OrdinalType size) : data_(size){};
   // not noexcept because copying d in the parameter can throw
-  explicit GenericBC(const std::vector<T> &d) : data_(d){};
-  explicit GenericBC(std::vector<T> &&d) noexcept : data_(std::move(d)){};
+  explicit GenericMT(const std::vector<T> &d) : data_(d){};
+  explicit GenericMT(std::vector<T> &&d) noexcept : data_(std::move(d)){};
   T &operator()(OrdinalType i) noexcept { return data_[i]; }
   const T &operator()(OrdinalType i) const noexcept { return data_[i]; }
   auto size() const { return data_.size(); }
-  void accept(BCVisitor &v) final { v.visit(*this); }
+  void accept(MTVisitor &v) final { v.visit(*this); }
 
 private:
   std::vector<T> data_;
 };
 
 template <typename T>
-class GenericBC<T, 0> : public IBoundaryCondition,
-                        public Convertible<GenericBC<T>> {
+class GenericMT<T, 0> : public IModelTrait, public Convertible<GenericMT<T>> {
 public:
   using type = T;
   static constexpr int dim = 0;
-  GenericBC() = default;
-  GenericBC(const T &d) noexcept : data_(d){};
-  GenericBC(T &&d) noexcept : data_(std::move(d)){};
+  GenericMT() = default;
+  GenericMT(const T &d) noexcept : data_(d){};
+  GenericMT(T &&d) noexcept : data_(std::move(d)){};
   T &operator()() noexcept { return data_; }
   const T &operator()() const noexcept { return data_; }
 
   operator T &() noexcept { return data_; }
   operator const T &() const noexcept { return data_; }
-  void accept(BCVisitor &v) final { v.visit(*this); }
+  void accept(MTVisitor &v) final { v.visit(*this); }
   const T &GetData() const noexcept { return data_; }
   T &GetData() noexcept { return data_; }
 
@@ -172,29 +171,29 @@ private:
   T data_;
 };
 
-template <typename T> struct IsGenericBC : public std::false_type {};
+template <typename T> struct IsGenericMT : public std::false_type {};
 template <typename T, int dim>
-struct IsGenericBC<GenericBC<T, dim>> : public std::true_type {};
-static_assert(IsGenericBC<GenericBC<int, 0>>::value,
-              "IsGeneric BC should return true for GenericBC types");
-static_assert(IsGenericBC<FunctionBC<int, 2, 1>>::value,
-              "IsGeneric BC should return true for GenericBC types");
+struct IsGenericMT<GenericMT<T, dim>> : public std::true_type {};
+static_assert(IsGenericMT<GenericMT<int, 0>>::value,
+              "IsGeneric MT should return true for GenericMT types");
+static_assert(IsGenericMT<FunctionMT<int, 2, 1>>::value,
+              "IsGeneric MT should return true for GenericMT types");
 static_assert(
-    !IsGenericBC<int>::value,
-    "IsGeneric BC should return false for types that aren't a GenericBC");
+    !IsGenericMT<int>::value,
+    "IsGeneric MT should return false for types that aren't a GenericMT");
 
 template <typename T, typename = void>
-struct IsFunctionBC : public std::false_type {};
+struct IsFunctionMT : public std::false_type {};
 template <typename T>
-struct IsFunctionBC<
-    T, VoidT<std::enable_if_t<IsGenericBC<T>::value &&
+struct IsFunctionMT<
+    T, VoidT<std::enable_if_t<IsGenericMT<T>::value &&
                               IsNamedFunction<typename T::type>::value>>>
     : public std::true_type {};
 
-static_assert(IsFunctionBC<FunctionBC<double, 1, 0>>::value,
-              "IsFunctionBC should return true for FunctionBC types");
-static_assert(!IsFunctionBC<int>::value,
-              "IsFunctionBC should return false for non FunctionBC types");
+static_assert(IsFunctionMT<FunctionMT<double, 1, 0>>::value,
+              "IsFunctionMT should return true for FunctionMT types");
+static_assert(!IsFunctionMT<int>::value,
+              "IsFunctionMT should return false for non FunctionMT types");
 
 } // namespace mt
 

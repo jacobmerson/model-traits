@@ -4,9 +4,9 @@
 #include "bcTypedefs.h"
 #include "catch2/catch_test_macros.hpp"
 // boundary condition struct
-// using BC = mt::BoolBC;
+// using BC = mt::BoolMT;
 //
-using mt::BoolBC;
+using mt::BoolMT;
 using mt::DimGeometrySet;
 using mt::GeometrySet;
 
@@ -26,32 +26,32 @@ TEST_CASE("add to category node", "[node]") {
     // cannot add a mt with the same name as the category
     REQUIRE_NOTHROW(
         node1 = cn.AddBoundaryCondition(
-            "category 2", DimGeometrySet<>(mt::DimGeometry(1, 1)), BoolBC{}));
+            "category 2", DimGeometrySet<>(mt::DimGeometry(1, 1)), BoolMT{}));
     REQUIRE(node1 != node2);
 
     REQUIRE_NOTHROW(
-        node1 = cn.AddBoundaryCondition("mt 1", GeometrySet<>(1), BoolBC{}));
+        node1 = cn.AddBoundaryCondition("mt 1", GeometrySet<>(1), BoolMT{}));
     REQUIRE_NOTHROW(
-        node2 = cn.AddBoundaryCondition("mt 2", GeometrySet<>(1), BoolBC{}));
+        node2 = cn.AddBoundaryCondition("mt 2", GeometrySet<>(1), BoolMT{}));
     REQUIRE(node1 != node2);
     /*
     REQUIRE_THROWS(
-        node2 = cn.AddBoundaryCondition("mt 1", GeometrySet<>(1), BoolBC{}));
+        node2 = cn.AddBoundaryCondition("mt 1", GeometrySet<>(1), BoolMT{}));
     */
   }
   SECTION("mt first") {
     mt::BCNode *bc1 = nullptr;
     mt::BCNode *bc2 = nullptr;
     REQUIRE_NOTHROW(
-        bc1 = cn.AddBoundaryCondition("mt 1", GeometrySet<>(1), BoolBC{}));
+        bc1 = cn.AddBoundaryCondition("mt 1", GeometrySet<>(1), BoolMT{}));
     REQUIRE_NOTHROW(
-        bc2 = cn.AddBoundaryCondition("mt 2", GeometrySet<>(1), BoolBC{}));
+        bc2 = cn.AddBoundaryCondition("mt 2", GeometrySet<>(1), BoolMT{}));
     REQUIRE(bc1 != bc2);
     REQUIRE_NOTHROW(
-        bc1 = cn.AddBoundaryCondition("mt 2", GeometrySet<>(1), BoolBC{}));
+        bc1 = cn.AddBoundaryCondition("mt 2", GeometrySet<>(1), BoolMT{}));
     REQUIRE(bc1 == bc2);
     REQUIRE_NOTHROW(
-        cn.AddBoundaryCondition("category 2", GeometrySet<>(1), BoolBC{}));
+        cn.AddBoundaryCondition("category 2", GeometrySet<>(1), BoolMT{}));
 
     REQUIRE_NOTHROW(cn.AddCategory("category 2"));
     REQUIRE_NOTHROW(cn.AddCategory("category 3"));

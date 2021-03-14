@@ -11,7 +11,7 @@ namespace mt {
 class BCNode : public INode, public Convertible<BCNode> {
 public:
   using GeomPtrT = std::shared_ptr<IGeometrySet>;
-  using BCPtrT = std::shared_ptr<IBoundaryCondition>;
+  using BCPtrT = std::shared_ptr<IModelTrait>;
   BCNode(const std::string &name, GeomPtrT g, BCPtrT bc) : INode(name) {
     bcs_.emplace_back(std::move(g), std::move(bc));
   }

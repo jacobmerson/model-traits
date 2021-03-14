@@ -32,7 +32,7 @@ public:
   BCNode *
   AddBoundaryCondition(const std::string &name,
                        std::shared_ptr<IGeometrySet> geometry,
-                       std::shared_ptr<IBoundaryCondition> boundary_condition) {
+                       std::shared_ptr<IModelTrait> boundary_condition) {
     auto nd = boundary_conditions_.FindNode(name);
     // if the boundary condition with a given name already exists
     if (nd) {
@@ -52,7 +52,7 @@ public:
         name,
         std::static_pointer_cast<IGeometrySet>(
             std::make_shared<Geom>(std::forward<Geom>(geometry))),
-        std::static_pointer_cast<IBoundaryCondition>(
+        std::static_pointer_cast<IModelTrait>(
             std::make_shared<BC>(std::forward<BC>(boundary_condition))));
   }
 

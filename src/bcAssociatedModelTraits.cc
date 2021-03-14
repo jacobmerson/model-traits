@@ -7,7 +7,7 @@ namespace mt {
 template <typename Geom>
 void AssociatedModelTraits<Geom>::AddGeometry(
     const Geom &geom, const std::vector<std::string> &category_names,
-    const std::string &bc_name, std::shared_ptr<const IBoundaryCondition> bc) {
+    const std::string &bc_name, std::shared_ptr<const IModelTrait> bc) {
   using std::find_if;
   // auto it = find(begin(geometry_),end(geometry_), g);
   auto it = find_if(begin(geometry_nodes_), end(geometry_nodes_),
@@ -93,8 +93,7 @@ AssociatedCategoryNode *AssociatedCategoryNode::AddCategory(std::string name) {
   return &(*it);
 }
 void AssociatedCategoryNode::AddBoundaryCondition(
-    const std::string &name,
-    const std::shared_ptr<const IBoundaryCondition> &bc) {
+    const std::string &name, const std::shared_ptr<const IModelTrait> &bc) {
   auto ret = boundary_conditions_.insert(std::make_pair(name, bc));
   if (!ret.second) {
     throw std::runtime_error(
@@ -106,7 +105,7 @@ void AssociatedCategoryNode::AddBoundaryCondition(
 const std::string &AssociatedCategoryNode::GetName() const noexcept {
   return name_;
 }
-const IBoundaryCondition *
+const IModelTrait *
 AssociatedCategoryNode::FindBoundaryCondition(const std::string &name) const {
   auto it = boundary_conditions_.find(name);
   if (it == end(boundary_conditions_)) {

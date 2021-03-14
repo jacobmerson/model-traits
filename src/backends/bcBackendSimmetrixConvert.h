@@ -10,26 +10,26 @@ namespace mt {
 template <> struct convert<SIMMETRIX> {
   // template <typename R, typename T> static R encode(const T &, SIMMETRIX *);
 
-  template <typename R, std::enable_if_t<!IsFunctionBC<R>::value, bool> = false>
+  template <typename R, std::enable_if_t<!IsFunctionMT<R>::value, bool> = false>
   static R encode(pAttInfo, SIMMETRIX *);
   // overloads for scalar, vector and tensor functions
   // SFINAE is used since the method to encode the functions of each type is
   // identical
   template <
       typename R,
-      std::enable_if_t<IsFunctionBC<R>::value && (R::dim == 0), bool> = false>
+      std::enable_if_t<IsFunctionMT<R>::value && (R::dim == 0), bool> = false>
   static R encode(pAttInfo, SIMMETRIX * /*unused*/);
   template <
       typename R,
-      std::enable_if_t<IsFunctionBC<R>::value && (R::dim == 1), bool> = false>
+      std::enable_if_t<IsFunctionMT<R>::value && (R::dim == 1), bool> = false>
   static R encode(pAttInfo, SIMMETRIX * /*unused*/);
   template <
       typename R,
-      std::enable_if_t<IsFunctionBC<R>::value && (R::dim == 2), bool> = false>
+      std::enable_if_t<IsFunctionMT<R>::value && (R::dim == 2), bool> = false>
   static R encode(pAttInfo, SIMMETRIX * /*unused*/);
 };
 template <typename R,
-          std::enable_if_t<IsFunctionBC<R>::value && (R::dim == 0), bool>>
+          std::enable_if_t<IsFunctionMT<R>::value && (R::dim == 0), bool>>
 R convert<SIMMETRIX>::encode(pAttInfo att, SIMMETRIX * /*unused*/) {
   auto rep_type = AttNode_repType(static_cast<pANode>(att));
   SimString exp;
@@ -52,7 +52,7 @@ R convert<SIMMETRIX>::encode(pAttInfo att, SIMMETRIX * /*unused*/) {
   return R{ExprtkFunction<R::type::ArgsCount()>{std::string(exp)}};
 }
 template <typename R,
-          std::enable_if_t<IsFunctionBC<R>::value && (R::dim == 1), bool>>
+          std::enable_if_t<IsFunctionMT<R>::value && (R::dim == 1), bool>>
 R convert<SIMMETRIX>::encode(pAttInfo att, SIMMETRIX * /*unused*/) {
   auto *tensor_att = static_cast<pAttInfoTensor1>(att);
   auto size = AttInfoTensor1_dimension(tensor_att);
@@ -73,7 +73,7 @@ R convert<SIMMETRIX>::encode(pAttInfo att, SIMMETRIX * /*unused*/) {
   return R{std::move(functions)};
 }
 template <typename R,
-          std::enable_if_t<IsFunctionBC<R>::value && (R::dim == 2), bool>>
+          std::enable_if_t<IsFunctionMT<R>::value && (R::dim == 2), bool>>
 R convert<SIMMETRIX>::encode(pAttInfo att, SIMMETRIX * /*unused*/) {
   auto *tensor_att = static_cast<pAttInfoTensor2>(att);
   auto size = AttInfoTensor2_dimension(tensor_att);
