@@ -17,22 +17,22 @@ static void AddExpression(const ::YAML::Node &bc, CategoryNode *parent_node,
   auto num_variables = bc["num variables"].as<int>();
   switch (num_variables) {
   case 1:
-    parent_node->AddBoundaryCondition(
+    parent_node->AddModelTrait(
         std::move(name), std::move(geometry_set),
         FunctionMT<T, 1, dim>::template from<YAML>(bc["value"]));
     break;
   case 2:
-    parent_node->AddBoundaryCondition(
+    parent_node->AddModelTrait(
         std::move(name), std::move(geometry_set),
         FunctionMT<T, 2, dim>::template from<YAML>(bc["value"]));
     break;
   case 3:
-    parent_node->AddBoundaryCondition(
+    parent_node->AddModelTrait(
         std::move(name), std::move(geometry_set),
         FunctionMT<T, 3, dim>::template from<YAML>(bc["value"]));
     break;
   case 4:
-    parent_node->AddBoundaryCondition(
+    parent_node->AddModelTrait(
         std::move(name), std::move(geometry_set),
         FunctionMT<T, 4, dim>::template from<YAML>(bc["value"]));
     break;
@@ -52,28 +52,28 @@ static void ParseBoundaryConditions(const ::YAML::Node &yaml_node,
     auto geometry_set = GeometrySet<>(geometry.begin(), geometry.end());
     if (type == "scalar") {
       auto value = ScalarMT::from<YAML>(bc["value"]);
-      parent_node->AddBoundaryCondition(name, std::move(geometry_set),
-                                        std::move(value));
+      parent_node->AddModelTrait(name, std::move(geometry_set),
+                                 std::move(value));
     } else if (type == "bool") {
       auto value = BoolMT::from<YAML>(bc["value"]);
-      parent_node->AddBoundaryCondition(name, std::move(geometry_set),
-                                        std::move(value));
+      parent_node->AddModelTrait(name, std::move(geometry_set),
+                                 std::move(value));
     } else if (type == "int") {
       auto value = IntMT::from<YAML>(bc["value"]);
-      parent_node->AddBoundaryCondition(name, std::move(geometry_set),
-                                        std::move(value));
+      parent_node->AddModelTrait(name, std::move(geometry_set),
+                                 std::move(value));
     } else if (type == "string") {
       auto value = StringMT::from<YAML>(bc["value"]);
-      parent_node->AddBoundaryCondition(name, std::move(geometry_set),
-                                        std::move(value));
+      parent_node->AddModelTrait(name, std::move(geometry_set),
+                                 std::move(value));
     } else if (type == "vector") {
       auto value = VectorMT::from<YAML>(bc["value"]);
-      parent_node->AddBoundaryCondition(name, std::move(geometry_set),
-                                        std::move(value));
+      parent_node->AddModelTrait(name, std::move(geometry_set),
+                                 std::move(value));
     } else if (type == "matrix") {
       auto value = MatrixMT::from<YAML>(bc["value"]);
-      parent_node->AddBoundaryCondition(name, std::move(geometry_set),
-                                        std::move(value));
+      parent_node->AddModelTrait(name, std::move(geometry_set),
+                                 std::move(value));
     } else if (type == "expression") {
       AddExpression<ScalarType, 0>(bc, parent_node, std::move(name),
                                    std::move(geometry_set));

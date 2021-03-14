@@ -24,15 +24,15 @@ void AssociatedModelTraits<Geom>::AddGeometry(
   for (const auto &category_name : category_names) {
     node = node->AddCategory(category_name);
   }
-  node->AddBoundaryCondition(bc_name, std::move(bc));
+  node->AddModelTrait(bc_name, std::move(bc));
 }
 
 template <typename Geom>
 void AssociatedModelTraits<Geom>::Process(
     const CategoryNode *current_node, std::vector<std::string> &categories) {
   // At a leaf node, merge the contents into the
-  for (const auto &bc_node : current_node->GetBoundaryConditionNodes()) {
-    for (const auto &bc : bc_node->GetBoundaryConditions()) {
+  for (const auto &bc_node : current_node->GetModelTraitNodes()) {
+    for (const auto &bc : bc_node->GetModelTraits()) {
       auto boundary_condition = bc.second;
       // only add the geometry type of interest
       auto geom_set = std::dynamic_pointer_cast<GeometrySet<Geom>>(bc.first);
@@ -92,9 +92,10 @@ AssociatedCategoryNode *AssociatedCategoryNode::AddCategory(std::string name) {
   }
   return &(*it);
 }
-void AssociatedCategoryNode::AddBoundaryCondition(
-    const std::string &name, const std::shared_ptr<const IModelTrait> &bc) {
-  auto ret = boundary_conditions_.insert(std::make_pair(name, bc));
+void AssociatedCategoryNode::AddModelTrait(
+    const std::string &name,
+    const std::shared_ptr<const IModelTrait> &model_trait) {
+  auto ret = model_traits_.insert(std::make_pair(name, model_trait));
   if (!ret.second) {
     throw std::runtime_error(
         fmt::format("Cannot add two boundary conditions with "
@@ -106,9 +107,9 @@ const std::string &AssociatedCategoryNode::GetName() const noexcept {
   return name_;
 }
 const IModelTrait *
-AssociatedCategoryNode::FindBoundaryCondition(const std::string &name) const {
-  auto it = boundary_conditions_.find(name);
-  if (it == end(boundary_conditions_)) {
+AssociatedCategoryNode::FindModelTrait(const std::string &name) const {
+  auto it = model_traits_.find(name);
+  if (it == end(model_traits_)) {
     return nullptr;
   }
   return it->second.get();

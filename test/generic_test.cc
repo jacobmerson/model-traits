@@ -14,7 +14,7 @@ int main(int, char **) {
   auto loads = ss->AddCategory("loads");
 
   std::vector<int> g{1, 2, 3, 4, 5, 6};
-  [[maybe_unused]] auto bc1 = loads->AddBoundaryCondition(
+  [[maybe_unused]] auto bc1 = loads->AddModelTrait(
       "load BC", mt::GeometrySet<>{g.begin(), g.end()}, mt::ScalarMT{});
   fmt::print("{}\n", model_traits);
   return 0;

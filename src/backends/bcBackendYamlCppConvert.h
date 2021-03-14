@@ -53,7 +53,7 @@ template <> struct convert<YAML> {
   static void decode(const VectorMT &, ::YAML::Node &, YAML *);
   static void decode(const SetT &, ::YAML::Node &, YAML *);
   static void decode(const DimSetT &, ::YAML::Node &, YAML *);
-  static void decode(const BCNode &bcn, ::YAML::Node &, YAML *);
+  static void decode(const ModelTraitNode &bcn, ::YAML::Node &, YAML *);
   static void decode(const CategoryNode &, ::YAML::Node &, YAML *);
   static void decode(const ModelTraits &, ::YAML::Node &, YAML *);
 

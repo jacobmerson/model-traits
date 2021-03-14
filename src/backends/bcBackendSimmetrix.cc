@@ -23,24 +23,23 @@ static void AddExpression(pAttInfo bc, CategoryNode *parent_node,
                           SimEquationType eqn_type) {
   switch (eqn_type) {
   case SimEquationType::Space:
-    parent_node->AddBoundaryCondition(
+    parent_node->AddModelTrait(
         std::move(name), std::move(geometry_set),
         FunctionMT<T, 3, dim>::template from<SIMMETRIX>(bc));
     break;
   case SimEquationType::Time:
-    parent_node->AddBoundaryCondition(
+    parent_node->AddModelTrait(
         std::move(name), std::move(geometry_set),
         FunctionMT<T, 1, dim>::template from<SIMMETRIX>(bc));
     break;
   case SimEquationType::SpaceTime:
-    parent_node->AddBoundaryCondition(
+    parent_node->AddModelTrait(
         std::move(name), std::move(geometry_set),
         FunctionMT<T, 4, dim>::template from<SIMMETRIX>(bc));
     break;
   case SimEquationType::None:
-    parent_node->AddBoundaryCondition(
-        std::move(name), std::move(geometry_set),
-        GenericMT<T, dim>::template from<SIMMETRIX>(bc));
+    parent_node->AddModelTrait(std::move(name), std::move(geometry_set),
+                               GenericMT<T, dim>::template from<SIMMETRIX>(bc));
     break;
   }
 }
@@ -141,8 +140,8 @@ static void AddBoundaryCondition(CategoryNode *parent_node, pAttInfo sim_node,
                                     std::move(geom), equation_type);
     } else {
       auto value = IntMT::from<SIMMETRIX>(sim_node);
-      parent_node->AddBoundaryCondition(std::string(name), std::move(geom),
-                                        std::move(value));
+      parent_node->AddModelTrait(std::string(name), std::move(geom),
+                                 std::move(value));
     }
   } else if (rep_type == Att_string) {
     if (AttInfoString_isExpression(static_cast<pAttInfoString>(sim_node)) !=
@@ -150,8 +149,8 @@ static void AddBoundaryCondition(CategoryNode *parent_node, pAttInfo sim_node,
       throw std::runtime_error("String Expressions Not Currently Supported");
     }
     auto value = StringMT::from<SIMMETRIX>(sim_node);
-    parent_node->AddBoundaryCondition(std::string(name), std::move(geom),
-                                      std::move(value));
+    parent_node->AddModelTrait(std::string(name), std::move(geom),
+                               std::move(value));
   } else if (rep_type == Att_double) {
     if (AttInfoDouble_isExpression(static_cast<pAttInfoDouble>(sim_node)) !=
         0) {
@@ -163,8 +162,8 @@ static void AddBoundaryCondition(CategoryNode *parent_node, pAttInfo sim_node,
                                    std::move(geom), equation_type);
     } else {
       auto value = ScalarMT::from<SIMMETRIX>(sim_node);
-      parent_node->AddBoundaryCondition(std::string(name), std::move(geom),
-                                        std::move(value));
+      parent_node->AddModelTrait(std::string(name), std::move(geom),
+                                 std::move(value));
     }
   } else if (rep_type == Att_tensor0) {
     if (AttInfoTensor0_isExpression(static_cast<pAttInfoTensor0>(sim_node)) !=
@@ -177,8 +176,8 @@ static void AddBoundaryCondition(CategoryNode *parent_node, pAttInfo sim_node,
                                    std::move(geom), equation_type);
     } else {
       auto value = ScalarMT::from<SIMMETRIX>(sim_node);
-      parent_node->AddBoundaryCondition(std::string(name), std::move(geom),
-                                        std::move(value));
+      parent_node->AddModelTrait(std::string(name), std::move(geom),
+                                 std::move(value));
     }
   } else if (rep_type == Att_tensor1) {
     auto *tensor_att = static_cast<pAttInfoTensor1>(sim_node);
@@ -201,8 +200,8 @@ static void AddBoundaryCondition(CategoryNode *parent_node, pAttInfo sim_node,
                                    std::move(geom), equation_type);
     } else {
       auto value = VectorMT::from<SIMMETRIX>(sim_node);
-      parent_node->AddBoundaryCondition(std::string(name), std::move(geom),
-                                        std::move(value));
+      parent_node->AddModelTrait(std::string(name), std::move(geom),
+                                 std::move(value));
     }
   } else if (rep_type == Att_tensor2) {
     auto *tensor_att = static_cast<pAttInfoTensor2>(sim_node);
@@ -228,8 +227,8 @@ static void AddBoundaryCondition(CategoryNode *parent_node, pAttInfo sim_node,
                                    std::move(geom), equation_type);
     }
     auto value = MatrixMT::from<SIMMETRIX>(sim_node);
-    parent_node->AddBoundaryCondition(std::string(name), std::move(geom),
-                                      std::move(value));
+    parent_node->AddModelTrait(std::string(name), std::move(geom),
+                               std::move(value));
   } else {
     fmt::print("Cannot add a boundary condition with the AttRepType of {}. "
                "Skipping it.\n",

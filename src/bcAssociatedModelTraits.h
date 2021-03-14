@@ -10,8 +10,8 @@ class AssociatedCategoryNode {
 public:
   explicit AssociatedCategoryNode(std::string name) : name_(std::move(name)) {}
   AssociatedCategoryNode *AddCategory(std::string name);
-  void AddBoundaryCondition(const std::string &,
-                            const std::shared_ptr<const IModelTrait> &);
+  void AddModelTrait(const std::string &name,
+                     const std::shared_ptr<const IModelTrait> &model_trait);
 
   AssociatedCategoryNode(const AssociatedCategoryNode &) noexcept = default;
   AssociatedCategoryNode &
@@ -21,7 +21,7 @@ public:
   operator=(AssociatedCategoryNode &&) noexcept = default;
   virtual ~AssociatedCategoryNode() noexcept = default;
   const std::string &GetName() const noexcept;
-  const IModelTrait *FindBoundaryCondition(const std::string &name) const;
+  const IModelTrait *FindModelTrait(const std::string &name) const;
   const AssociatedCategoryNode *FindCategory(const std::string &name) const;
 
 private:
@@ -29,13 +29,11 @@ private:
   // important that category nodes are stored by value, so the deep
   // copy works as expected
   std::vector<AssociatedCategoryNode> categories_;
-  // Since the same boundary condition may be referenced by multiple geometries,
-  // it is stored as a shared ptr. It also shares ownership with the boundary
-  // conditions stored as part of ModelTraits
-  // std::vector<std::shared_ptr<const IModelTrait>>
-  // boundary_conditions_;
+  // Since the same model trait may be referenced by multiple geometries,
+  // it is stored as a shared ptr. It also shares ownership with the model
+  // traits stored as part of ModelTraits
   std::unordered_map<std::string, std::shared_ptr<const IModelTrait>>
-      boundary_conditions_;
+      model_traits_;
 };
 
 template <typename Geom>

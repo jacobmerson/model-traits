@@ -14,7 +14,7 @@
 namespace mt {
 
 class CategoryNode : public INode, public Convertible<CategoryNode> {
-  using BCSetT = NodeSet<BCNode, BC_VEC_WORKAROUND>;
+  using BCSetT = NodeSet<ModelTraitNode, BC_VEC_WORKAROUND>;
   using CategorySetT = NodeSet<CategoryNode, BC_VEC_WORKAROUND>;
 
 public:
@@ -29,48 +29,45 @@ public:
     return categories_.AddNode(std::make_unique<CategoryNode>(std::move(name)));
   }
 
-  BCNode *
-  AddBoundaryCondition(const std::string &name,
-                       std::shared_ptr<IGeometrySet> geometry,
-                       std::shared_ptr<IModelTrait> boundary_condition) {
-    auto nd = boundary_conditions_.FindNode(name);
-    // if the boundary condition with a given name already exists
+  ModelTraitNode *AddModelTrait(const std::string &name,
+                                std::shared_ptr<IGeometrySet> geometry,
+                                std::shared_ptr<IModelTrait> model_trait) {
+    auto nd = model_trait_nodes_.FindNode(name);
+    // if the  model trait with a given name already exists
     if (nd) {
-      nd->AddBoundaryCondition(geometry, boundary_condition);
+      nd->AddModelTrait(geometry, model_trait);
       return nd;
     } else {
-      return boundary_conditions_.AddNode(
-          std::make_unique<BCNode>(name, geometry, boundary_condition));
+      return model_trait_nodes_.AddNode(
+          std::make_unique<ModelTraitNode>(name, geometry, model_trait));
     }
   }
 
-  template <typename Geom, typename BC>
-  BCNode *AddBoundaryCondition(const std::string &name, Geom &&geometry,
-                               BC &&boundary_condition) {
+  template <typename Geom, typename ModelTrait>
+  ModelTraitNode *AddModelTrait(const std::string &name, Geom &&geometry,
+                                ModelTrait &&model_trait) {
 
-    return AddBoundaryCondition(
+    return AddModelTrait(
         name,
         std::static_pointer_cast<IGeometrySet>(
             std::make_shared<Geom>(std::forward<Geom>(geometry))),
-        std::static_pointer_cast<IModelTrait>(
-            std::make_shared<BC>(std::forward<BC>(boundary_condition))));
+        std::static_pointer_cast<IModelTrait>(std::make_shared<ModelTrait>(
+            std::forward<ModelTrait>(model_trait))));
   }
 
-  BCSetT &GetBoundaryConditionNodes() { return boundary_conditions_; }
-  const BCSetT &GetBoundaryConditionNodes() const {
-    return boundary_conditions_;
-  }
+  BCSetT &GetModelTraitNodes() { return model_trait_nodes_; }
+  const BCSetT &GetModelTraitNodes() const { return model_trait_nodes_; }
   CategorySetT &GetCategories() { return categories_; }
   const CategorySetT &GetCategories() const { return categories_; }
 
   friend fmt::formatter<CategoryNode>;
 
 protected:
-  // currently both categories, and boundary_conditions are
+  // currently both categories, and model_traits are
   // stored with the vector backend. This is a reasonable assumption
   // with small numbers of nodes
   CategorySetT categories_;
-  BCSetT boundary_conditions_;
+  BCSetT model_trait_nodes_;
 };
 } // namespace mt
 /*

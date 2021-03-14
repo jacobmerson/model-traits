@@ -169,9 +169,9 @@ void convert<YAML>::decode(const DimSetT &g, ::YAML::Node &nd,
   }
 }
 
-void convert<YAML>::decode(const BCNode &bcn, ::YAML::Node &nd,
+void convert<YAML>::decode(const ModelTraitNode &bcn, ::YAML::Node &nd,
                            YAML * /*unused*/) {
-  for (const auto &bc : bcn.GetBoundaryConditions()) {
+  for (const auto &bc : bcn.GetModelTraits()) {
     ::YAML::Node local;
     local["name"] = bcn.GetName();
     YamlExportBCVisitor bc_visitor(local);
@@ -184,7 +184,7 @@ void convert<YAML>::decode(const BCNode &bcn, ::YAML::Node &nd,
 void convert<YAML>::decode(const CategoryNode &cn, ::YAML::Node &nd,
                            YAML * /*unused*/) {
   auto bcn = nd["boundary conditions"];
-  for (const auto &bc : cn.GetBoundaryConditionNodes()) {
+  for (const auto &bc : cn.GetModelTraitNodes()) {
     bc->to<YAML>(bcn);
   }
   for (const auto &cat : cn.GetCategories()) {
