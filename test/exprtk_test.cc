@@ -1,4 +1,4 @@
-#include "model_traits/bcExprtkFunction.h"
+#include "model_traits/ExprtkFunction.h"
 #include <fmt/format.h>
 #include <functional>
 #include <string>

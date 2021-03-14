@@ -1,7 +1,7 @@
 #ifndef BC_MODEL_TRAITS_IO_H__
 #define BC_MODEL_TRAITS_IO_H__
 
-#include "bcModelTraits.h"
+#include "ModelTraits.h"
 #include <fstream>
 
 namespace mt {

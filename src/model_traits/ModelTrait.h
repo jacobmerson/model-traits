@@ -1,11 +1,11 @@
 #ifndef BC_BC_H__
 #define BC_BC_H__
 
-#include "bcConvert.h"
-#include "bcFunctionHelper.h"
-#include "bcNamedFunction.h"
-#include "bcTypeTraits.h"
-#include "bcTypedefs.h"
+#include "Convert.h"
+#include "FunctionHelper.h"
+#include "NamedFunction.h"
+#include "TypeTraits.h"
+#include "Typedefs.h"
 #include <functional>
 #include <stdexcept>
 #include <vector>

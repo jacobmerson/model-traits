@@ -1,8 +1,8 @@
 #include "catch2/catch_test_macros.hpp"
-#include "model_traits/bcBC.h"
-#include "model_traits/bcBCNode.h"
-#include "model_traits/bcCategoryNode.h"
-#include "model_traits/bcTypedefs.h"
+#include "model_traits/CategoryNode.h"
+#include "model_traits/ModelTrait.h"
+#include "model_traits/ModelTraitNode.h"
+#include "model_traits/Typedefs.h"
 // boundary condition struct
 // using BC = mt::BoolMT;
 //

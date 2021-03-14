@@ -1,8 +1,8 @@
-#include "bcBackendSimmetrix.h"
-#include "bcBackendSimmetrixConvert.h"
-#include "bcSimWrapper.h"
-#include "model_traits/bcExprtkFunction.h"
-#include "model_traits/bcGeometrySet.h"
+#include "Simmetrix.h"
+#include "SimmetrixConvert.h"
+#include "SimmetrixWrapper.h"
+#include "model_traits/ExprtkFunction.h"
+#include "model_traits/GeometrySet.h"
 #include <SimAttribute.h>
 #include <SimError.h>
 #include <SimModel.h>

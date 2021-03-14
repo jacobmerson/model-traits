@@ -1,10 +1,8 @@
-#include "model_traits/bcAssociatedModelTraits.h"
-#include "model_traits/bcBC.h"
-#include "model_traits/bcTypedefs.h"
+#include "model_traits/AssociatedModelTraits.h"
+#include "model_traits/ModelTrait.h"
+#include "model_traits/ModelTraits.h"
+#include "model_traits/Typedefs.h"
 #include <catch2/catch_test_macros.hpp>
-#include <iostream>
-#include <model_traits/backends/bcBackendSimmetrix.h>
-#include <model_traits/backends/bcBackendYamlCpp.h>
 
 using mt::AssociatedModelTraits;
 using mt::BoolMT;

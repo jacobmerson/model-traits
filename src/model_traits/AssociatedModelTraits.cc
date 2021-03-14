@@ -1,4 +1,4 @@
-#include "bcAssociatedModelTraits.h"
+#include "AssociatedModelTraits.h"
 #include <algorithm>
 #include <fmt/format.h>
 

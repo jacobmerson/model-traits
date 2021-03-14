@@ -1,13 +1,13 @@
-#include "bcBackendYamlCpp.h"
-#include "model_traits/bcBC.h"
+#include "YamlCpp.h"
+#include "model_traits/ModelTrait.h"
 #include <fmt/ostream.h>
 // clang-format off
 // it's currently important that bcBackendYamlCppConvert.h
 // gets loaded after yaml-cpp
 #include <yaml-cpp/yaml.h>
-#include "bcBackendYamlCppConvert.h"
+#include "YamlConvert.h"
 // clang-format on
-#include "model_traits/bcModelTraits.h"
+#include "model_traits/ModelTraits.h"
 
 namespace mt {
 

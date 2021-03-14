@@ -1,11 +1,11 @@
 #ifndef BC_CATEGORY_NODE_H__
 #define BC_CATEGORY_NODE_H__
-#include "bcBC.h"
-#include "bcBCNode.h"
-#include "bcConvert.h"
-#include "bcGeometrySet.h"
-#include "bcINode.h"
-#include "bcNodeSet.h"
+#include "Convert.h"
+#include "GeometrySet.h"
+#include "INode.h"
+#include "ModelTrait.h"
+#include "ModelTraitNode.h"
+#include "NodeSet.h"
 #include <memory>
 #include <string>
 #include <vector>

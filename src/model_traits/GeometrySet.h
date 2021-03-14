@@ -1,9 +1,9 @@
 #ifndef BC_GEOMETRY_H__
 #define BC_GEOMETRY_H__
 
-#include "bcConvert.h"
-#include "bcTypedefs.h"
-#include "bcUtility.h"
+#include "Convert.h"
+#include "Typedefs.h"
+#include "Utility.h"
 
 namespace mt {
 

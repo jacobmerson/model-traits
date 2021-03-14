@@ -1,8 +1,8 @@
 #ifndef BC_CLASSIFIED_MODEL_TRAITS_H__
 #define BC_CLASSIFIED_MODEL_TRAITS_H__
-#include "bcBC.h"
-#include "bcCategoryNode.h"
-#include "bcGeometrySet.h" // DimGeometry
+#include "CategoryNode.h"
+#include "GeometrySet.h" // DimGeometry
+#include "ModelTrait.h"
 #include <unordered_map>
 #include <vector>
 namespace mt {

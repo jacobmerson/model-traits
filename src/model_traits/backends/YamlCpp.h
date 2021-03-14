@@ -1,7 +1,7 @@
 #ifndef BC_BACKEND_YAML_CPP_H__
 #define BC_BACKEND_YAML_CPP_H__
-#include "model_traits/bcModelTraits.h"
-#include "model_traits/bcModelTraitsIO.h"
+#include "model_traits/ModelTraits.h"
+#include "model_traits/ModelTraitsIO.h"
 
 namespace mt {
 struct YAML : Backend {};

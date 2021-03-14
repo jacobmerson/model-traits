@@ -2,12 +2,12 @@
 option(YAML-CPP "Enables yaml-cpp backend. Requires yaml-cpp." ON)
 if (YAML-CPP)
     find_package(yaml-cpp REQUIRED)
-    set(SOURCES ${SOURCES} bcBackendYamlCpp.cc bcBackendYamlCppConvert.cc)
+    set(SOURCES ${SOURCES} YamlCpp.cc YamlConvert.cc)
 endif ()
 
 if (ENABLE_SIMMETRIX)
     find_package(SIMMODSUITE MODULE REQUIRED)
-    set(SOURCES ${SOURCES} bcBackendSimmetrix.cc bcBackendSimmetrixConvert.cc)
+    set(SOURCES ${SOURCES} Simmetrix.cc SimmetrixConvert.cc)
 endif ()
 
 add_library(bcIOBackend ${SOURCES})

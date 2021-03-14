@@ -1,9 +1,9 @@
 #ifndef BC_BC_NODE_H__
 #define BC_BC_NODE_H__
-#include "bcBC.h"
-#include "bcConvert.h"
-#include "bcGeometrySet.h"
-#include "bcINode.h"
+#include "Convert.h"
+#include "GeometrySet.h"
+#include "INode.h"
+#include "ModelTrait.h"
 #include <memory>
 
 namespace mt {

@@ -1,7 +1,7 @@
 #ifndef BC_NODE_SET_H__
 #define BC_NODE_SET_H__
-#include "bcINode.h"
-#include "bcUtility.h"
+#include "INode.h"
+#include "Utility.h"
 #include <algorithm>
 #include <fmt/format.h>
 #include <memory>

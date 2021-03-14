@@ -1,12 +1,12 @@
 #ifndef BC_BACKEND_YAML_CPP_CONVERT_H__
 #define BC_BACKEND_YAML_CPP_CONVERT_H__
-#include "bcBackendYamlCpp.h"
-#include "model_traits/bcTypeTraits.h"
+#include "YamlCpp.h"
+#include "model_traits/TypeTraits.h"
 #include <yaml-cpp/yaml.h>
 //#include "bcConvert.h"
-#include "model_traits/bcBC.h"
-#include "model_traits/bcExprtkFunction.h"
-#include "model_traits/bcNamedFunction.h"
+#include "model_traits/ExprtkFunction.h"
+#include "model_traits/ModelTrait.h"
+#include "model_traits/NamedFunction.h"
 #include <exception>
 
 namespace mt {

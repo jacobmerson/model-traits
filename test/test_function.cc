@@ -1,8 +1,8 @@
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "cppcoreguidelines-avoid-magic-numbers"
 #pragma ide diagnostic ignored "readability-function-cognitive-complexity"
-#include "model_traits/bcExprtkFunction.h"
-#include "model_traits/bcNamedFunction.h"
+#include "model_traits/ExprtkFunction.h"
+#include "model_traits/NamedFunction.h"
 #include <catch2/catch_approx.hpp>
 #include <catch2/catch_test_macros.hpp>
 

@@ -1,7 +1,7 @@
 #ifndef BC_MODEL_TRAITS_H__
 #define BC_MODEL_TRAITS_H__
-#include "bcCategoryNode.h"
-#include "bcINode.h"
+#include "CategoryNode.h"
+#include "INode.h"
 #include <memory>
 #include <string>
 

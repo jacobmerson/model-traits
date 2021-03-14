@@ -1,6 +1,6 @@
 #ifndef BC_EXPRTK_FUNCTION_H__
 #define BC_EXPRTK_FUNCTION_H__
-#include "bcTypedefs.h"
+#include "Typedefs.h"
 #include <array>
 #include <memory>
 #include <stdexcept>

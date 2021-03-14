@@ -1,8 +1,8 @@
 #include "fmt/format.h"
-#include "model_traits/bcBC.h"
-#include "model_traits/bcCategoryNode.h"
-#include "model_traits/bcGeometrySet.h"
-#include "model_traits/bcModelTraits.h"
+#include "model_traits/CategoryNode.h"
+#include "model_traits/GeometrySet.h"
+#include "model_traits/ModelTrait.h"
+#include "model_traits/ModelTraits.h"
 
 int main(int, char **) {
   mt::ModelTraits model_traits{"Generic Model"};
