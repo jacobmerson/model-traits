@@ -2,7 +2,6 @@
 #define BC_CATEGORY_NODE_H__
 #include "Convert.h"
 #include "GeometrySet.h"
-#include "INode.h"
 #include "ModelTrait.h"
 #include "ModelTraitNode.h"
 #include "NodeSet.h"
@@ -12,13 +11,13 @@
 
 namespace mt {
 
-class CategoryNode : public INode, public Convertible<CategoryNode> {
+class CategoryNode : public Convertible<CategoryNode> {
   using BCSetT = NodeSet<ModelTraitNode, BC_VEC_WORKAROUND>;
   using CategorySetT = NodeSet<CategoryNode, BC_VEC_WORKAROUND>;
 
 public:
-  explicit CategoryNode(const std::string &name) : INode(name) {}
-  explicit CategoryNode(std::string &&name) : INode(std::move(name)) {}
+  explicit CategoryNode(const std::string &name) : name_(name) {}
+  explicit CategoryNode(std::string &&name) : name_(std::move(name)) {}
   // FIXME rename to AddOrFindCategory
   CategoryNode *AddCategory(std::string name) {
     auto *nd = categories_.FindNode(name);
@@ -58,6 +57,7 @@ public:
   const BCSetT &GetModelTraitNodes() const { return model_trait_nodes_; }
   CategorySetT &GetCategories() { return categories_; }
   const CategorySetT &GetCategories() const { return categories_; }
+  const std::string &GetName() const noexcept { return name_; }
 
   friend fmt::formatter<CategoryNode>;
 
@@ -67,6 +67,7 @@ protected:
   // with small numbers of nodes
   CategorySetT categories_;
   BCSetT model_trait_nodes_;
+  std::string name_;
 };
 } // namespace mt
 /*

@@ -1,6 +1,5 @@
 #ifndef BC_NODE_SET_H__
 #define BC_NODE_SET_H__
-#include "INode.h"
 #include "Utility.h"
 #include <algorithm>
 #include <fmt/format.h>
@@ -18,8 +17,7 @@ namespace mt {
  * algorithms, it's reccomended that you specialize the add, find, and remove
  * functions
  */
-template <typename T = INode,
-          template <typename> class Cont = BC_VEC_WORKAROUND>
+template <typename T, template <typename> class Cont = BC_VEC_WORKAROUND>
 class NodeSet {
 public:
   /*
