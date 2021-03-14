@@ -124,14 +124,14 @@ std::unique_ptr<ModelTraits> LoadFromYamlNode(const ::YAML::Node &base_node) {
 }
 
 template <>
-std::unique_ptr<ModelTraits> ReadFromStream<YAML>(std::istream &stream) {
+std::unique_ptr<ModelTraits> ReadFromStream(std::istream &stream, YAML *) {
   auto node = ::YAML::Load(stream);
   return LoadFromYamlNode(node["model traits"]);
 }
 
 template <>
-void WriteToStream<YAML>(const ModelTraits *model_traits,
-                         std::ostream &stream) {
+void WriteToStream(const ModelTraits *model_traits, std::ostream &stream,
+                   YAML *) {
   if (model_traits == nullptr) {
     return;
   }

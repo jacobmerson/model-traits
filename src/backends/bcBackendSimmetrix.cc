@@ -296,8 +296,8 @@ static void ParseNode(CategoryNode *parent_node, pANode sim_node, pACase cs,
 // TODO, ReadFromFile should also take an instance of backend,
 // and should allow the user to choose a "root node" for the attributes
 template <>
-std::unique_ptr<ModelTraits>
-ReadFromFile<SIMMETRIX>(const std::string &filename) {
+std::unique_ptr<ModelTraits> ReadFromFile(const std::string &filename,
+                                          SIMMETRIX *) {
   try {
     SimmodelerLog lg("reader.log");
     SimmodelerStartup s;

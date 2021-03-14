@@ -7,14 +7,28 @@
 #include <unordered_map>
 
 namespace bc {
+/**
+ * ModelTraits object is the root object that stores any boundary conditions, or
+ * other attributes that may be stored on a model.
+ */
 class ModelTraits : public Convertible<ModelTraits> {
 public:
+  /**
+   * @param [in] name of the root model traits object
+   */
   ModelTraits(const std::string &name) : name_(name) {}
+  /**
+   * @param [in] name the root model traits object
+   */
   ModelTraits(std::string &&name) : name_(std::move(name)) {}
   /**
-   * Adds a case if it doesn't exist and returns a pointer
-   * to it's INode. If the case does exist, the pointer to
-   * the case is returned.
+   * @brief Add case to model traits object
+   * @param [in] name
+   * @return pointer to the inserted value if it wasn't already in the map or
+   * nullptr
+   *
+   * Adds a case if it doesn't exist and returns a pointer to it's
+   * INode. If the case does exist, the pointer to the case is returned.
    */
   CategoryNode *AddCase(const std::string &name) {
     return cases_.AddNode(std::make_unique<CategoryNode>(name));

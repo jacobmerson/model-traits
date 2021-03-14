@@ -165,7 +165,7 @@ void convert<YAML>::decode(const DimSetT &g, ::YAML::Node &nd,
   auto gnd = nd["geometry"];
   gnd.SetStyle(::YAML::EmitterStyle::Flow);
   for (const auto &dg : g) {
-    gnd.push_back(std::make_pair(dg.dim_, dg.GID_));
+    gnd.push_back(std::make_pair(dg.GetDimension(), dg.GetID()));
   }
 }
 
