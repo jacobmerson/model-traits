@@ -1,5 +1,5 @@
-#include "bcModelTraits.h"
 #include "catch2/catch_test_macros.hpp"
+#include "model_traits/bcModelTraits.h"
 
 class TestModelTraits : public mt::ModelTraits {
 public:

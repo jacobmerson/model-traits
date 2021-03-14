@@ -5,7 +5,6 @@
 #include "bcGeometrySet.h"
 #include "bcINode.h"
 #include <memory>
-#include <unordered_set>
 
 namespace mt {
 class ModelTraitNode : public INode, public Convertible<ModelTraitNode> {

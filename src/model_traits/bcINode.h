@@ -1,8 +1,7 @@
 #ifndef BC_INTERFACE_NODE_H__
 #define BC_INTERFACE_NODE_H__
-#include "fmt/format.h"
 #include <cstdlib>
-#include <iostream>
+#include <fmt/format.h>
 #include <string>
 #include <type_traits>
 

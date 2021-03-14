@@ -1,5 +1,5 @@
 #include "bcBackendYamlCpp.h"
-#include "bcBC.h"
+#include "model_traits/bcBC.h"
 #include <fmt/ostream.h>
 // clang-format off
 // it's currently important that bcBackendYamlCppConvert.h
@@ -7,7 +7,7 @@
 #include <yaml-cpp/yaml.h>
 #include "bcBackendYamlCppConvert.h"
 // clang-format on
-#include "bcModelTraits.h"
+#include "model_traits/bcModelTraits.h"
 
 namespace mt {
 

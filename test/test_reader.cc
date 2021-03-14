@@ -1,8 +1,8 @@
 #ifdef BC_HAVE_SIMMETRIX
 #include <backends/bcBackendSimmetrix.h>
 #endif
-#include <backends/bcBackendYamlCpp.h>
 #include <iostream>
+#include <model_traits/backends/bcBackendYamlCpp.h>
 
 int main(int, char **) {
   std::ifstream istream("../../test/syntax-test.yaml");

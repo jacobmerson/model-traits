@@ -1,9 +1,9 @@
 #include "bcBackendSimmetrixConvert.h"
-#include "bcBC.h"
 #include "bcBackendSimmetrix.h"
-#include "bcConvert.h"
 #include "bcSimWrapper.h"
-#include "bcTypedefs.h"
+#include "model_traits/bcBC.h"
+#include "model_traits/bcConvert.h"
+#include "model_traits/bcTypedefs.h"
 #include <SimAttribute.h>
 
 namespace mt {

@@ -1,9 +1,9 @@
 #ifndef BC_GEOMETRY_H__
 #define BC_GEOMETRY_H__
+
 #include "bcConvert.h"
 #include "bcTypedefs.h"
 #include "bcUtility.h"
-#include <unordered_set>
 
 namespace mt {
 
