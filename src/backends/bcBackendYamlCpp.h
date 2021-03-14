@@ -7,9 +7,11 @@ namespace bc {
 struct YAML : Backend {};
 
 template <>
-void WriteToStream<YAML>(const ModelTraits *model_traits, std::ostream &stream);
+void WriteToStream(const ModelTraits *model_traits, std::ostream &stream,
+                   YAML *backend);
 template <>
-std::unique_ptr<ModelTraits> ReadFromStream<YAML>(std::istream &stream);
+std::unique_ptr<ModelTraits> ReadFromStream(std::istream &stream,
+                                            YAML *backend);
 
 } // namespace bc
 

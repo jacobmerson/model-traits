@@ -19,9 +19,6 @@ public:
     bcs_.emplace_back(std::move(g), std::move(bc));
   };
 
-  // FIXME rename this? It's a bit confusing that
-  // it shares a name with GetBoundaryConditions in bcCategoryNode
-  // which gets the boundary condition nodes
   std::vector<std::pair<GeomPtrT, BCPtrT>> &GetBoundaryConditions() noexcept {
     return bcs_;
   }

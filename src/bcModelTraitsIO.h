@@ -6,7 +6,7 @@
 
 namespace bc {
 /*
-*/
+ */
 
 /**
  * Write the model traits file to the stream using the specified backend
@@ -14,7 +14,8 @@ namespace bc {
  * @return a unique pointer to a filled ModelTraits object
  */
 template <typename Backend>
-std::unique_ptr<ModelTraits> ReadFromStream(std::istream &stream);
+std::unique_ptr<ModelTraits> ReadFromStream(std::istream &stream,
+                                            Backend *backend = nullptr);
 
 /**
  * Write the model traits file to the stream using the specified backend
@@ -22,18 +23,21 @@ std::unique_ptr<ModelTraits> ReadFromStream(std::istream &stream);
  * @param [inout] the stream to write to. i.e. a stream to a yaml file
  */
 template <typename Backend>
-void WriteToStream(const ModelTraits *model_traits, std::ostream &stream);
+void WriteToStream(const ModelTraits *model_traits, std::ostream &stream,
+                   Backend *backend = nullptr);
 
 template <typename Backend>
-std::unique_ptr<ModelTraits> ReadFromFile(const std::string &filename) {
+std::unique_ptr<ModelTraits> ReadFromFile(const std::string &filename,
+                                          Backend *backend = nullptr) {
   std::ifstream fstream{filename};
-  return ReadFromStream<Backend>(fstream);
+  return ReadFromStream<Backend>(fstream, backend);
 }
 
 template <typename Backend>
-void WriteToFile(const ModelTraits *model_traits, const std::string &filename) {
+void WriteToFile(const ModelTraits *model_traits, const std::string &filename,
+                 Backend *backend = nullptr) {
   std::ofstream fstream{filename};
-  WriteToStream<Backend>(model_traits, fstream);
+  WriteToStream<Backend>(model_traits, fstream, backend);
 }
 
 } // namespace bc

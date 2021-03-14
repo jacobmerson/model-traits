@@ -16,7 +16,7 @@ TEST_CASE("add and remove case from ModelTraits", "[traits]") {
 
   auto case1 = model_traits.AddCase("case1");
   auto case2 = model_traits.AddCase("case2");
-  // enusure that we are adding a new case
+  // ensure that we are adding a new case
   // each time we add case
   REQUIRE(case1 != case2);
   REQUIRE(case1 == model_traits.GetCase("case1"));

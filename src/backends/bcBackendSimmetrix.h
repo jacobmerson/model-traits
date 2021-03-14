@@ -7,8 +7,8 @@ namespace bc {
 struct SIMMETRIX : Backend {};
 
 template <>
-std::unique_ptr<ModelTraits>
-ReadFromFile<SIMMETRIX>(const std::string &filename);
+std::unique_ptr<ModelTraits> ReadFromFile(const std::string &filename,
+                                          SIMMETRIX *backend);
 
 } // namespace bc
 

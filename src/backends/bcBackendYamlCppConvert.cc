@@ -165,7 +165,7 @@ void convert<YAML>::decode(const DimSetT &g, ::YAML::Node &nd,
   auto gnd = nd["geometry"];
   gnd.SetStyle(::YAML::EmitterStyle::Flow);
   for (const auto &dg : g) {
-    gnd.push_back(std::make_pair(dg.dim_, dg.GID_));
+    gnd.push_back(std::make_pair(dg.GetDimension(), dg.GetID()));
   }
 }
 
@@ -184,7 +184,7 @@ void convert<YAML>::decode(const BCNode &bcn, ::YAML::Node &nd,
 void convert<YAML>::decode(const CategoryNode &cn, ::YAML::Node &nd,
                            YAML * /*unused*/) {
   auto bcn = nd["boundary conditions"];
-  for (const auto &bc : cn.GetBoundaryConditions()) {
+  for (const auto &bc : cn.GetBoundaryConditionNodes()) {
     bc->to<YAML>(bcn);
   }
   for (const auto &cat : cn.GetCategories()) {

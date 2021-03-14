@@ -14,15 +14,16 @@
 namespace bc {
 
 class CategoryNode : public INode, public Convertible<CategoryNode> {
-  using NodeSetT = NodeSet<>;
+  using BCSetT = NodeSet<BCNode, BC_VEC_WORKAROUND>;
+  using CategorySetT = NodeSet<CategoryNode, BC_VEC_WORKAROUND>;
 
 public:
-  CategoryNode(const std::string &name) : INode(name) {}
-  CategoryNode(std::string &&name) : INode(std::move(name)) {}
+  explicit CategoryNode(const std::string &name) : INode(name) {}
+  explicit CategoryNode(std::string &&name) : INode(std::move(name)) {}
   // FIXME rename to AddOrFindCategory
   CategoryNode *AddCategory(std::string name) {
-    auto nd = categories_.FindNode(name);
-    if (nd) {
+    auto *nd = categories_.FindNode(name);
+    if (nd != nullptr) {
       return nd;
     }
     return categories_.AddNode(std::make_unique<CategoryNode>(std::move(name)));
@@ -55,12 +56,12 @@ public:
             std::make_shared<BC>(std::forward<BC>(boundary_condition))));
   }
 
-  // FIXME rename this? Not sure what to call it, but it's confusing
-  // that it shares a name with GetBoundaryConditions in BCNode
-  auto &GetBoundaryConditions() { return boundary_conditions_; }
-  const auto &GetBoundaryConditions() const { return boundary_conditions_; }
-  auto &GetCategories() { return categories_; }
-  const auto &GetCategories() const { return categories_; }
+  BCSetT &GetBoundaryConditionNodes() { return boundary_conditions_; }
+  const BCSetT &GetBoundaryConditionNodes() const {
+    return boundary_conditions_;
+  }
+  CategorySetT &GetCategories() { return categories_; }
+  const CategorySetT &GetCategories() const { return categories_; }
 
   friend fmt::formatter<CategoryNode>;
 
@@ -68,8 +69,8 @@ protected:
   // currently both categories, and boundary_conditions are
   // stored with the vector backend. This is a reasonable assumption
   // with small numbers of nodes
-  NodeSet<CategoryNode, BC_VEC_WORKAROUND> categories_;
-  NodeSet<BCNode, BC_VEC_WORKAROUND> boundary_conditions_;
+  CategorySetT categories_;
+  BCSetT boundary_conditions_;
 };
 } // namespace bc
 /*

@@ -10,6 +10,24 @@ namespace bc {
 // FIXME Better name?
 struct DimGeometry {
   DimGeometry(OrdinalType d, OrdinalType g) : dim_(d), GID_(g) {}
+  OrdinalType GetDimension() const { return dim_; }
+  OrdinalType GetID() const { return GID_; }
+  bool operator==(const DimGeometry &rhs) const {
+    return dim_ == rhs.dim_ && GID_ == rhs.GID_;
+  }
+  bool operator!=(const DimGeometry &rhs) const { return !(rhs == *this); }
+  bool operator<(const DimGeometry &rhs) const {
+    if (dim_ < rhs.dim_)
+      return true;
+    if (rhs.dim_ < dim_)
+      return false;
+    return GID_ < rhs.GID_;
+  }
+  bool operator>(const DimGeometry &rhs) const { return rhs < *this; }
+  bool operator<=(const DimGeometry &rhs) const { return !(rhs < *this); }
+  bool operator>=(const DimGeometry &rhs) const { return !(*this < rhs); }
+
+private:
   OrdinalType dim_;
   OrdinalType GID_;
 };
@@ -47,8 +65,10 @@ class GeometrySet : public IGeometrySet,
 public:
   using Container = Cont<Geometry>;
   GeometrySet() = default;
-  GeometrySet(const Geometry &g) { geometry_.push_back(g); }
-  GeometrySet(Geometry &&g) { geometry_.push_back(std::move(g)); }
+  explicit GeometrySet(const Geometry &g) { geometry_.push_back(g); }
+  explicit GeometrySet(Geometry &&g) { geometry_.push_back(std::move(g)); }
+  explicit GeometrySet(std::initializer_list<Geometry> list)
+      : GeometrySet(list.begin(), list.end()) {}
   // FIXME need to constrain this template
   template <typename InputIt>
   GeometrySet(InputIt first, InputIt last) : geometry_(first, last) {}
