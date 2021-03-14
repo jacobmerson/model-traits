@@ -10,21 +10,13 @@ class ModelTraitNode : public Convertible<ModelTraitNode> {
 public:
   using GeomPtrT = std::shared_ptr<IGeometrySet>;
   using MTPtrT = std::shared_ptr<IModelTrait>;
-  ModelTraitNode(const std::string &name, GeomPtrT g, MTPtrT bc) : name_(name) {
-    model_traits_.emplace_back(std::move(g), std::move(bc));
-  }
-  void AddModelTrait(GeomPtrT g, MTPtrT bc) {
-    model_traits_.emplace_back(std::move(g), std::move(bc));
-  };
+  ModelTraitNode(const std::string &name, GeomPtrT g, MTPtrT bc);
+  void AddModelTrait(GeomPtrT g, MTPtrT bc);
 
-  std::vector<std::pair<GeomPtrT, MTPtrT>> &GetModelTraits() noexcept {
-    return model_traits_;
-  }
+  std::vector<std::pair<GeomPtrT, MTPtrT>> &GetModelTraits() noexcept;
   const std::vector<std::pair<GeomPtrT, MTPtrT>> &
-  GetModelTraits() const noexcept {
-    return model_traits_;
-  }
-  const std::string &GetName() const noexcept { return name_; }
+  GetModelTraits() const noexcept;
+  const std::string &GetName() const noexcept;
 
 private:
   // each name can have multiple BC's associated with them as long as each
