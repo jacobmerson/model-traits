@@ -1,8 +1,8 @@
-#include "Simmetrix.h"
 #include "SimmetrixConvert.h"
 #include "SimmetrixWrapper.h"
 #include "model_traits/ExprtkFunction.h"
 #include "model_traits/GeometrySet.h"
+#include "model_traits/ModelTraitsIO.h"
 #include <SimAttribute.h>
 #include <SimError.h>
 #include <SimModel.h>

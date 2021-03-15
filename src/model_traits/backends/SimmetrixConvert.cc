@@ -1,8 +1,8 @@
 #include "SimmetrixConvert.h"
-#include "Simmetrix.h"
 #include "SimmetrixWrapper.h"
 #include "model_traits/Convert.h"
 #include "model_traits/ModelTrait.h"
+#include "model_traits/ModelTraitsIO.h"
 #include "model_traits/Typedefs.h"
 #include <SimAttribute.h>
 

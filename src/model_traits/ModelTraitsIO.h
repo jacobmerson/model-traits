@@ -39,7 +39,13 @@ void WriteToFile(const ModelTraits *model_traits, const std::string &filename,
   std::ofstream fstream{filename};
   WriteToStream<Backend>(model_traits, fstream, backend);
 }
-
 } // namespace mt
+
+#ifdef MT_HAVE_YAML
+#include "backends/Yaml.h"
+#endif
+#ifdef MT_HAVE_SIMMETRIX
+#include "backends/Simmetrix.h"
+#endif
 
 #endif
