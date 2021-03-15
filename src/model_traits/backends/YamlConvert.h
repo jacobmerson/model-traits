@@ -1,6 +1,6 @@
 #ifndef BC_BACKEND_YAML_CPP_CONVERT_H__
 #define BC_BACKEND_YAML_CPP_CONVERT_H__
-#include "YamlCpp.h"
+#include "Yaml.h"
 #include "model_traits/ExprtkFunction.h"
 #include "model_traits/ModelTrait.h"
 #include "model_traits/NamedFunction.h"

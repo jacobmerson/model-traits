@@ -2,7 +2,7 @@
 option(YAML-CPP "Enables yaml-cpp backend. Requires yaml-cpp." ON)
 if (YAML-CPP)
     find_package(yaml-cpp REQUIRED)
-    set(SOURCES ${SOURCES} YamlCpp.cc YamlConvert.cc)
+    set(SOURCES ${SOURCES} Yaml.cc YamlConvert.cc)
 endif ()
 
 if (ENABLE_SIMMETRIX)

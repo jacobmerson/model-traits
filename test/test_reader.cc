@@ -2,7 +2,7 @@
 #include <model_traits/backends/Simmetrix.h>
 #endif
 #include <iostream>
-#include <model_traits/backends/YamlCpp.h>
+#include <model_traits/backends/Yaml.h>
 
 int main(int, char **) {
   std::ifstream istream("../../test/syntax-test.yaml");
