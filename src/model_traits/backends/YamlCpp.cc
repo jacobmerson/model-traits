@@ -138,7 +138,7 @@ void WriteToStream(const ModelTraits *model_traits, std::ostream &stream,
   ::YAML::Emitter e;
 
   auto n = model_traits->to<YAML>();
-  // auto cs = model_traits->GetCase("case 1");
+  // auto cs = model_traits->FindCase("case 1");
   // auto n = cs->to<YAML>();
   e << n;
   fmt::print(stream, "{}\n", e.c_str());

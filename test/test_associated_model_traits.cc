@@ -21,9 +21,13 @@ TEST_CASE("Associate Traits", "[associated]") {
                          BoolMT{true});
     case1->AddModelTrait("top level int", GeometrySet<OrdinalType>({1, 2, 3}),
                          IntMT{5});
+
+    // adding cases potentially invalidates any pointers
     auto *cat = case1->AddCategory("category 1");
-    auto *right = cat->AddCategory("category 3");
-    auto *left = cat->AddCategory("category 2");
+    cat->AddCategory("category 3");
+    cat->AddCategory("category 2");
+    auto *right = cat->FindCategoryNode("category 3");
+    auto *left = cat->FindCategoryNode("category 2");
     left->AddModelTrait("base boundary condition 1",
                         GeometrySet<OrdinalType>({6, 8, 19, 34}), IntMT{10});
     right->AddModelTrait("base boundary condition 2",

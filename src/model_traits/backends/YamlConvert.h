@@ -1,13 +1,13 @@
 #ifndef BC_BACKEND_YAML_CPP_CONVERT_H__
 #define BC_BACKEND_YAML_CPP_CONVERT_H__
 #include "YamlCpp.h"
-#include "model_traits/TypeTraits.h"
-#include <yaml-cpp/yaml.h>
-//#include "bcConvert.h"
 #include "model_traits/ExprtkFunction.h"
 #include "model_traits/ModelTrait.h"
 #include "model_traits/NamedFunction.h"
+#include "model_traits/TypeTraits.h"
+#include <algorithm>
 #include <exception>
+#include <yaml-cpp/yaml.h>
 
 namespace mt {
 // Is there a better way to get this compile time

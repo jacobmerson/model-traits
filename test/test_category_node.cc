@@ -3,13 +3,11 @@
 #include "model_traits/ModelTrait.h"
 #include "model_traits/ModelTraitNode.h"
 #include "model_traits/Typedefs.h"
-// boundary condition struct
-// using BC = mt::BoolMT;
-//
 using mt::BoolMT;
 using mt::CategoryNode;
 using mt::DimGeometrySet;
 using mt::GeometrySet;
+using mt::IntMT;
 using mt::ModelTraitNode;
 
 TEST_CASE("add to category node", "[node]") {
@@ -19,15 +17,17 @@ TEST_CASE("add to category node", "[node]") {
   CategoryNode *node2 = nullptr;
   SECTION("Category First") {
     REQUIRE_NOTHROW(node1 = cn.AddCategory("category 2"));
-    REQUIRE_NOTHROW(node2 = cn.AddCategory("category 3"));
-    REQUIRE(node1 != node2);
     // trying to add two category nodes with the same name returns a pointer
     // to the same node as the original
     REQUIRE_NOTHROW(node2 = cn.AddCategory("category 2"));
     REQUIRE(node2 == node1);
+    REQUIRE(cn.FindCategoryNode("category 2") == node1);
+
+    REQUIRE_NOTHROW(node2 = cn.AddCategory("category 3"));
+    REQUIRE(node1 != node2);
+    REQUIRE_NOTHROW(node2 = cn.AddCategory("category 2"));
     ModelTraitNode *mt_node1 = nullptr;
     ModelTraitNode *mt_node2 = nullptr;
-    // cannot add a mt with the same name as the category
     REQUIRE_NOTHROW(
         mt_node1 = cn.AddModelTrait(
             "category 2", DimGeometrySet<>(mt::DimGeometry(1, 1)), BoolMT{}));
@@ -54,5 +54,21 @@ TEST_CASE("add to category node", "[node]") {
 
     REQUIRE_NOTHROW(cn.AddCategory("category 2"));
     REQUIRE_NOTHROW(cn.AddCategory("category 3"));
+  }
+  // adding multiple model traits with the same name should
+  // append the geometry and model trait to the model trait node
+  SECTION("multiple model traits with same name") {
+    cn.AddModelTrait("model_trait", GeometrySet<>(1), BoolMT{});
+    cn.AddModelTrait("model_trait", GeometrySet<>(2), BoolMT{});
+    cn.AddModelTrait("model_trait", GeometrySet<>(3), IntMT{});
+    ModelTraitNode *nd = cn.FindModelTraitNode("model_trait");
+    REQUIRE(nd->GetModelTraits().size() == 3);
+    REQUIRE(nd->GetName() == "model_trait");
+    int count = 0;
+    for (auto &trait_pair : nd->GetModelTraits()) {
+      auto *geometry = dynamic_cast<GeometrySet<> *>(trait_pair.first.get());
+      REQUIRE(geometry != nullptr);
+      REQUIRE(*(geometry->begin()) == ++count);
+    }
   }
 }

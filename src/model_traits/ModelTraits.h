@@ -14,11 +14,11 @@ public:
   /**
    * @param [in] name of the root model traits object
    */
-  ModelTraits(const std::string &name) : name_(name) {}
+  explicit ModelTraits(const std::string &name);
   /**
    * @param [in] name the root model traits object
    */
-  ModelTraits(std::string &&name) : name_(std::move(name)) {}
+  explicit ModelTraits(std::string &&name);
   /**
    * @brief Add case to model traits object
    * @param [in] name
@@ -28,34 +28,19 @@ public:
    * Adds a case if it doesn't exist and returns a pointer to it's
    * INode. If the case does exist, the pointer to the case is returned.
    */
-  CategoryNode *AddCase(const std::string &name) {
-    return cases_.AddNode(std::make_unique<CategoryNode>(name));
-  }
-  CategoryNode *AddCase(std::string &&name) {
-    return cases_.AddNode(std::make_unique<CategoryNode>(std::move(name)));
-  }
-  CategoryNode *GetCase(const std::string &name) {
-    return cases_.FindNode(name);
-  }
-  const CategoryNode *GetCase(const std::string &name) const {
-    return cases_.FindNode(name);
-  }
+  CategoryNode *AddCase(const std::string &name);
+  const CategoryNode *FindCase(const std::string &name) const noexcept;
+  CategoryNode *FindCase(const std::string &name) noexcept;
   /**
    * Removes a case from ModelTraits by it's name
    */
-  std::unique_ptr<CategoryNode> RemoveCase(const std::string &name) {
-    return std::move(std::unique_ptr<CategoryNode>(
-        static_cast<CategoryNode *>(cases_.RemoveNode(name).release())));
-  }
-  const auto &GetCases() const { return cases_; }
-  auto &GetCases() { return cases_; }
-  int NumCases() { return cases_.Size(); }
-  const std::string &GetName() const noexcept { return name_; }
-
-  friend fmt::formatter<ModelTraits>;
+  void RemoveCase(const std::string &name);
+  const std::vector<CategoryNode> &GetCases() const;
+  int NumCases();
+  const std::string &GetName() const noexcept;
 
 protected:
-  NodeSet<CategoryNode, BC_VEC_WORKAROUND> cases_;
+  std::vector<CategoryNode> cases_;
   std::string name_;
 };
 

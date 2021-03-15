@@ -185,10 +185,10 @@ void convert<YAML>::decode(const CategoryNode &cn, ::YAML::Node &nd,
                            YAML * /*unused*/) {
   auto bcn = nd["boundary conditions"];
   for (const auto &bc : cn.GetModelTraitNodes()) {
-    bc->to<YAML>(bcn);
+    bc.to<YAML>(bcn);
   }
-  for (const auto &cat : cn.GetCategories()) {
-    nd[cat->GetName()] = cat->to<YAML>();
+  for (const auto &cat : cn.GetCategoryNodes()) {
+    nd[cat.GetName()] = cat.to<YAML>();
   }
 }
 void convert<YAML>::decode(const ModelTraits &mt, ::YAML::Node &nd,
@@ -198,8 +198,8 @@ void convert<YAML>::decode(const ModelTraits &mt, ::YAML::Node &nd,
   auto cases_node = mtn["cases"];
   for (const auto &cs : mt.GetCases()) {
     ::YAML::Node local;
-    local["name"] = cs->GetName();
-    local["model traits"] = cs->to<YAML>();
+    local["name"] = cs.GetName();
+    local["model traits"] = cs.to<YAML>();
     cases_node.push_back(local);
   }
 }

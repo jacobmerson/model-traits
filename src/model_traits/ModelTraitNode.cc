@@ -12,10 +12,6 @@ void ModelTraitNode::AddModelTrait(ModelTraitNode::GeomPtrT g,
                                    ModelTraitNode::MTPtrT bc) {
   model_traits_.emplace_back(std::move(g), std::move(bc));
 }
-std::vector<std::pair<ModelTraitNode::GeomPtrT, ModelTraitNode::MTPtrT>> &
-ModelTraitNode::GetModelTraits() noexcept {
-  return model_traits_;
-}
 const std::vector<std::pair<ModelTraitNode::GeomPtrT, ModelTraitNode::MTPtrT>> &
 ModelTraitNode::GetModelTraits() const noexcept {
   return model_traits_;

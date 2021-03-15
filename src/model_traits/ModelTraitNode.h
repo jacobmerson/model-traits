@@ -10,10 +10,9 @@ class ModelTraitNode : public Convertible<ModelTraitNode> {
 public:
   using GeomPtrT = std::shared_ptr<IGeometrySet>;
   using MTPtrT = std::shared_ptr<IModelTrait>;
+  ModelTraitNode() = default;
   ModelTraitNode(const std::string &name, GeomPtrT g, MTPtrT bc);
   void AddModelTrait(GeomPtrT g, MTPtrT bc);
-
-  std::vector<std::pair<GeomPtrT, MTPtrT>> &GetModelTraits() noexcept;
   const std::vector<std::pair<GeomPtrT, MTPtrT>> &
   GetModelTraits() const noexcept;
   const std::string &GetName() const noexcept;

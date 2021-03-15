@@ -4,7 +4,6 @@
 #include "GeometrySet.h"
 #include "ModelTrait.h"
 #include "ModelTraitNode.h"
-#include "NodeSet.h"
 #include <memory>
 #include <string>
 #include <vector>
@@ -12,14 +11,26 @@
 namespace mt {
 
 class CategoryNode : public Convertible<CategoryNode> {
-  using BCSetT = NodeSet<ModelTraitNode, BC_VEC_WORKAROUND>;
-  using CategorySetT = NodeSet<CategoryNode, BC_VEC_WORKAROUND>;
+  using BCSetT = std::vector<ModelTraitNode>;
+  using CategorySetT = std::vector<CategoryNode>;
 
 public:
   explicit CategoryNode(const std::string &name);
   explicit CategoryNode(std::string &&name);
-  CategoryNode *AddCategory(std::string name);
-
+  const CategoryNode *FindCategoryNode(const std::string &name) const noexcept;
+  const ModelTraitNode *
+  FindModelTraitNode(const std::string &name) const noexcept;
+  CategoryNode *FindCategoryNode(const std::string &name) noexcept;
+  ModelTraitNode *FindModelTraitNode(const std::string &name) noexcept;
+  /**
+   * Adds a category. If the internal memory grows, then it invalidates
+   * the previously captured pointers
+   */
+  CategoryNode *AddCategory(const std::string &name);
+  /**
+   * Adds a ModelTrait. If the internal memory grows, then it invalidates
+   * the previously captured pointers
+   */
   template <typename Geom, typename ModelTrait>
   ModelTraitNode *AddModelTrait(const std::string &name, Geom &&geometry,
                                 ModelTrait &&model_trait) {
@@ -33,10 +44,8 @@ public:
   }
 
   const BCSetT &GetModelTraitNodes() const;
-  const CategorySetT &GetCategories() const;
+  const CategorySetT &GetCategoryNodes() const;
   const std::string &GetName() const noexcept;
-
-  friend fmt::formatter<CategoryNode>;
 
 protected:
   ModelTraitNode *AddModelTrait(const std::string &name,

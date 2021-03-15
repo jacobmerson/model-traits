@@ -32,22 +32,22 @@ void AssociatedModelTraits<Geom>::Process(
     const CategoryNode *current_node, std::vector<std::string> &categories) {
   // At a leaf node, merge the contents into the
   for (const auto &bc_node : current_node->GetModelTraitNodes()) {
-    for (const auto &bc : bc_node->GetModelTraits()) {
+    for (const auto &bc : bc_node.GetModelTraits()) {
       auto boundary_condition = bc.second;
       // only add the geometry type of interest
       auto geom_set = std::dynamic_pointer_cast<GeometrySet<Geom>>(bc.first);
       if (geom_set) {
         for (auto &g : *geom_set) {
-          AddGeometry(g, categories, bc_node->GetName(), boundary_condition);
+          AddGeometry(g, categories, bc_node.GetName(), boundary_condition);
         }
       }
     }
   }
-  for (const auto &category : current_node->GetCategories()) {
+  for (const auto &category : current_node->GetCategoryNodes()) {
     // copy associated nodes, on each call it only holds one DFS arm of the tree
     auto categories_copy = categories;
-    categories_copy.push_back(category->GetName());
-    Process(category.get(), categories_copy);
+    categories_copy.push_back(category.GetName());
+    Process(&category, categories_copy);
   }
 }
 
