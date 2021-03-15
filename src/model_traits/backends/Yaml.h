@@ -4,7 +4,7 @@
 #include "model_traits/ModelTraitsIO.h"
 
 namespace mt {
-struct YAML : Backend {};
+struct YAML {};
 
 template <>
 void WriteToStream(const ModelTraits *model_traits, std::ostream &stream,

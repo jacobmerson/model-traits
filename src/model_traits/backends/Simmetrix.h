@@ -4,7 +4,7 @@
 #include "model_traits/ModelTraitsIO.h"
 
 namespace mt {
-struct SIMMETRIX : Backend {};
+struct SIMMETRIX {};
 
 template <>
 std::unique_ptr<ModelTraits> ReadFromFile(const std::string &filename,

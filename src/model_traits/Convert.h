@@ -12,12 +12,6 @@ template <typename T, typename Backend> struct BackendTypeMap {};
 
 template <typename Backend = void> struct convert {};
 
-// FIXME remove this requirement
-// an abstract backend struct that all backends derive from
-// this is used to enable conversion to/from backends as
-// well as
-struct Backend {};
-
 template <typename BaseClass> struct Convertible {
   // convert from that takes T by reference
   template <typename Backend, typename T>
