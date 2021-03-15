@@ -301,7 +301,6 @@ std::unique_ptr<ModelTraits> ReadFromFile(const std::string &filename,
     SimmodelerLog lg("reader.log");
     SimmodelerStartup s;
     SimmodelerLicenses l(s);
-    SimmodelerParasolid ps;
 
     SimProgress progress;
 

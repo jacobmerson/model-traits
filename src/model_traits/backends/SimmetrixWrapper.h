@@ -7,8 +7,6 @@
 #include <SimErrorCodes.h>
 #include <SimUtil.h>
 
-#include "SimParasolidKrnl.h"
-
 #include <fmt/format.h>
 #include <iterator>
 #include <type_traits>
@@ -175,14 +173,6 @@ class SimmodelerLog {
 public:
   SimmodelerLog(const char *log_name) noexcept { Sim_logOn(log_name); }
   ~SimmodelerLog() noexcept { Sim_logOff(); }
-};
-/*
- * RAII class for simmodeler parasolid
- */
-class SimmodelerParasolid {
-public:
-  SimmodelerParasolid() noexcept { SimParasolid_start(1); }
-  ~SimmodelerParasolid() noexcept { SimParasolid_stop(1); }
 };
 /*
  * RAII class for simmetrix progress
