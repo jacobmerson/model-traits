@@ -65,6 +65,7 @@ BoolMT convert<YAML>::encode(const ::YAML::Node &nd, YAML * /*unused*/) {
 
 void convert<YAML>::decode(const BoolMT &bc, ::YAML::Node &nd, YAML *backend) {
   if (backend == nullptr || backend->write_trait_type_on_named_types ||
+      !backend->name2type ||
       backend->name2type(nd["name"].as<std::string>()).empty()) {
     nd["type"] = "bool";
   }
@@ -82,6 +83,7 @@ MatrixMT convert<YAML>::encode(const ::YAML::Node &nd, YAML * /*unused*/) {
 void convert<YAML>::decode(const MatrixMT &bc, ::YAML::Node &nd,
                            YAML *backend) {
   if (backend == nullptr || backend->write_trait_type_on_named_types ||
+      !backend->name2type ||
       backend->name2type(nd["name"].as<std::string>()).empty()) {
     nd["type"] = "matrix";
   }
@@ -104,6 +106,7 @@ ScalarMT convert<YAML>::encode(const ::YAML::Node &nd, YAML * /*unused*/) {
 void convert<YAML>::decode(const ScalarMT &bc, ::YAML::Node &nd,
                            YAML *backend) {
   if (backend == nullptr || backend->write_trait_type_on_named_types ||
+      !backend->name2type ||
       backend->name2type(nd["name"].as<std::string>()).empty()) {
     nd["type"] = "scalar";
   }
@@ -116,6 +119,7 @@ IntMT convert<YAML>::encode(const ::YAML::Node &nd, YAML * /*unused*/) {
 }
 void convert<YAML>::decode(const IntMT &bc, ::YAML::Node &nd, YAML *backend) {
   if (backend == nullptr || backend->write_trait_type_on_named_types ||
+      !backend->name2type ||
       backend->name2type(nd["name"].as<std::string>()).empty()) {
     nd["type"] = "int";
   }
@@ -129,6 +133,7 @@ StringMT convert<YAML>::encode(const ::YAML::Node &nd, YAML * /*unused*/) {
 void convert<YAML>::decode(const StringMT &bc, ::YAML::Node &nd,
                            YAML *backend) {
   if (backend == nullptr || backend->write_trait_type_on_named_types ||
+      !backend->name2type ||
       backend->name2type(nd["name"].as<std::string>()).empty()) {
     nd["type"] = "string";
   }
@@ -144,6 +149,7 @@ void convert<YAML>::decode(const VectorMT &bc, ::YAML::Node &nd,
                            YAML *backend) {
 
   if (backend == nullptr || backend->write_trait_type_on_named_types ||
+      !backend->name2type ||
       backend->name2type(nd["name"].as<std::string>()).empty()) {
     nd["type"] = "vector";
   }
