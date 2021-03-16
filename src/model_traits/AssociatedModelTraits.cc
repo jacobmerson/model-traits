@@ -7,7 +7,7 @@ namespace mt {
 template <typename Geom>
 void AssociatedModelTraits<Geom>::AddGeometry(
     const Geom &geom, const std::vector<std::string> &category_names,
-    const std::string &bc_name, std::shared_ptr<const IModelTrait> bc) {
+    const std::string &mt_name, std::shared_ptr<const IModelTrait> mt) {
   using std::find_if;
   // auto it = find(begin(geometry_),end(geometry_), g);
   auto it = find_if(begin(geometry_nodes_), end(geometry_nodes_),
@@ -24,7 +24,7 @@ void AssociatedModelTraits<Geom>::AddGeometry(
   for (const auto &category_name : category_names) {
     node = node->AddCategory(category_name);
   }
-  node->AddModelTrait(bc_name, std::move(bc));
+  node->AddModelTrait(mt_name, std::move(mt));
 }
 
 template <typename Geom>
@@ -37,8 +37,13 @@ void AssociatedModelTraits<Geom>::Process(
       // only add the geometry type of interest
       auto geom_set = std::dynamic_pointer_cast<GeometrySet<Geom>>(bc.first);
       if (geom_set) {
-        for (auto &g : *geom_set) {
-          AddGeometry(g, categories, bc_node.GetName(), boundary_condition);
+        // the set is empty, so add the null geometry
+        if (geom_set->begin() == geom_set->end()) {
+          AddNullGeometry(categories, bc_node.GetName(), boundary_condition);
+        } else {
+          for (auto &g : *geom_set) {
+            AddGeometry(g, categories, bc_node.GetName(), boundary_condition);
+          }
         }
       }
     }
@@ -65,7 +70,7 @@ AssociatedModelTraits<Geometry>::GetGeometryNodes() const noexcept {
 template <typename Geometry>
 std::size_t
 AssociatedModelTraits<Geometry>::NumGeometricEntities() const noexcept {
-  return geometry_nodes_.size();
+  return geometry_nodes_.size() + (null_geometry_ != nullptr);
 }
 template <typename Geometry>
 const AssociatedGeometryNode<Geometry> *
@@ -79,6 +84,24 @@ AssociatedModelTraits<Geometry>::Find(const Geometry &geometry) {
     return nullptr;
   }
   return &(*it);
+}
+template <typename Geometry>
+const AssociatedCategoryNode *
+AssociatedModelTraits<Geometry>::GetNullGeometry() {
+  return null_geometry_.get();
+}
+template <typename Geometry>
+void AssociatedModelTraits<Geometry>::AddNullGeometry(
+    const std::vector<std::string> &category_names, const std::string &mt_name,
+    std::shared_ptr<const IModelTrait> model_trait) {
+  if (null_geometry_ == nullptr) {
+    null_geometry_ = std::make_unique<AssociatedCategoryNode>();
+  }
+  AssociatedCategoryNode *node{null_geometry_.get()};
+  for (const auto &category_name : category_names) {
+    node = node->AddCategory(category_name);
+  }
+  node->AddModelTrait(mt_name, std::move(model_trait));
 }
 AssociatedCategoryNode *AssociatedCategoryNode::AddCategory(std::string name) {
   using std::find_if;
@@ -129,4 +152,4 @@ AssociatedCategoryNode::FindCategory(const std::string &name) const {
 
 template class AssociatedModelTraits<DimGeometry>;
 template class AssociatedModelTraits<OrdinalType>;
-} // namespace bc
+} // namespace mt

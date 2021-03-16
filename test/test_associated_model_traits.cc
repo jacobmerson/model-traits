@@ -10,6 +10,7 @@ using mt::DimGeometry;
 using mt::GeometrySet;
 using mt::IntMT;
 using mt::ModelTraits;
+using mt::MTCast;
 using mt::OrdinalType;
 
 TEST_CASE("Associate Traits", "[associated]") {
@@ -35,6 +36,7 @@ TEST_CASE("Associate Traits", "[associated]") {
 
     AssociatedModelTraits<DimGeometry> wrong_assoc{case1};
     REQUIRE(wrong_assoc.NumGeometricEntities() == 0);
+    REQUIRE(wrong_assoc.GetNullGeometry() == nullptr);
 
     AssociatedModelTraits<OrdinalType> model_association{case1};
     // seven unique geometric entities
@@ -55,11 +57,11 @@ TEST_CASE("Associate Traits", "[associated]") {
     auto *bc1_int = g1->FindModelTrait("top level int");
     auto *bc2_bool = g2->FindModelTrait("top level bool");
     auto *bc2_int = g2->FindModelTrait("top level int");
-    REQUIRE((*dynamic_cast<const BoolMT *>(bc1_bool))() == true);
-    REQUIRE((*dynamic_cast<const BoolMT *>(bc2_bool))() == true);
+    REQUIRE((*MTCast<BoolMT>(bc1_bool))() == true);
+    REQUIRE((*MTCast<BoolMT>(bc2_bool))() == true);
 
-    REQUIRE((*dynamic_cast<const IntMT *>(bc1_int))() == 5);
-    REQUIRE((*dynamic_cast<const IntMT *>(bc2_int))() == 5);
+    REQUIRE((*MTCast<IntMT>(bc1_int))() == 5);
+    REQUIRE((*MTCast<IntMT>(bc2_int))() == 5);
     REQUIRE(bc1_bool != nullptr);
     REQUIRE(bc1_int != nullptr);
     REQUIRE(bc2_bool != nullptr);
@@ -79,8 +81,9 @@ TEST_CASE("Associate Traits", "[associated]") {
     auto *base_bc_2 = category3->FindModelTrait("base boundary condition 2");
     REQUIRE(base_bc_1 != nullptr);
     REQUIRE(base_bc_2 != nullptr);
-    REQUIRE((*dynamic_cast<const IntMT *>(base_bc_1))() == 10);
-    REQUIRE((*dynamic_cast<const IntMT *>(base_bc_2))() == 17);
+    REQUIRE((*MTCast<IntMT>(base_bc_1))() == 10);
+    REQUIRE((*MTCast<IntMT>(base_bc_2))() == 17);
+    REQUIRE(model_association.GetNullGeometry() == nullptr);
   }
   SECTION("Associate Dim Geometry") {
 
@@ -105,17 +108,21 @@ TEST_CASE("Associate Traits", "[associated]") {
 
     auto *bc1 = g1->FindModelTrait("top level int");
     REQUIRE(bc1 != nullptr);
-    const IntMT *bc1_int = dynamic_cast<const IntMT *>(bc1);
+    const IntMT *bc1_int = MTCast<IntMT>(bc1);
     REQUIRE(bc1_int != nullptr);
     REQUIRE((*bc1_int)() == 7);
 
     auto *bc2 = g2->FindModelTrait("top level int");
     REQUIRE(bc2 != nullptr);
-    const IntMT *bc2_int = dynamic_cast<const IntMT *>(bc2);
+    const IntMT *bc2_int = MTCast<IntMT>(bc2);
     REQUIRE(bc2_int != nullptr);
     REQUIRE((*bc2_int)() == 5);
+    REQUIRE(model_association.GetNullGeometry() == nullptr);
   }
   SECTION("Repeat BC Fail") {
+    // the name is a misnomer on purpose. This test shows that even if the BCs
+    // are different types, but they share the same name they cannot be
+    // associated on the same model entity
     case1->AddModelTrait("top level int", GeometrySet<OrdinalType>({1, 2, 3}),
                          BoolMT{true});
     case1->AddModelTrait("top level int", GeometrySet<OrdinalType>({1, 5, 7}),
@@ -124,5 +131,18 @@ TEST_CASE("Associate Traits", "[associated]") {
     // multiple boundary conditions with the same name applied to the same
     // geometry fails
     REQUIRE_THROWS(AssociatedModelTraits<OrdinalType>(case1));
+  }
+  SECTION("empty geometry set") {
+    case1->AddModelTrait("top level int", GeometrySet<OrdinalType>(),
+                         IntMT{88});
+    AssociatedModelTraits<OrdinalType> associated_model_traits{case1};
+    REQUIRE(associated_model_traits.NumGeometricEntities() == 1);
+    REQUIRE(associated_model_traits.GetNullGeometry() != nullptr);
+    auto *trait = associated_model_traits.GetNullGeometry()->FindModelTrait(
+        "top level int");
+    REQUIRE(trait != nullptr);
+    auto *int_trait = MTCast<IntMT>(trait);
+    REQUIRE(int_trait != nullptr);
+    REQUIRE((*int_trait)() == 88);
   }
 }

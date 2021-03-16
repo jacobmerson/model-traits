@@ -195,6 +195,9 @@ static_assert(IsFunctionMT<FunctionMT<double, 1, 0>>::value,
 static_assert(!IsFunctionMT<int>::value,
               "IsFunctionMT should return false for non FunctionMT types");
 
+template <typename ModelTrait> const ModelTrait *MTCast(const IModelTrait *mt) {
+  return dynamic_cast<const ModelTrait *>(mt);
+}
 } // namespace mt
 
 #endif

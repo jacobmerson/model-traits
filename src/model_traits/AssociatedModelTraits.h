@@ -6,23 +6,14 @@
 #include <unordered_map>
 #include <vector>
 namespace mt {
-template <typename ModelTrait> const ModelTrait *MTCast(const IModelTrait *mt) {
-  return dynamic_cast<const ModelTrait *>(mt);
-}
 class AssociatedCategoryNode {
 public:
+  AssociatedCategoryNode() = default;
   explicit AssociatedCategoryNode(std::string name) : name_(std::move(name)) {}
   AssociatedCategoryNode *AddCategory(std::string name);
   void AddModelTrait(const std::string &name,
                      const std::shared_ptr<const IModelTrait> &model_trait);
 
-  AssociatedCategoryNode(const AssociatedCategoryNode &) noexcept = default;
-  AssociatedCategoryNode &
-  operator=(const AssociatedCategoryNode &) noexcept = default;
-  AssociatedCategoryNode(AssociatedCategoryNode &&) noexcept = default;
-  AssociatedCategoryNode &
-  operator=(AssociatedCategoryNode &&) noexcept = default;
-  virtual ~AssociatedCategoryNode() noexcept = default;
   const std::string &GetName() const noexcept;
   const IModelTrait *FindModelTrait(const std::string &name) const;
   const AssociatedCategoryNode *FindCategory(const std::string &name) const;
@@ -43,9 +34,9 @@ template <typename Geom>
 class AssociatedGeometryNode : public AssociatedCategoryNode {
 public:
   explicit AssociatedGeometryNode(const Geom &g)
-      : AssociatedCategoryNode(""), geom_(g) {}
+      : AssociatedCategoryNode(), geom_(g) {}
   explicit AssociatedGeometryNode(Geom &&g)
-      : AssociatedCategoryNode(""), geom_(std::move(g)) {}
+      : AssociatedCategoryNode(), geom_(std::move(g)) {}
   const Geom &GetGeometry() const noexcept { return geom_; }
 
 private:
@@ -63,15 +54,29 @@ public:
   GetGeometryNodes() const noexcept;
   std::size_t NumGeometricEntities() const noexcept;
   const AssociatedGeometryNode<Geometry> *Find(const Geometry &geometry);
+  const AssociatedCategoryNode *GetNullGeometry();
+
+  // copy construction and assignment are not allowed
+  AssociatedModelTraits(const AssociatedModelTraits &) = delete;
+  AssociatedModelTraits &operator=(const AssociatedModelTraits &) = delete;
+  // move construction and assignment
+  AssociatedModelTraits(AssociatedModelTraits &&) = default;
+  AssociatedModelTraits &operator=(AssociatedModelTraits &&) = default;
+  ~AssociatedModelTraits() = default;
 
 private:
-  // IAssociatedGeometryNode *
-  // AddGeometryNode(std::unique_ptr<IAssociatedGeometryNode> geom);
   std::vector<AssociatedGeometryNode<Geometry>> geometry_nodes_;
+  // ptr because the value may, or may not exist
+  std::unique_ptr<AssociatedCategoryNode> null_geometry_;
   void Process(const CategoryNode *current_node,
                std::vector<std::string> &categories);
-  void AddGeometry(const Geometry &, const std::vector<std::string> &,
-                   const std::string &, std::shared_ptr<const IModelTrait>);
+  void AddGeometry(const Geometry &geometry,
+                   const std::vector<std::string> &category_names,
+                   const std::string &mt_name,
+                   std::shared_ptr<const IModelTrait> model_trait);
+  void AddNullGeometry(const std::vector<std::string> &category_names,
+                       const std::string &mt_name,
+                       std::shared_ptr<const IModelTrait> model_trait);
 };
 
 } // namespace mt
