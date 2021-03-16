@@ -34,11 +34,11 @@ private:
 
 struct IGeometrySet;
 
-template <typename, template <typename> class> class GeometrySet;
+template <typename> class GeometrySet;
 
 struct GeometrySetVisitor {
-  virtual void visit(GeometrySet<OrdinalType, BC_VEC_WORKAROUND> &) = 0;
-  virtual void visit(GeometrySet<DimGeometry, BC_VEC_WORKAROUND> &) = 0;
+  virtual void visit(GeometrySet<OrdinalType> &) = 0;
+  virtual void visit(GeometrySet<DimGeometry> &) = 0;
   virtual ~GeometrySetVisitor() = default;
 };
 
@@ -58,12 +58,11 @@ struct IGeometrySet {
  * geometry id, or even a pointer to some geometry.
  *
  */
-template <typename Geometry = OrdinalType,
-          template <typename> class Cont = BC_VEC_WORKAROUND>
+template <typename Geometry = OrdinalType>
 class GeometrySet : public IGeometrySet,
-                    public Convertible<GeometrySet<Geometry, Cont>> {
+                    public Convertible<GeometrySet<Geometry>> {
 public:
-  using Container = Cont<Geometry>;
+  using Container = std::vector<Geometry>;
   GeometrySet() = default;
   explicit GeometrySet(const Geometry &g) { geometry_.push_back(g); }
   explicit GeometrySet(Geometry &&g) { geometry_.push_back(std::move(g)); }
@@ -83,9 +82,8 @@ public:
 private:
   Container geometry_;
 };
-// FIXME Better name?
-template <template <typename> class Cont = BC_VEC_WORKAROUND>
-using DimGeometrySet = GeometrySet<DimGeometry, Cont>;
+using DimGeometrySet = GeometrySet<DimGeometry>;
+using IdGeometrySet = GeometrySet<OrdinalType>;
 
 } // namespace mt
 #endif

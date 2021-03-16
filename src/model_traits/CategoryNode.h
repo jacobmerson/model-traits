@@ -42,15 +42,21 @@ public:
         std::static_pointer_cast<IModelTrait>(std::make_shared<ModelTrait>(
             std::forward<ModelTrait>(model_trait))));
   }
+  /**
+   * Add the model trait by pointer.
+   * If you are getting compiler errors when trying to use this overload make
+   * sure that your types match exactly. If the types are not identical (have
+   * consts,etc) you are probably accidentally calling the by value overload.
+   */
+  ModelTraitNode *AddModelTrait(const std::string &name,
+                                std::shared_ptr<IGeometrySet> geometry,
+                                std::shared_ptr<IModelTrait> model_trait);
 
   const BCSetT &GetModelTraitNodes() const;
   const CategorySetT &GetCategoryNodes() const;
   const std::string &GetName() const noexcept;
 
 protected:
-  ModelTraitNode *AddModelTrait(const std::string &name,
-                                std::shared_ptr<IGeometrySet> geometry,
-                                std::shared_ptr<IModelTrait> model_trait);
   // currently both categories, and model_traits are
   // stored with the vector backend. This is a reasonable assumption
   // with small numbers of nodes

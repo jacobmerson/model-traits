@@ -1,6 +1,7 @@
-#include "catch2/catch_test_macros.hpp"
 #include "model_traits/ModelTraits.h"
+#include <catch2/catch_test_macros.hpp>
 
+// FIXME remove
 class TestModelTraits : public mt::ModelTraits {
 public:
   TestModelTraits(const std::string &name) : mt::ModelTraits(name){};

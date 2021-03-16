@@ -6,7 +6,7 @@
 using mt::BoolMT;
 using mt::CategoryNode;
 using mt::DimGeometrySet;
-using mt::GeometrySet;
+using mt::IdGeometrySet;
 using mt::IntMT;
 using mt::ModelTraitNode;
 
@@ -30,27 +30,27 @@ TEST_CASE("add to category node", "[node]") {
     ModelTraitNode *mt_node2 = nullptr;
     REQUIRE_NOTHROW(
         mt_node1 = cn.AddModelTrait(
-            "category 2", DimGeometrySet<>(mt::DimGeometry(1, 1)), BoolMT{}));
+            "category 2", DimGeometrySet(mt::DimGeometry(1, 1)), BoolMT{}));
 
     REQUIRE_NOTHROW(mt_node1 =
-                        cn.AddModelTrait("mt 1", GeometrySet<>(1), BoolMT{}));
+                        cn.AddModelTrait("mt 1", IdGeometrySet(1), BoolMT{}));
     REQUIRE_NOTHROW(mt_node2 =
-                        cn.AddModelTrait("mt 2", GeometrySet<>(1), BoolMT{}));
+                        cn.AddModelTrait("mt 2", IdGeometrySet(1), BoolMT{}));
     REQUIRE(mt_node1 != mt_node2);
     /*
     REQUIRE_THROWS(
-        node2 = cn.AddModelTrait("mt 1", GeometrySet<>(1), BoolMT{}));
+        node2 = cn.AddModelTrait("mt 1", IdGeometrySet(1), BoolMT{}));
     */
   }
   SECTION("mt first") {
     mt::ModelTraitNode *bc1 = nullptr;
     mt::ModelTraitNode *bc2 = nullptr;
-    REQUIRE_NOTHROW(bc1 = cn.AddModelTrait("mt 1", GeometrySet<>(1), BoolMT{}));
-    REQUIRE_NOTHROW(bc2 = cn.AddModelTrait("mt 2", GeometrySet<>(1), BoolMT{}));
+    REQUIRE_NOTHROW(bc1 = cn.AddModelTrait("mt 1", IdGeometrySet(1), BoolMT{}));
+    REQUIRE_NOTHROW(bc2 = cn.AddModelTrait("mt 2", IdGeometrySet(1), BoolMT{}));
     REQUIRE(bc1 != bc2);
-    REQUIRE_NOTHROW(bc1 = cn.AddModelTrait("mt 2", GeometrySet<>(1), BoolMT{}));
+    REQUIRE_NOTHROW(bc1 = cn.AddModelTrait("mt 2", IdGeometrySet(1), BoolMT{}));
     REQUIRE(bc1 == bc2);
-    REQUIRE_NOTHROW(cn.AddModelTrait("category 2", GeometrySet<>(1), BoolMT{}));
+    REQUIRE_NOTHROW(cn.AddModelTrait("category 2", IdGeometrySet(1), BoolMT{}));
 
     REQUIRE_NOTHROW(cn.AddCategory("category 2"));
     REQUIRE_NOTHROW(cn.AddCategory("category 3"));
@@ -58,15 +58,15 @@ TEST_CASE("add to category node", "[node]") {
   // adding multiple model traits with the same name should
   // append the geometry and model trait to the model trait node
   SECTION("multiple model traits with same name") {
-    cn.AddModelTrait("model_trait", GeometrySet<>(1), BoolMT{});
-    cn.AddModelTrait("model_trait", GeometrySet<>(2), BoolMT{});
-    cn.AddModelTrait("model_trait", GeometrySet<>(3), IntMT{});
+    cn.AddModelTrait("model_trait", IdGeometrySet(1), BoolMT{});
+    cn.AddModelTrait("model_trait", IdGeometrySet(2), BoolMT{});
+    cn.AddModelTrait("model_trait", IdGeometrySet(3), IntMT{});
     ModelTraitNode *nd = cn.FindModelTraitNode("model_trait");
     REQUIRE(nd->GetModelTraits().size() == 3);
     REQUIRE(nd->GetName() == "model_trait");
     int count = 0;
     for (auto &trait_pair : nd->GetModelTraits()) {
-      auto *geometry = dynamic_cast<GeometrySet<> *>(trait_pair.first.get());
+      auto *geometry = dynamic_cast<IdGeometrySet *>(trait_pair.first.get());
       REQUIRE(geometry != nullptr);
       REQUIRE(*(geometry->begin()) == ++count);
     }

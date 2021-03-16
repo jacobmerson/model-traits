@@ -42,17 +42,14 @@ template <> struct convert<YAML> {
       std::enable_if_t<IsFunctionMT<R>::value && (R::dim == 2), bool> = false>
   static R encode(const ::YAML::Node & /*nd*/, YAML * /*unused*/);
 
-  using DimSetT = GeometrySet<DimGeometry, BC_VEC_WORKAROUND>;
-  using SetT = GeometrySet<OrdinalType, BC_VEC_WORKAROUND>;
-
   static void decode(const BoolMT &, ::YAML::Node &, YAML *);
   static void decode(const MatrixMT &, ::YAML::Node &, YAML *);
   static void decode(const ScalarMT &, ::YAML::Node &, YAML *);
   static void decode(const IntMT &, ::YAML::Node &, YAML *);
   static void decode(const StringMT &, ::YAML::Node &, YAML *);
   static void decode(const VectorMT &, ::YAML::Node &, YAML *);
-  static void decode(const SetT &, ::YAML::Node &, YAML *);
-  static void decode(const DimSetT &, ::YAML::Node &, YAML *);
+  static void decode(const IdGeometrySet &, ::YAML::Node &, YAML *);
+  static void decode(const DimGeometrySet &, ::YAML::Node &, YAML *);
   static void decode(const ModelTraitNode &bcn, ::YAML::Node &, YAML *);
   static void decode(const CategoryNode &, ::YAML::Node &, YAML *);
   static void decode(const ModelTraits &, ::YAML::Node &, YAML *);

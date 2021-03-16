@@ -1,42 +1,39 @@
-#include "model_traits/ModelTrait.h"
-#include "model_traits/ModelTraitsIO.h"
-#include <fmt/ostream.h>
-// clang-format off
-// it's currently important that bcBackendYamlCppConvert.h
-// gets loaded after yaml-cpp
-#include <yaml-cpp/yaml.h>
 #include "YamlConvert.h"
-// clang-format on
+#include "model_traits/ModelTrait.h"
 #include "model_traits/ModelTraits.h"
+#include "model_traits/ModelTraitsIO.h"
+#include <cassert>
+#include <fmt/ostream.h>
+#include <yaml-cpp/yaml.h>
 
 namespace mt {
 
+template <typename ModelTrait>
+static std::shared_ptr<IModelTrait> ModelTraitToPtr(ModelTrait &&model_trait) {
+  return std::static_pointer_cast<IModelTrait>(
+      std::make_shared<ModelTrait>(model_trait));
+}
+template <typename Geom>
+static std::shared_ptr<IGeometrySet> GeomToPtr(Geom &&geometry) {
+  return std::static_pointer_cast<IGeometrySet>(
+      std::make_shared<Geom>(geometry));
+}
 template <typename T, int dim>
-static void AddExpression(const ::YAML::Node &bc, CategoryNode *parent_node,
-                          std::string &&name, GeometrySet<> &&geometry_set) {
+static std::shared_ptr<IModelTrait> GetExpressionPtr(const ::YAML::Node &bc) {
   auto num_variables = bc["num variables"].as<int>();
   switch (num_variables) {
   case 1:
-    parent_node->AddModelTrait(
-        std::move(name), std::move(geometry_set),
+    return ModelTraitToPtr(
         FunctionMT<T, 1, dim>::template from<YAML>(bc["value"]));
-    break;
   case 2:
-    parent_node->AddModelTrait(
-        std::move(name), std::move(geometry_set),
+    return ModelTraitToPtr(
         FunctionMT<T, 2, dim>::template from<YAML>(bc["value"]));
-    break;
   case 3:
-    parent_node->AddModelTrait(
-        std::move(name), std::move(geometry_set),
+    return ModelTraitToPtr(
         FunctionMT<T, 3, dim>::template from<YAML>(bc["value"]));
-    break;
   case 4:
-    parent_node->AddModelTrait(
-        std::move(name), std::move(geometry_set),
-        FunctionMT<T, 4, dim>::template from<YAML>(bc["value"]));
-    break;
-    // in the default case, the boundary condition is added as a dynamic type
+    return ModelTraitToPtr(
+        FunctionMT<T, 3, dim>::template from<YAML>(bc["value"]));
   default:
     throw std::runtime_error(
         "Equations are only implemented with up to 4 arguments");
@@ -44,103 +41,150 @@ static void AddExpression(const ::YAML::Node &bc, CategoryNode *parent_node,
 }
 
 static void ParseBoundaryConditions(const ::YAML::Node &yaml_node,
-                                    CategoryNode *parent_node) {
+                                    CategoryNode *parent_node, YAML *backend) {
+  assert(backend != nullptr);
   for (auto &&bc : yaml_node) {
-    auto name = bc["name"].as<std::string>();
-    auto type = bc["type"].as<std::string>();
-    auto geometry = bc["geometry"].as<std::vector<int>>();
-    auto geometry_set = GeometrySet<>(geometry.begin(), geometry.end());
-    if (type == "scalar") {
-      auto value = ScalarMT::from<YAML>(bc["value"]);
-      parent_node->AddModelTrait(name, std::move(geometry_set),
-                                 std::move(value));
-    } else if (type == "bool") {
-      auto value = BoolMT::from<YAML>(bc["value"]);
-      parent_node->AddModelTrait(name, std::move(geometry_set),
-                                 std::move(value));
-    } else if (type == "int") {
-      auto value = IntMT::from<YAML>(bc["value"]);
-      parent_node->AddModelTrait(name, std::move(geometry_set),
-                                 std::move(value));
-    } else if (type == "string") {
-      auto value = StringMT::from<YAML>(bc["value"]);
-      parent_node->AddModelTrait(name, std::move(geometry_set),
-                                 std::move(value));
-    } else if (type == "vector") {
-      auto value = VectorMT::from<YAML>(bc["value"]);
-      parent_node->AddModelTrait(name, std::move(geometry_set),
-                                 std::move(value));
-    } else if (type == "matrix") {
-      auto value = MatrixMT::from<YAML>(bc["value"]);
-      parent_node->AddModelTrait(name, std::move(geometry_set),
-                                 std::move(value));
-    } else if (type == "expression") {
-      AddExpression<ScalarType, 0>(bc, parent_node, std::move(name),
-                                   std::move(geometry_set));
-    } else if (type == "vector expression") {
-      AddExpression<ScalarType, 1>(bc, parent_node, std::move(name),
-                                   std::move(geometry_set));
-    } else if (type == "matrix expression") {
-      AddExpression<ScalarType, 2>(bc, parent_node, std::move(name),
-                                   std::move(geometry_set));
+    const auto &name_nd = bc["name"];
+    if (!name_nd) {
+      throw std::runtime_error(fmt::format("No name provided on Model Trait."));
+    }
+    auto name = name_nd.as<std::string>();
+    std::string type{};
+    std::string geometry_type = backend->default_geometry_type;
+    if (bc["geometry type"]) {
+      geometry_type = bc["geometry type"].as<std::string>();
+    }
+    // get the default type for a given name
+    if (backend->name2type) {
+      type = backend->name2type(name);
+    }
+    // if the type is explicitly stated in the input file override
+    if (bc["type"]) {
+      std::string type2 = bc["type"].as<std::string>();
+      if (!type.empty() && type2 != type) {
+        fmt::print(
+            "WARNING: overriding the default backend type for {} ({}) with {}",
+            name, type, type2);
+      }
+      type = std::move(type2);
+    }
+    if (type.empty()) {
+      throw std::runtime_error(
+          fmt::format("ModelTrait {} must have a type.", name));
+    }
+    std::shared_ptr<IModelTrait> model_trait;
+    std::shared_ptr<IGeometrySet> geometry_set;
+    const auto &geometry_nd = bc["geometry"];
+    const auto &value_nd = bc["value"];
+    if (!geometry_nd) {
+      throw std::runtime_error(
+          fmt::format("No geometry provided for ModelTrait {}.", name));
+    }
+    if (geometry_type == "id") {
+      geometry_set = GeomToPtr(IdGeometrySet::from(bc["geometry"], backend));
+    } else if (geometry_type == "dimension id") {
+      geometry_set = GeomToPtr(DimGeometrySet::from(bc["geometry"], backend));
     } else {
       throw std::runtime_error(
-          fmt::format("Boundary condition type {} not implemented.", type));
+          fmt::format("Geometry type {} on ModelTrait {} is invalid.",
+                      geometry_type, name));
     }
+    if (!value_nd) {
+      throw std::runtime_error(
+          fmt::format("No value provided for ModelTrait {}.", name));
+    }
+    if (type == "scalar") {
+      model_trait = ModelTraitToPtr(ScalarMT::from(bc["value"], backend));
+    } else if (type == "bool") {
+      model_trait = ModelTraitToPtr(BoolMT::from(bc["value"], backend));
+    } else if (type == "int") {
+      model_trait = ModelTraitToPtr(IntMT::from(bc["value"], backend));
+    } else if (type == "string") {
+      model_trait = ModelTraitToPtr(StringMT::from(bc["value"], backend));
+    } else if (type == "vector") {
+      model_trait = ModelTraitToPtr(VectorMT::from(bc["value"], backend));
+    } else if (type == "matrix") {
+      model_trait = ModelTraitToPtr(MatrixMT::from(bc["value"], backend));
+    } else if (type == "expression") {
+      model_trait = GetExpressionPtr<ScalarType, 0>(bc);
+    } else if (type == "vector expression") {
+      model_trait = GetExpressionPtr<ScalarType, 1>(bc);
+    } else if (type == "matrix expression") {
+      model_trait = GetExpressionPtr<ScalarType, 2>(bc);
+    } else {
+      throw std::runtime_error(
+          fmt::format("Model trait type {} not implemented.", type));
+    }
+    parent_node->AddModelTrait(name, std::move(geometry_set),
+                               std::move(model_trait));
   }
 }
 
 static void ParseCaseHelper(const ::YAML::Node &yaml_node,
-                            CategoryNode *parent_node) {
+                            CategoryNode *parent_node, YAML *backend) {
+  assert(backend != nullptr);
   for (auto &&c : yaml_node) {
     auto key = c.first.as<std::string>();
-    // if(c.first.as<std::string>() == "boundary conditions")
-    if (key == "boundary conditions") {
-      ParseBoundaryConditions(c.second, parent_node);
+    if (key == backend->model_trait_key) {
+      ParseBoundaryConditions(c.second, parent_node, backend);
     } else {
-      ParseCaseHelper(c.second, parent_node->AddCategory(key));
+      ParseCaseHelper(c.second, parent_node->AddCategory(key), backend);
     }
   }
 }
 
-static void ParseCase(const ::YAML::Node &yaml_case,
-                      ModelTraits *model_traits) {
-  auto model_case = model_traits->AddCase(yaml_case["name"].as<std::string>());
-  auto &case_traits = yaml_case["model traits"];
-  auto &geometry_type = case_traits["geometry_type"];
-  if (geometry_type && geometry_type.as<std::string>() != "int") {
-    throw std::runtime_error("only integer mt types are currently supported");
+static void ParseCase(const ::YAML::Node &yaml_case, ModelTraits *model_traits,
+                      YAML *backend) {
+  assert(backend != nullptr);
+  auto *model_case = model_traits->AddCase(yaml_case["name"].as<std::string>());
+  const auto &case_traits = yaml_case[backend->model_traits_prefix];
+
+  const auto &geometry_type = case_traits["default geometry type"];
+  if (geometry_type) {
+    backend->default_geometry_type = geometry_type.as<std::string>();
   }
-  ParseCaseHelper(case_traits, model_case);
+  ParseCaseHelper(case_traits, model_case, backend);
 }
 
-std::unique_ptr<ModelTraits> LoadFromYamlNode(const ::YAML::Node &base_node) {
+std::unique_ptr<ModelTraits> LoadFromYamlNode(const ::YAML::Node &base_node,
+                                              YAML *backend) {
+  assert(backend != nullptr);
   auto model_traits =
       std::make_unique<ModelTraits>(base_node["name"].as<std::string>());
-  for (auto &cs : base_node["cases"]) {
-    ParseCase(cs, model_traits.get());
+  for (const auto &cs : base_node["cases"]) {
+    ParseCase(cs, model_traits.get(), backend);
   }
   return model_traits;
 }
 
 template <>
-std::unique_ptr<ModelTraits> ReadFromStream(std::istream &stream, YAML *) {
+std::unique_ptr<ModelTraits> ReadFromStream(std::istream &stream,
+                                            YAML *backend) {
   auto node = ::YAML::Load(stream);
-  return LoadFromYamlNode(node["model traits"]);
+  if (backend == nullptr) {
+    auto backend_ptr = std::make_unique<YAML>();
+    return LoadFromYamlNode(node[backend_ptr->model_traits_prefix],
+                            backend_ptr.get());
+  }
+  return LoadFromYamlNode(node[backend->model_traits_prefix], backend);
 }
 
 template <>
 void WriteToStream(const ModelTraits *model_traits, std::ostream &stream,
-                   YAML *) {
+                   YAML *backend) {
   if (model_traits == nullptr) {
     return;
   }
   ::YAML::Emitter e;
 
-  auto n = model_traits->to<YAML>();
-  // auto cs = model_traits->FindCase("case 1");
-  // auto n = cs->to<YAML>();
-  e << n;
+  if (backend == nullptr) {
+    auto backend_ptr = std::make_unique<YAML>();
+    auto n = model_traits->to(backend_ptr.get());
+    e << n;
+  } else {
+    auto n = model_traits->to(backend);
+    e << n;
+  }
   fmt::print(stream, "{}\n", e.c_str());
 }
 

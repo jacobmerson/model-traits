@@ -19,7 +19,7 @@ enum class SimEquationType { Space, Time, SpaceTime, None };
 
 template <typename T, int dim>
 static void AddExpression(pAttInfo bc, CategoryNode *parent_node,
-                          std::string &&name, DimGeometrySet<> &&geometry_set,
+                          std::string &&name, DimGeometrySet &&geometry_set,
                           SimEquationType eqn_type) {
   switch (eqn_type) {
   case SimEquationType::Space:
@@ -101,9 +101,9 @@ GetEquationType(const std::vector<std::string> &expressions) {
   return SimEquationType::None;
 }
 
-static DimGeometrySet<> GetGeomFromModelAssoc(pModelAssoc ma) {
+static DimGeometrySet GetGeomFromModelAssoc(pModelAssoc ma) {
   if (ma == nullptr) {
-    return DimGeometrySet<>{};
+    return DimGeometrySet{};
   }
   SimList<pModelItem> model_items = AMA_modelItems(ma);
   std::vector<DimGeometry> geom;
@@ -130,6 +130,7 @@ static void AddBoundaryCondition(CategoryNode *parent_node, pAttInfo sim_node,
                                  pModelAssoc ma) {
   auto rep_type = AttNode_repType(static_cast<pANode>(sim_node));
   SimString name = AttNode_infoType(static_cast<pANode>(sim_node));
+  SimString image_class = AttNode_imageClass(static_cast<pANode>(sim_node));
   auto geom = GetGeomFromModelAssoc(ma);
   if (rep_type == Att_int) {
     if (AttInfoInt_isExpression(static_cast<pAttInfoInt>(sim_node)) != 0) {
@@ -292,8 +293,6 @@ static void ParseNode(CategoryNode *parent_node, pANode sim_node, pACase cs,
   }
 }
 
-// TODO, ReadFromFile should also take an instance of backend,
-// and should allow the user to choose a "root node" for the attributes
 template <>
 std::unique_ptr<ModelTraits> ReadFromFile(const std::string &filename,
                                           SIMMETRIX *) {
