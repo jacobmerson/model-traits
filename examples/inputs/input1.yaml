@@ -2,17 +2,8 @@ model traits:
   name: "basic model setup"
   cases:
     - name: "case 1"
-      # this is here because in the general case
-      # we might have a geometry type that allows
-      # for setting both the dimension, and id
-      # an example of what we might want tom impliment
-      # geometry:
-      #   vertices: [19,39,49]
-      #   faces: [132], ...
-      # the boundary condition geometry set will take a struct
-      # with a dimension and id rather than just an id
       model traits:
-        #geometry type: int
+        default geometry type: id
         category 1:
           boundary conditions:
             - name: "scalar bc"

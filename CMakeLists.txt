@@ -45,7 +45,7 @@ message(STATUS "ENABLE_YAML=${ENABLE_YAML}")
 
 add_subdirectory(tpl)
 add_subdirectory(src)
-add_subdirectory(exe)
+add_subdirectory(examples)
 
 if (BUILD_TESTING)
     include(CTest)

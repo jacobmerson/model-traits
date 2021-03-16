@@ -6,6 +6,9 @@
 #include <unordered_map>
 #include <vector>
 namespace mt {
+template <typename ModelTrait> const ModelTrait *MTCast(const IModelTrait *mt) {
+  return dynamic_cast<const ModelTrait *>(mt);
+}
 class AssociatedCategoryNode {
 public:
   explicit AssociatedCategoryNode(std::string name) : name_(std::move(name)) {}
@@ -55,7 +58,7 @@ public:
    * Constructs the associated model traits from a category node
    * The category node is most likely a top level case.
    */
-  explicit AssociatedModelTraits(const CategoryNode *);
+  explicit AssociatedModelTraits(const CategoryNode *case_name);
   const std::vector<AssociatedGeometryNode<Geometry>> &
   GetGeometryNodes() const noexcept;
   std::size_t NumGeometricEntities() const noexcept;

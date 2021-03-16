@@ -121,6 +121,9 @@ public:
   typename FunctionT::result_type operator()(Args &&...args) {
     return this->func_(std::forward<Args>(args)...);
   }
+  typename FunctionT::result_type operator()(Args &&...args) const {
+    return this->func_(std::forward<Args>(args)...);
+  }
   friend std::string to_string(const NamedFunction &nf) { return nf.name_(nf); }
   const FunctionT &GetFunc() const { return func_; }
 
