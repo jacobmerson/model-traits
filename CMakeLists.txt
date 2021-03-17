@@ -42,6 +42,8 @@ option(ENABLE_SIMMETRIX "Build with Simmetrix support" OFF)
 message(STATUS "ENABLE_SIMMETRIX=${ENABLE_SIMMETRIX}")
 option(ENABLE_YAML "Build with YAML support" ON)
 message(STATUS "ENABLE_YAML=${ENABLE_YAML}")
+option(ENABLE_SCOREC "Build the pumi example" ON)
+message(STATUS "ENABLE_SCOREC=${ENABLE_YAML}" OFF)
 
 add_subdirectory(tpl)
 add_subdirectory(src)

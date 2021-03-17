@@ -15,3 +15,11 @@ endif ()
 
 add_executable(core_usage core_usage.cc)
 target_link_libraries(core_usage modelTraits fmt::fmt)
+
+if(${ENABLE_SCOREC})
+  find_package(SCOREC CONFIG REQUIRED)
+  if(${SCOREC_FOUND})
+      add_executable(pumi pumi.cc)
+      target_link_libraries(pumi SCOREC::core SCOREC::apf SCOREC::gmi modelTraits IO)
+  endif()
+endif()
