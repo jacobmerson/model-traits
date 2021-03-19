@@ -24,7 +24,10 @@ endif ()
 
 add_executable(core_usage core_usage.cc)
 target_link_libraries(core_usage PUBLIC ModelTraits::ModelTraits fmt::fmt)
-install(TARGETS core_usage
+
+add_executable(basic_usage basic_usage.cc)
+target_link_libraries(basic_usage PUBLIC ModelTraits::ModelTraits fmt::fmt)
+install(TARGETS basic_usage core_usage
         DESTINATION ${CMAKE_INSTALL_BINDIR}
         )
 

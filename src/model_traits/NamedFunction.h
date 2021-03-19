@@ -118,11 +118,11 @@ public:
         "Second parameter must be constructible as std::function<R(Args...)>");
   }
   // operator() forwards to the operator() of the underlying function type
-  typename FunctionT::result_type operator()(Args &&...args) {
-    return this->func_(std::forward<Args>(args)...);
+  typename FunctionT::result_type operator()(const Args &...args) {
+    return this->func_(args...);
   }
-  typename FunctionT::result_type operator()(Args &&...args) const {
-    return this->func_(std::forward<Args>(args)...);
+  typename FunctionT::result_type operator()(const Args &...args) const {
+    return this->func_(args...);
   }
   friend std::string to_string(const NamedFunction &nf) { return nf.name_(nf); }
   const FunctionT &GetFunc() const { return func_; }

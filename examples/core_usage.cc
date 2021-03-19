@@ -124,7 +124,7 @@ int main(int, char **) {
   // boundary condition, and second calls the underlying function. The first set
   // of parens can be removed, but this offers consistency with vectors and
   // matrices
-  fmt::print("Evaluating function load f(1,2)={}.\n", (*function)()(1, 2));
+  fmt::print("Evaluating function load f(1,2)={}.\n", (*function)(1, 2));
 
   // let's see what is stored in our vector output
   assert(id_associated_traits.Find({8})->FindCategory("output")->FindModelTrait(

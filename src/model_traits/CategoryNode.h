@@ -43,6 +43,33 @@ public:
             std::forward<ModelTrait>(model_trait))));
   }
   /**
+   * add model trait by passing a vector of geometry
+   */
+  template <typename Geom, typename ModelTrait>
+  ModelTraitNode *AddModelTrait(const std::string &name,
+                                const std::vector<Geom> &geometry,
+                                ModelTrait &&model_trait) {
+    return AddModelTrait(
+        name,
+        std::static_pointer_cast<IGeometrySet>(
+            std::make_shared<GeometrySet<Geom>>(geometry.begin(),
+                                                geometry.end())),
+        std::static_pointer_cast<IModelTrait>(std::make_shared<ModelTrait>(
+            std::forward<ModelTrait>(model_trait))));
+  }
+  template <typename Geom, typename ModelTrait>
+  ModelTraitNode *AddModelTrait(const std::string &name,
+                                std::vector<Geom> &geometry,
+                                ModelTrait &&model_trait) {
+    return AddModelTrait(
+        name,
+        std::static_pointer_cast<IGeometrySet>(
+            std::make_shared<GeometrySet<Geom>>(geometry.begin(),
+                                                geometry.end())),
+        std::static_pointer_cast<IModelTrait>(std::make_shared<ModelTrait>(
+            std::forward<ModelTrait>(model_trait))));
+  }
+  /**
    * Add the model trait by pointer.
    * If you are getting compiler errors when trying to use this overload make
    * sure that your types match exactly. If the types are not identical (have

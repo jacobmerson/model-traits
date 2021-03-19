@@ -6,6 +6,7 @@
 #include <unordered_map>
 #include <vector>
 namespace mt {
+
 class AssociatedCategoryNode {
 public:
   AssociatedCategoryNode() = default;
@@ -43,7 +44,7 @@ private:
   Geom geom_;
 };
 
-template <typename Geometry> class AssociatedModelTraits {
+template <typename Geometry = DimGeometry> class AssociatedModelTraits {
 public:
   /*
    * Constructs the associated model traits from a category node
@@ -78,6 +79,15 @@ private:
                        const std::string &mt_name,
                        std::shared_ptr<const IModelTrait> model_trait);
 };
+
+/*
+ * Factory function to create the associated model traits.
+ */
+template <typename Geom = DimGeometry>
+std::unique_ptr<AssociatedModelTraits<Geom>>
+AssociateModel(const CategoryNode *category_node) {
+  return std::make_unique<AssociatedModelTraits<Geom>>(category_node);
+}
 
 } // namespace mt
 

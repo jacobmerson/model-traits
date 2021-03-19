@@ -130,6 +130,51 @@ private:
   OrdinalType ncols_;
 };
 
+template <typename R, typename... Args>
+class GenericMT<NamedFunction<R(Args...)>, 2>
+    : public IModelTrait,
+      public Convertible<GenericMT<NamedFunction<R(Args...)>, 2>> {
+public:
+  using type = NamedFunction<R(Args...)>;
+  static constexpr int dim = 2;
+  GenericMT() noexcept = default;
+  GenericMT(OrdinalType nrows, OrdinalType ncols) : data_(nrows * ncols) {}
+  // not noexcept because copying d in the parameter can throw
+  explicit GenericMT(std::vector<std::vector<type>> d) {
+    ncols_ = d[0].size();
+    data_.reserve(d.size() * ncols_);
+    for (std::size_t i = 0; i < d.size(); ++i) {
+      if (d[i].size() != static_cast<std::size_t>(ncols_)) {
+        throw std::runtime_error(
+            "All rows must have the same number of columns!");
+      }
+      for (OrdinalType j = 0; j < ncols_; ++j) {
+        data_.push_back(std::move(d[i][j]));
+      }
+    }
+  }
+  const type &operator()(OrdinalType row, OrdinalType col) const noexcept {
+    return data_[row + col * ncols_];
+  }
+  type &operator()(OrdinalType row, OrdinalType col) noexcept {
+    return data_[row + col * ncols_];
+  }
+  R operator()(OrdinalType row, OrdinalType col, const Args &...args) {
+    return data_[row + col * ncols_](args...);
+  }
+  R operator()(OrdinalType row, OrdinalType col, const Args &...args) const {
+    return data_[row + col * ncols_](args...);
+  }
+  void accept(MTVisitor &v) final { v.visit(*this); }
+
+  OrdinalType nrows() const { return data_.size() / ncols_; }
+  OrdinalType ncols() const { return ncols_; }
+
+private:
+  std::vector<type> data_;
+  OrdinalType ncols_;
+};
+
 template <typename T>
 class GenericMT<T, 1> : public IModelTrait,
                         public Convertible<GenericMT<T, 1>> {
@@ -150,8 +195,36 @@ private:
   std::vector<T> data_;
 };
 
+template <typename R, typename... Args>
+class GenericMT<NamedFunction<R(Args...)>, 1>
+    : public IModelTrait,
+      public Convertible<GenericMT<NamedFunction<R(Args...)>, 1>> {
+public:
+  using type = NamedFunction<R(Args...)>;
+  static constexpr int dim = 1;
+  GenericMT() noexcept = default;
+  GenericMT(OrdinalType size) : data_(size){};
+  // not noexcept because copying d in the parameter can throw
+  explicit GenericMT(const std::vector<type> &d) : data_(d){};
+  explicit GenericMT(std::vector<type> &&d) noexcept : data_(std::move(d)){};
+  type &operator()(OrdinalType i) { return data_[i]; }
+  const type &operator()(OrdinalType i) const { return data_[i]; }
+  R operator()(OrdinalType i, const Args &...args) noexcept {
+    return data_[i](args...);
+  }
+  R operator()(OrdinalType i, const Args &...args) const noexcept {
+    return data_[i](args...);
+  }
+  auto size() const { return data_.size(); }
+  void accept(MTVisitor &v) final { v.visit(*this); }
+
+private:
+  std::vector<type> data_;
+};
+
 template <typename T>
-class GenericMT<T, 0> : public IModelTrait, public Convertible<GenericMT<T>> {
+class GenericMT<T, 0> : public IModelTrait,
+                        public Convertible<GenericMT<T, 0>> {
 public:
   using type = T;
   static constexpr int dim = 0;
@@ -169,6 +242,29 @@ public:
 
 private:
   T data_;
+};
+
+template <typename R, typename... Args>
+class GenericMT<NamedFunction<R(Args...)>, 0>
+    : public IModelTrait,
+      public Convertible<GenericMT<NamedFunction<R(Args...)>, 0>> {
+public:
+  using type = NamedFunction<R(Args...)>;
+  static constexpr int dim = 0;
+  GenericMT() = default;
+  GenericMT(const type &d) noexcept : data_(d){};
+  GenericMT(type &&d) noexcept : data_(std::move(d)){};
+  R operator()(const Args &...args) { return data_(args...); }
+  R operator()(const Args &...args) const { return data_(args...); }
+
+  operator type &() noexcept { return data_; }
+  operator const type &() const noexcept { return data_; }
+  void accept(MTVisitor &v) final { v.visit(*this); }
+  const type &GetData() const noexcept { return data_; }
+  type &GetData() noexcept { return data_; }
+
+private:
+  type data_;
 };
 
 template <typename T> struct IsGenericMT : public std::false_type {};
