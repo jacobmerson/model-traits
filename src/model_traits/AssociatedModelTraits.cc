@@ -150,6 +150,6 @@ AssociatedCategoryNode::FindCategory(const std::string &name) const {
   return &(*it);
 }
 
-template class AssociatedModelTraits<DimGeometry>;
-template class AssociatedModelTraits<OrdinalType>;
+template class AssociatedModelTraits<DimIdGeometry>;
+template class AssociatedModelTraits<IdGeometry>;
 } // namespace mt

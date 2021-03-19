@@ -1,7 +1,7 @@
 #ifndef BC_CLASSIFIED_MODEL_TRAITS_H__
 #define BC_CLASSIFIED_MODEL_TRAITS_H__
 #include "CategoryNode.h"
-#include "GeometrySet.h" // DimGeometry
+#include "GeometrySet.h" // DimIdGeometry
 #include "ModelTrait.h"
 #include <unordered_map>
 #include <vector>
@@ -44,7 +44,7 @@ private:
   Geom geom_;
 };
 
-template <typename Geometry = DimGeometry> class AssociatedModelTraits {
+template <typename Geometry = DimIdGeometry> class AssociatedModelTraits {
 public:
   /*
    * Constructs the associated model traits from a category node
@@ -83,7 +83,7 @@ private:
 /*
  * Factory function to create the associated model traits.
  */
-template <typename Geom = DimGeometry>
+template <typename Geom = DimIdGeometry>
 std::unique_ptr<AssociatedModelTraits<Geom>>
 AssociateModel(const CategoryNode *category_node) {
   return std::make_unique<AssociatedModelTraits<Geom>>(category_node);

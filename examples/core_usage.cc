@@ -14,8 +14,9 @@ struct FunctorPlus {
 
 using mt::AssociatedModelTraits;
 using mt::BoolMT;
-using mt::DimGeometry;
-using mt::DimGeometrySet;
+using mt::DimIdGeometry;
+using mt::DimIdGeometrySet;
+using mt::IdGeometry;
 using mt::IdGeometrySet;
 using mt::IntMT;
 using mt::ModelTraits;
@@ -56,7 +57,7 @@ int main(int, char **) {
 
   // we can also add a model trait with geometry that stores both the dimension
   // and the id
-  loads->AddModelTrait("load 2", DimGeometrySet{{0, 1}, {2, 2}, {2, 3}},
+  loads->AddModelTrait("load 2", DimIdGeometrySet{{0, 1}, {2, 2}, {2, 3}},
                        ScalarMT{7.0});
 
   // now lets add a model trait that uses a function. The Exprtk function class
@@ -73,10 +74,10 @@ int main(int, char **) {
   // but we don't need to explicitly construct values, we can use the typedefs
   // in ModelTrait.h to add the functions directly
 
-  loads->AddModelTrait("function load", DimGeometrySet{{0, 2}},
+  loads->AddModelTrait("function load", DimIdGeometrySet{{0, 2}},
                        ScalarFunctionMT<2>{FunctorPlus{}});
   loads->AddModelTrait(
-      "function load", DimGeometrySet{{0, 3}},
+      "function load", DimIdGeometrySet{{0, 3}},
       ScalarFunctionMT<1>{{"single input", [](double a) { return a; }}});
 
   // lets make sure we don't write outputs with a bool trait.
@@ -93,10 +94,11 @@ int main(int, char **) {
   // include
 
   // first let's associate the IdGeometry
-  AssociatedModelTraits<int> id_associated_traits{case1};
+  AssociatedModelTraits<IdGeometry> id_associated_traits{case1};
   // now let's associate the dimensional geometry but only on the problem
   // definition
-  AssociatedModelTraits<DimGeometry> dim_associated_traits{problem_definition};
+  AssociatedModelTraits<DimIdGeometry> dim_associated_traits{
+      problem_definition};
 
   // lets see if we need to write to the file in the output
   // note that since this model trait has no geometry associated with it,

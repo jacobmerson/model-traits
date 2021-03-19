@@ -51,7 +51,7 @@ public:
   explicit YamlExportGeomVisitor(::YAML::Node &nd, YAML *backend)
       : nd_(nd), backend_(backend) {}
   void visit(IdGeometrySet &g) override { g.to(nd_, backend_); }
-  void visit(DimGeometrySet &g) override { g.to(nd_, backend_); }
+  void visit(DimIdGeometrySet &g) override { g.to(nd_, backend_); }
 
 private:
   ::YAML::Node &nd_;
@@ -176,20 +176,20 @@ void convert<YAML>::decode(const IdGeometrySet &g, ::YAML::Node &nd,
   }
   gnd.SetStyle(::YAML::EmitterStyle::Flow);
   for (const auto &gid : g) {
-    gnd.push_back(gid);
+    gnd.push_back(gid.GetID());
   }
 }
 
 template <>
-DimGeometrySet convert<YAML>::encode(const ::YAML::Node &nd,
-                                     YAML * /*unused*/) {
-  std::vector<DimGeometry> vec;
+DimIdGeometrySet convert<YAML>::encode(const ::YAML::Node &nd,
+                                       YAML * /*unused*/) {
+  std::vector<DimIdGeometry> vec;
   for (const auto &g : nd) {
     vec.emplace_back(g[0].as<int>(), g[1].as<int>());
   }
-  return DimGeometrySet(vec.begin(), vec.end());
+  return DimIdGeometrySet(vec.begin(), vec.end());
 }
-void convert<YAML>::decode(const DimGeometrySet &g, ::YAML::Node &nd,
+void convert<YAML>::decode(const DimIdGeometrySet &g, ::YAML::Node &nd,
                            YAML *backend) {
   auto gnd = nd["geometry"];
   if (backend == nullptr || backend->write_geometry_type_per_model_trait ||

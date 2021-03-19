@@ -6,22 +6,22 @@
 
 using mt::AssociatedModelTraits;
 using mt::BoolMT;
-using mt::DimGeometry;
-using mt::GeometrySet;
+using mt::DimIdGeometry;
+using mt::DimIdGeometrySet;
+using mt::IdGeometry;
+using mt::IdGeometrySet;
 using mt::IntMT;
 using mt::ModelTraits;
 using mt::MTCast;
-using mt::OrdinalType;
 
 TEST_CASE("Associate Traits", "[associated]") {
   ModelTraits model_traits{"test"};
   auto *case1 = model_traits.AddCase("case 1");
 
-  SECTION("Associate Ordinal Geometry") {
-    case1->AddModelTrait("top level bool", GeometrySet<OrdinalType>({1, 2, 3}),
+  SECTION("Associate Id Geometry") {
+    case1->AddModelTrait("top level bool", IdGeometrySet({1, 2, 3}),
                          BoolMT{true});
-    case1->AddModelTrait("top level int", GeometrySet<OrdinalType>({1, 2, 3}),
-                         IntMT{5});
+    case1->AddModelTrait("top level int", IdGeometrySet({1, 2, 3}), IntMT{5});
 
     // adding cases potentially invalidates any pointers
     auto *cat = case1->AddCategory("category 1");
@@ -30,15 +30,15 @@ TEST_CASE("Associate Traits", "[associated]") {
     auto *right = cat->FindCategoryNode("category 3");
     auto *left = cat->FindCategoryNode("category 2");
     left->AddModelTrait("base boundary condition 1",
-                        GeometrySet<OrdinalType>({6, 8, 19, 34}), IntMT{10});
+                        IdGeometrySet({6, 8, 19, 34}), IntMT{10});
     right->AddModelTrait("base boundary condition 2",
-                         GeometrySet<OrdinalType>({6, 8, 19, 34}), IntMT{17});
+                         IdGeometrySet({6, 8, 19, 34}), IntMT{17});
 
-    AssociatedModelTraits<DimGeometry> wrong_assoc{case1};
+    AssociatedModelTraits<DimIdGeometry> wrong_assoc{case1};
     REQUIRE(wrong_assoc.NumGeometricEntities() == 0);
     REQUIRE(wrong_assoc.GetNullGeometry() == nullptr);
 
-    AssociatedModelTraits<OrdinalType> model_association{case1};
+    AssociatedModelTraits<IdGeometry> model_association{case1};
     // seven unique geometric entities
     REQUIRE(model_association.NumGeometricEntities() == 7);
     auto *g1 = model_association.Find(1);
@@ -87,11 +87,11 @@ TEST_CASE("Associate Traits", "[associated]") {
   }
   SECTION("Associate Dim Geometry") {
 
-    case1->AddModelTrait("top level int",
-                         GeometrySet<DimGeometry>({{1, 1}, {1, 2}}), IntMT{7});
-    case1->AddModelTrait("top level int",
-                         GeometrySet<DimGeometry>({{2, 1}, {2, 2}}), IntMT{5});
-    AssociatedModelTraits<DimGeometry> model_association{case1};
+    case1->AddModelTrait("top level int", DimIdGeometrySet({{1, 1}, {1, 2}}),
+                         IntMT{7});
+    case1->AddModelTrait("top level int", DimIdGeometrySet({{2, 1}, {2, 2}}),
+                         IntMT{5});
+    AssociatedModelTraits<DimIdGeometry> model_association{case1};
 
     // seven unique geometric entities
     REQUIRE(model_association.NumGeometricEntities() == 4);
@@ -99,10 +99,10 @@ TEST_CASE("Associate Traits", "[associated]") {
     auto *g2 = model_association.Find({2, 1});
     REQUIRE(g1 != nullptr);
     REQUIRE(g2 != nullptr);
-    REQUIRE(g1->GetGeometry() == DimGeometry{1, 1});
-    REQUIRE(g1->GetGeometry() != DimGeometry{2, 1});
-    REQUIRE(g2->GetGeometry() == DimGeometry{2, 1});
-    REQUIRE(g2->GetGeometry() != DimGeometry{1, 1});
+    REQUIRE(g1->GetGeometry() == DimIdGeometry{1, 1});
+    REQUIRE(g1->GetGeometry() != DimIdGeometry{2, 1});
+    REQUIRE(g2->GetGeometry() == DimIdGeometry{2, 1});
+    REQUIRE(g2->GetGeometry() != DimIdGeometry{1, 1});
 
     REQUIRE(model_association.Find({1, 3}) == nullptr);
 
@@ -123,19 +123,17 @@ TEST_CASE("Associate Traits", "[associated]") {
     // the name is a misnomer on purpose. This test shows that even if the BCs
     // are different types, but they share the same name they cannot be
     // associated on the same model entity
-    case1->AddModelTrait("top level int", GeometrySet<OrdinalType>({1, 2, 3}),
+    case1->AddModelTrait("top level int", IdGeometrySet({1, 2, 3}),
                          BoolMT{true});
-    case1->AddModelTrait("top level int", GeometrySet<OrdinalType>({1, 5, 7}),
-                         IntMT{5});
+    case1->AddModelTrait("top level int", IdGeometrySet({1, 5, 7}), IntMT{5});
 
     // multiple boundary conditions with the same name applied to the same
     // geometry fails
-    REQUIRE_THROWS(AssociatedModelTraits<OrdinalType>(case1));
+    REQUIRE_THROWS(AssociatedModelTraits<IdGeometry>(case1));
   }
   SECTION("empty geometry set") {
-    case1->AddModelTrait("top level int", GeometrySet<OrdinalType>(),
-                         IntMT{88});
-    AssociatedModelTraits<OrdinalType> associated_model_traits{case1};
+    case1->AddModelTrait("top level int", IdGeometrySet(), IntMT{88});
+    AssociatedModelTraits<IdGeometry> associated_model_traits{case1};
     REQUIRE(associated_model_traits.NumGeometricEntities() == 1);
     REQUIRE(associated_model_traits.GetNullGeometry() != nullptr);
     auto *trait = associated_model_traits.GetNullGeometry()->FindModelTrait(

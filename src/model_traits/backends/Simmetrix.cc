@@ -19,7 +19,7 @@ enum class SimEquationType { Space, Time, SpaceTime, None };
 
 template <typename T, int dim>
 static void AddExpression(pAttInfo bc, CategoryNode *parent_node,
-                          std::string &&name, DimGeometrySet &&geometry_set,
+                          std::string &&name, DimIdGeometrySet &&geometry_set,
                           SimEquationType eqn_type) {
   switch (eqn_type) {
   case SimEquationType::Space:
@@ -101,12 +101,12 @@ GetEquationType(const std::vector<std::string> &expressions) {
   return SimEquationType::None;
 }
 
-static DimGeometrySet GetGeomFromModelAssoc(pModelAssoc ma) {
+static DimIdGeometrySet GetGeomFromModelAssoc(pModelAssoc ma) {
   if (ma == nullptr) {
-    return DimGeometrySet{};
+    return DimIdGeometrySet{};
   }
   SimList<pModelItem> model_items = AMA_modelItems(ma);
-  std::vector<DimGeometry> geom;
+  std::vector<DimIdGeometry> geom;
   geom.reserve(model_items.Size());
   for (auto &model_item : model_items) {
     auto item_type = ModelItem_type(model_item);
@@ -122,7 +122,7 @@ static DimGeometrySet GetGeomFromModelAssoc(pModelAssoc ma) {
                  "supported\n");
     }
   }
-  // return std::make_unique<DimGeometrySet<>>(geom.begin(), geom.end());
+  // return std::make_unique<DimIdGeometrySet<>>(geom.begin(), geom.end());
   return {geom.begin(), geom.end()};
 }
 

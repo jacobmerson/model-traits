@@ -15,8 +15,8 @@ private:
 };
 
 using mt::BoolMT;
-using mt::DimGeometry;
-using mt::DimGeometrySet;
+using mt::DimIdGeometry;
+using mt::DimIdGeometrySet;
 using mt::ExprtkFunction;
 using mt::IdGeometrySet;
 using mt::IntFunctionMT;
@@ -37,21 +37,21 @@ int main(int, char **) {
 
   auto *problem_definition = case1->FindCategoryNode("problem definition");
   auto *loads = problem_definition->AddCategory("loads");
-  std::vector<DimGeometry> v = {{0, 1}, {2, 2}, {2, 3}};
+  std::vector<DimIdGeometry> v = {{0, 1}, {2, 2}, {2, 3}};
   loads->AddModelTrait("load 2", v, ScalarMT{7.0});
   loads->AddModelTrait("load 3", v, VectorMT{{1, 2, 3}});
 
   // functor function
-  loads->AddModelTrait("functor function", DimGeometrySet{{0, 2}},
+  loads->AddModelTrait("functor function", DimIdGeometrySet{{0, 2}},
                        ScalarFunctionMT<1>{FunctorPlus{}});
 
   // lambda function
-  loads->AddModelTrait("lambda function", DimGeometrySet{{0, 2}},
+  loads->AddModelTrait("lambda function", DimIdGeometrySet{{0, 2}},
                        ScalarFunctionMT<1>{{"lambda multiply by 4",
                                             [](double a) { return 4 * a; }}});
 
   // string function
-  loads->AddModelTrait("exprtk function", DimGeometrySet{{0, 2}},
+  loads->AddModelTrait("exprtk function", DimIdGeometrySet{{0, 2}},
                        ScalarFunctionMT<1>{ExprtkFunction<1>("4*$x")});
 
   // Step 2: After the model traits are fully loaded, the model is associated,

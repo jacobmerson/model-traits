@@ -83,7 +83,7 @@ static void ParseBoundaryConditions(const ::YAML::Node &yaml_node,
     if (geometry_type == "id") {
       geometry_set = GeomToPtr(IdGeometrySet::from(bc["geometry"], backend));
     } else if (geometry_type == "dimension id") {
-      geometry_set = GeomToPtr(DimGeometrySet::from(bc["geometry"], backend));
+      geometry_set = GeomToPtr(DimIdGeometrySet::from(bc["geometry"], backend));
     } else {
       throw std::runtime_error(
           fmt::format("Geometry type {} on ModelTrait {} is invalid.",

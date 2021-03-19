@@ -5,7 +5,7 @@
 #include "model_traits/Typedefs.h"
 using mt::BoolMT;
 using mt::CategoryNode;
-using mt::DimGeometrySet;
+using mt::DimIdGeometrySet;
 using mt::IdGeometrySet;
 using mt::IntMT;
 using mt::ModelTraitNode;
@@ -30,7 +30,7 @@ TEST_CASE("add to category node", "[node]") {
     ModelTraitNode *mt_node2 = nullptr;
     REQUIRE_NOTHROW(
         mt_node1 = cn.AddModelTrait(
-            "category 2", DimGeometrySet(mt::DimGeometry(1, 1)), BoolMT{}));
+            "category 2", DimIdGeometrySet(mt::DimIdGeometry(1, 1)), BoolMT{}));
 
     REQUIRE_NOTHROW(mt_node1 =
                         cn.AddModelTrait("mt 1", IdGeometrySet(1), BoolMT{}));

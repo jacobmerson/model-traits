@@ -5,30 +5,43 @@
 #include "Typedefs.h"
 #include "Utility.h"
 
+#include <stdexcept>
 namespace mt {
 
-// FIXME Better name?
-struct DimGeometry {
-  DimGeometry(OrdinalType d, OrdinalType g) : dim_(d), GID_(g) {}
+struct DimIdGeometry {
+  DimIdGeometry(OrdinalType d, OrdinalType g) : dim_(d), GID_(g) {}
   OrdinalType GetDimension() const { return dim_; }
   OrdinalType GetID() const { return GID_; }
-  bool operator==(const DimGeometry &rhs) const {
+  bool operator==(const DimIdGeometry &rhs) const {
     return dim_ == rhs.dim_ && GID_ == rhs.GID_;
   }
-  bool operator!=(const DimGeometry &rhs) const { return !(rhs == *this); }
-  bool operator<(const DimGeometry &rhs) const {
+  bool operator!=(const DimIdGeometry &rhs) const { return !(rhs == *this); }
+  bool operator<(const DimIdGeometry &rhs) const {
     if (dim_ < rhs.dim_)
       return true;
     if (rhs.dim_ < dim_)
       return false;
     return GID_ < rhs.GID_;
   }
-  bool operator>(const DimGeometry &rhs) const { return rhs < *this; }
-  bool operator<=(const DimGeometry &rhs) const { return !(rhs < *this); }
-  bool operator>=(const DimGeometry &rhs) const { return !(*this < rhs); }
+  bool operator>(const DimIdGeometry &rhs) const { return rhs < *this; }
+  bool operator<=(const DimIdGeometry &rhs) const { return !(rhs < *this); }
+  bool operator>=(const DimIdGeometry &rhs) const { return !(*this < rhs); }
 
 private:
   OrdinalType dim_;
+  OrdinalType GID_;
+};
+struct IdGeometry {
+  IdGeometry(OrdinalType g) : GID_(g) {}
+  OrdinalType GetID() const { return GID_; }
+  bool operator==(const IdGeometry &rhs) const { return GID_ == rhs.GID_; }
+  bool operator!=(const IdGeometry &rhs) const { return !(rhs == *this); }
+  bool operator<(const IdGeometry &rhs) const { return GID_ < rhs.GID_; }
+  bool operator>(const IdGeometry &rhs) const { return rhs < *this; }
+  bool operator<=(const IdGeometry &rhs) const { return !(rhs < *this); }
+  bool operator>=(const IdGeometry &rhs) const { return !(*this < rhs); }
+
+private:
   OrdinalType GID_;
 };
 
@@ -37,8 +50,8 @@ struct IGeometrySet;
 template <typename> class GeometrySet;
 
 struct GeometrySetVisitor {
-  virtual void visit(GeometrySet<OrdinalType> &) = 0;
-  virtual void visit(GeometrySet<DimGeometry> &) = 0;
+  virtual void visit(GeometrySet<IdGeometry> &) = 0;
+  virtual void visit(GeometrySet<DimIdGeometry> &) = 0;
   virtual ~GeometrySetVisitor() = default;
 };
 
@@ -58,7 +71,7 @@ struct IGeometrySet {
  * geometry id, or even a pointer to some geometry.
  *
  */
-template <typename Geometry = OrdinalType>
+template <typename Geometry>
 class GeometrySet : public IGeometrySet,
                     public Convertible<GeometrySet<Geometry>> {
 public:
@@ -82,8 +95,8 @@ public:
 private:
   Container geometry_;
 };
-using DimGeometrySet = GeometrySet<DimGeometry>;
-using IdGeometrySet = GeometrySet<OrdinalType>;
+using DimIdGeometrySet = GeometrySet<DimIdGeometry>;
+using IdGeometrySet = GeometrySet<IdGeometry>;
 
 } // namespace mt
 #endif

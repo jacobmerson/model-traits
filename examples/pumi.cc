@@ -26,7 +26,8 @@ int main(int argc, char** argv)
   // load the model traits from yaml
   auto model_traits = mt::ReadFromFile<mt::YAML>(fmt::format("{}",argv[1]));
   // created the associated model traits to enable search by geometry
-  auto associated_model_traits = mt::AssociatedModelTraits<mt::DimGeometry>(&(model_traits->GetCases()[0]));
+  auto associated_model_traits = mt::AssociatedModelTraits<mt::DimIdGeometry>(
+      &(model_traits->GetCases()[0]));
 
   // load the pumi mesh and geometry
   gmi_register_mesh();
