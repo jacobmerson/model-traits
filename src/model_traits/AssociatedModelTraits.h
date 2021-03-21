@@ -54,7 +54,7 @@ public:
   const std::vector<AssociatedGeometryNode<Geometry>> &
   GetGeometryNodes() const noexcept;
   std::size_t NumGeometricEntities() const noexcept;
-  const AssociatedGeometryNode<Geometry> *Find(const Geometry &geometry);
+  const AssociatedGeometryNode<Geometry> *Find(const Geometry &geometry) const;
   const AssociatedCategoryNode *GetNullGeometry();
 
   // copy construction and assignment are not allowed

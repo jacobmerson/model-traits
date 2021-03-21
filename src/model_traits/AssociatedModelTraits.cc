@@ -74,7 +74,7 @@ AssociatedModelTraits<Geometry>::NumGeometricEntities() const noexcept {
 }
 template <typename Geometry>
 const AssociatedGeometryNode<Geometry> *
-AssociatedModelTraits<Geometry>::Find(const Geometry &geometry) {
+AssociatedModelTraits<Geometry>::Find(const Geometry &geometry) const {
   using std::find_if;
   auto it = find_if(begin(geometry_nodes_), end(geometry_nodes_),
                     [&geometry](const AssociatedGeometryNode<Geometry> &node) {
