@@ -34,14 +34,17 @@ if (ENABLE_SIMMETRIX)
     target_compile_definitions(ModelTraits_IO PUBLIC -DMT_HAVE_SIMMETRIX)
 endif ()
 
+
 install(TARGETS ModelTraits_IO
         EXPORT ModelTraits_IO
         DESTINATION ${CMAKE_INSTALL_LIBDIR}
         PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/model_traits/backends
         )
+export(EXPORT ModelTraits_IO
+       NAMESPACE ModelTraits::
+       FILE ModelTraits_IO.cmake
+       )
 install(EXPORT ModelTraits_IO
         DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/ModelTraits
         NAMESPACE ModelTraits::
-        COMPONENT ModelTraits_IO
-        FILE ModelTraits_IO.cmake
         )

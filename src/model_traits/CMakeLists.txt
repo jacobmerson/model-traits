@@ -35,10 +35,13 @@ install(TARGETS ModelTraits_ModelTraits
         DESTINATION ${CMAKE_INSTALL_LIBDIR}
         PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/model_traits
         )
+export(EXPORT ModelTraits_ModelTraits
+        NAMESPACE ModelTraits::
+        FILE ModelTraits_ModelTraits.cmake
+        )
+
 install(EXPORT ModelTraits_ModelTraits
         DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/ModelTraits
         NAMESPACE ModelTraits::
-        COMPONENT ModelTraits_ModelTraits
-        FILE ModelTraits_ModelTraits.cmake
         )
 add_subdirectory(backends)
