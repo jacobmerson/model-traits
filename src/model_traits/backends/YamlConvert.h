@@ -53,6 +53,7 @@ template <> struct convert<YAML> {
   static void decode(const ModelTraitNode &bcn, ::YAML::Node &, YAML *);
   static void decode(const CategoryNode &, ::YAML::Node &, YAML *);
   static void decode(const ModelTraits &, ::YAML::Node &, YAML *);
+  static void decode(const VoidMT &, ::YAML::Node &, YAML *);
 
   template <typename T,
             std::enable_if_t<IsNamedFunction<T>::value, bool> = false>
