@@ -12,7 +12,6 @@ public:
   void visit(IntMT &bc) final { bc.to(nd_, backend_); };
   void visit(StringMT &bc) final { bc.to(nd_, backend_); };
   void visit(VectorMT &bc) final { bc.to(nd_, backend_); };
-  void visit(VoidMT &bc) final { bc.to(nd_, backend_); };
   // equations
   void visit(BoolFunctionMT<4> &bc) final { bc.to(nd_, backend_); };
   void visit(ScalarFunctionMT<4> &bc) final { bc.to(nd_, backend_); };
@@ -97,14 +96,6 @@ void convert<YAML>::decode(const MatrixMT &bc, ::YAML::Node &nd,
       row.push_back(bc(i, j));
     }
     val.push_back(row);
-  }
-}
-
-void convert<YAML>::decode(const VoidMT &, ::YAML::Node &nd, YAML *backend) {
-  if (backend == nullptr || backend->write_trait_type_on_named_types ||
-      !backend->name2type ||
-      backend->name2type(nd["name"].as<std::string>()).empty()) {
-    nd["type"] = "void";
   }
 }
 
@@ -225,9 +216,6 @@ void convert<YAML>::decode(const ModelTraitNode &bcn, ::YAML::Node &nd,
 }
 void convert<YAML>::decode(const CategoryNode &cn, ::YAML::Node &nd,
                            YAML *backend) {
-  if (!cn.GetType().empty()) {
-    nd["type"] = cn.GetType();
-  }
   assert(backend != nullptr);
   auto bcn = nd[backend->model_trait_key];
   for (const auto &bc : cn.GetModelTraitNodes()) {

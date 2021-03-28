@@ -19,7 +19,6 @@ using StringMT = GenericMT<std::string>;
 using IntMT = GenericMT<OrdinalType>;
 using MatrixMT = GenericMT<ScalarType, 2>;
 using VectorMT = GenericMT<ScalarType, 1>;
-class VoidMT;
 
 // typedef to define the function boundary condition types
 // T is the return type of the function, NARG is the number of
@@ -50,7 +49,6 @@ struct MTVisitor {
   virtual void visit(IntMT &) = 0;
   virtual void visit(StringMT &) = 0;
   virtual void visit(VectorMT &) = 0;
-  virtual void visit(VoidMT &){};
   // equation types
   // 4 parameters (space and time)
   virtual void visit(BoolFunctionMT<4> &){};
@@ -92,10 +90,6 @@ public:
   IModelTrait &operator=(const IModelTrait &) = default;
   IModelTrait &operator=(IModelTrait &&) = default;
   virtual ~IModelTrait() = default;
-};
-
-class VoidMT : public IModelTrait, public Convertible<VoidMT> {
-  void accept(MTVisitor &v) override { v.visit(*this); }
 };
 
 template <typename T>

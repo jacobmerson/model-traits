@@ -230,8 +230,6 @@ static void AddBoundaryCondition(CategoryNode *parent_node, pAttInfo sim_node,
     auto value = MatrixMT::from<SIMMETRIX>(sim_node);
     parent_node->AddModelTrait(std::string(name), std::move(geom),
                                std::move(value));
-  } else if (rep_type == Att_void) {
-    parent_node->AddModelTrait(std::string(name), std::move(geom), VoidMT{});
   } else {
     fmt::print("Cannot add a boundary condition with the AttRepType of {}. "
                "Skipping it.\n",
@@ -253,7 +251,7 @@ static bool AttRepTypeIsBC(AttRepType rep_type) {
  * be used as a category node in model traits
  */
 static bool AttRepTypeIsCategory(AttRepType rep_type) {
-  return (rep_type == Att_case || rep_type == Att_refnode);
+  return (rep_type == Att_void || rep_type == Att_case);
 }
 
 // the simmetrix attribute node should be used as a const node
@@ -263,7 +261,6 @@ static void ParseNode(CategoryNode *parent_node, pANode sim_node, pACase cs,
                       pModelAssoc model_association) {
   auto rep_type = AttNode_repType(sim_node);
   SimString name = AttNode_infoType(sim_node);
-  SimString image_class = AttNode_imageClass(sim_node);
   if (rep_type == Att_case) {
     // get the model from the parent case and set it on the new case node
     // if the model is not set on the case, then various functions such as
@@ -281,27 +278,16 @@ static void ParseNode(CategoryNode *parent_node, pANode sim_node, pACase cs,
   if (model_associations.Size() == 1) {
     model_association = model_associations[0];
   }
-  SimList<pANode> children = AttNode_children(sim_node);
-  if (AttRepTypeIsBC(rep_type) ||
-      (rep_type == Att_void && children.Size() == 0)) {
+  if (AttRepTypeIsBC(rep_type)) {
     AddBoundaryCondition(parent_node, static_cast<pAttInfo>(sim_node),
                          model_association);
-  } else if (AttRepTypeIsCategory(rep_type) ||
-             (rep_type == Att_void && children.Size() > 0)) {
-    parent_node =
-        parent_node->AddCategory(std::string(name), std::string(image_class));
+  } else if (AttRepTypeIsCategory(rep_type)) {
+    parent_node = parent_node->AddCategory(std::string(name));
   } else {
-    throw std::runtime_error(
-        fmt::format("Unsupported AttRepType: {}", rep_type));
-  }
-  // process the referenced element for a ref node.
-  // note that the main node element is added as a category
-  if (rep_type == Att_refnode) {
-    ParseNode(parent_node,
-              AttInfoRefNode_value(static_cast<pAttInfoRefNode>(sim_node)), cs,
-              model_association);
+    throw std::runtime_error("Unsupported AttRepType");
   }
   // process children
+  SimList<pANode> children = AttNode_children(sim_node);
   for (auto *child : children) {
     ParseNode(parent_node, child, cs, model_association);
   }

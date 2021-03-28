@@ -15,7 +15,8 @@ class CategoryNode : public Convertible<CategoryNode> {
   using CategorySetT = std::vector<CategoryNode>;
 
 public:
-  CategoryNode(std::string name, std::string type = "");
+  explicit CategoryNode(const std::string &name);
+  explicit CategoryNode(std::string &&name);
   const CategoryNode *FindCategoryNode(const std::string &name) const noexcept;
   const ModelTraitNode *
   FindModelTraitNode(const std::string &name) const noexcept;
@@ -25,7 +26,7 @@ public:
    * Adds a category. If the internal memory grows, then it invalidates
    * the previously captured pointers
    */
-  CategoryNode *AddCategory(std::string name, std::string type = "");
+  CategoryNode *AddCategory(const std::string &name);
   /**
    * Adds a ModelTrait. If the internal memory grows, then it invalidates
    * the previously captured pointers
@@ -57,10 +58,11 @@ public:
             std::forward<ModelTrait>(model_trait))));
   }
   template <typename Geom, typename ModelTrait>
-  ModelTraitNode *AddModelTrait(std::string name, std::vector<Geom> &geometry,
+  ModelTraitNode *AddModelTrait(const std::string &name,
+                                std::vector<Geom> &geometry,
                                 ModelTrait &&model_trait) {
     return AddModelTrait(
-        std::move(name),
+        name,
         std::static_pointer_cast<IGeometrySet>(
             std::make_shared<GeometrySet<Geom>>(geometry.begin(),
                                                 geometry.end())),
@@ -73,14 +75,13 @@ public:
    * sure that your types match exactly. If the types are not identical (have
    * consts,etc) you are probably accidentally calling the by value overload.
    */
-  ModelTraitNode *AddModelTrait(std::string name,
+  ModelTraitNode *AddModelTrait(const std::string &name,
                                 std::shared_ptr<IGeometrySet> geometry,
                                 std::shared_ptr<IModelTrait> model_trait);
 
   const BCSetT &GetModelTraitNodes() const;
   const CategorySetT &GetCategoryNodes() const;
   const std::string &GetName() const noexcept;
-  const std::string &GetType() const noexcept;
 
 protected:
   // currently both categories, and model_traits are
@@ -89,7 +90,6 @@ protected:
   CategorySetT categories_;
   BCSetT model_trait_nodes_;
   std::string name_;
-  std::string type_;
 };
 } // namespace mt
 #endif

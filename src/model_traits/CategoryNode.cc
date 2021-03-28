@@ -6,23 +6,23 @@ namespace mt {
 
 using std::find_if;
 
-CategoryNode::CategoryNode(std::string name, std::string type)
-    : name_(std::move(name)), type_(std::move(type)) {}
-CategoryNode *CategoryNode::AddCategory(std::string name, std::string type) {
+CategoryNode::CategoryNode(const std::string &name) : name_(name) {}
+CategoryNode::CategoryNode(std::string &&name) : name_(std::move(name)) {}
+CategoryNode *CategoryNode::AddCategory(const std::string &name) {
   CategoryNode *nd = FindCategoryNode(name);
   if (nd == nullptr) {
-    categories_.emplace_back(std::move(name), std::move(type));
+    categories_.emplace_back(std::move(name));
     return &categories_.back();
   }
   return nd;
 }
 ModelTraitNode *
-CategoryNode::AddModelTrait(std::string name,
+CategoryNode::AddModelTrait(const std::string &name,
                             std::shared_ptr<IGeometrySet> geometry,
                             std::shared_ptr<IModelTrait> model_trait) {
   ModelTraitNode *nd = FindModelTraitNode(name);
   if (nd == nullptr) {
-    model_trait_nodes_.emplace_back(std::move(name), geometry, model_trait);
+    model_trait_nodes_.emplace_back(name, geometry, model_trait);
     return &(model_trait_nodes_.back());
   }
   nd->AddModelTrait(geometry, model_trait);
@@ -66,5 +66,4 @@ CategoryNode *CategoryNode::FindCategoryNode(const std::string &name) noexcept {
   return const_cast<CategoryNode *>(
       static_cast<const CategoryNode &>(*this).FindCategoryNode(name));
 }
-const std::string &CategoryNode::GetType() const noexcept { return type_; }
 } // namespace mt
