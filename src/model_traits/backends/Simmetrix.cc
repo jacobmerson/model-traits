@@ -230,6 +230,8 @@ static void AddBoundaryCondition(CategoryNode *parent_node, pAttInfo sim_node,
     auto value = MatrixMT::from<SIMMETRIX>(sim_node);
     parent_node->AddModelTrait(std::string(name), std::move(geom),
                                std::move(value));
+  } else if (rep_type == Att_void) {
+    parent_node->AddModelTrait(std::string(name), std::move(geom), VoidMT{});
   } else {
     fmt::print("Cannot add a boundary condition with the AttRepType of {}. "
                "Skipping it.\n",
@@ -251,7 +253,7 @@ static bool AttRepTypeIsBC(AttRepType rep_type) {
  * be used as a category node in model traits
  */
 static bool AttRepTypeIsCategory(AttRepType rep_type) {
-  return (rep_type == Att_void || rep_type == Att_case);
+  return (rep_type == Att_case || rep_type == Att_refnode);
 }
 
 // the simmetrix attribute node should be used as a const node
@@ -278,16 +280,26 @@ static void ParseNode(CategoryNode *parent_node, pANode sim_node, pACase cs,
   if (model_associations.Size() == 1) {
     model_association = model_associations[0];
   }
-  if (AttRepTypeIsBC(rep_type)) {
+  SimList<pANode> children = AttNode_children(sim_node);
+  if (AttRepTypeIsBC(rep_type) ||
+      (rep_type == Att_void && children.Size() == 0)) {
     AddBoundaryCondition(parent_node, static_cast<pAttInfo>(sim_node),
                          model_association);
-  } else if (AttRepTypeIsCategory(rep_type)) {
+  } else if (AttRepTypeIsCategory(rep_type) ||
+             (rep_type == Att_void && children.Size() > 0)) {
     parent_node = parent_node->AddCategory(std::string(name));
   } else {
-    throw std::runtime_error("Unsupported AttRepType");
+    throw std::runtime_error(
+        fmt::format("Unsupported AttRepType: {}", rep_type));
+  }
+  // process the referenced element for a ref node.
+  // note that the main node element is added as a category
+  if (rep_type == Att_refnode) {
+    ParseNode(parent_node,
+              AttInfoRefNode_value(static_cast<pAttInfoRefNode>(sim_node)), cs,
+              model_association);
   }
   // process children
-  SimList<pANode> children = AttNode_children(sim_node);
   for (auto *child : children) {
     ParseNode(parent_node, child, cs, model_association);
   }

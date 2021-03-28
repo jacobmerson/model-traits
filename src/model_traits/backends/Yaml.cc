@@ -111,6 +111,8 @@ static void ParseBoundaryConditions(const ::YAML::Node &yaml_node,
       model_trait = GetExpressionPtr<ScalarType, 1>(bc);
     } else if (type == "matrix expression") {
       model_trait = GetExpressionPtr<ScalarType, 2>(bc);
+    } else if (type == "void") {
+      model_trait = ModelTraitToPtr(VoidMT{});
     } else {
       throw std::runtime_error(
           fmt::format("Model trait type {} not implemented.", type));
