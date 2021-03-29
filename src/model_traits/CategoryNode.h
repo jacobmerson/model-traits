@@ -15,6 +15,7 @@ class CategoryNode : public Convertible<CategoryNode> {
   using CategorySetT = std::vector<CategoryNode>;
 
 public:
+  CategoryNode() = default;
   explicit CategoryNode(const std::string &name);
   explicit CategoryNode(std::string &&name);
   const CategoryNode *FindCategoryNode(const std::string &name) const noexcept;

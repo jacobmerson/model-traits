@@ -12,7 +12,6 @@ int main(int argc, char *argv[]) {
   auto model_traits = mt::ReadFromFile(filename, yaml_backend.get());
 
   yaml_backend->model_traits_prefix = "My Application";
-  yaml_backend->model_trait_key = "BOUNDARIES";
   yaml_backend->write_geometry_type_per_model_trait = true;
   mt::WriteToStream(model_traits.get(), std::cout, yaml_backend.get());
   return 0;

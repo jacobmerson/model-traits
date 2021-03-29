@@ -127,21 +127,19 @@ static DimIdGeometrySet GetGeomFromModelAssoc(pModelAssoc ma) {
 }
 
 static void AddBoundaryCondition(CategoryNode *parent_node, pAttInfo sim_node,
-                                 pModelAssoc ma) {
+                                 pModelAssoc ma, std::string &&name) {
   auto rep_type = AttNode_repType(static_cast<pANode>(sim_node));
-  SimString name = AttNode_infoType(static_cast<pANode>(sim_node));
-  SimString image_class = AttNode_imageClass(static_cast<pANode>(sim_node));
   auto geom = GetGeomFromModelAssoc(ma);
   if (rep_type == Att_int) {
     if (AttInfoInt_isExpression(static_cast<pAttInfoInt>(sim_node)) != 0) {
       SimString e = AttInfoInt_expression(static_cast<pAttInfoInt>(sim_node));
       auto exp = std::string(e);
       auto equation_type = GetEquationType(exp);
-      AddExpression<OrdinalType, 0>(sim_node, parent_node, std::string(name),
+      AddExpression<OrdinalType, 0>(sim_node, parent_node, std::move(name),
                                     std::move(geom), equation_type);
     } else {
       auto value = IntMT::from<SIMMETRIX>(sim_node);
-      parent_node->AddModelTrait(std::string(name), std::move(geom),
+      parent_node->AddModelTrait(std::move(name), std::move(geom),
                                  std::move(value));
     }
   } else if (rep_type == Att_string) {
@@ -150,7 +148,7 @@ static void AddBoundaryCondition(CategoryNode *parent_node, pAttInfo sim_node,
       throw std::runtime_error("String Expressions Not Currently Supported");
     }
     auto value = StringMT::from<SIMMETRIX>(sim_node);
-    parent_node->AddModelTrait(std::string(name), std::move(geom),
+    parent_node->AddModelTrait(std::move(name), std::move(geom),
                                std::move(value));
   } else if (rep_type == Att_double) {
     if (AttInfoDouble_isExpression(static_cast<pAttInfoDouble>(sim_node)) !=
@@ -159,11 +157,11 @@ static void AddBoundaryCondition(CategoryNode *parent_node, pAttInfo sim_node,
           AttInfoDouble_expression(static_cast<pAttInfoDouble>(sim_node));
       auto exp = std::string(e);
       auto equation_type = GetEquationType(exp);
-      AddExpression<ScalarType, 0>(sim_node, parent_node, std::string(name),
+      AddExpression<ScalarType, 0>(sim_node, parent_node, std::move(name),
                                    std::move(geom), equation_type);
     } else {
       auto value = ScalarMT::from<SIMMETRIX>(sim_node);
-      parent_node->AddModelTrait(std::string(name), std::move(geom),
+      parent_node->AddModelTrait(std::move(name), std::move(geom),
                                  std::move(value));
     }
   } else if (rep_type == Att_tensor0) {
@@ -173,11 +171,11 @@ static void AddBoundaryCondition(CategoryNode *parent_node, pAttInfo sim_node,
           AttInfoTensor0_expression(static_cast<pAttInfoTensor0>(sim_node));
       auto exp = std::string(e);
       auto equation_type = GetEquationType(exp);
-      AddExpression<ScalarType, 0>(sim_node, parent_node, std::string(name),
+      AddExpression<ScalarType, 0>(sim_node, parent_node, std::move(name),
                                    std::move(geom), equation_type);
     } else {
       auto value = ScalarMT::from<SIMMETRIX>(sim_node);
-      parent_node->AddModelTrait(std::string(name), std::move(geom),
+      parent_node->AddModelTrait(std::move(name), std::move(geom),
                                  std::move(value));
     }
   } else if (rep_type == Att_tensor1) {
@@ -197,11 +195,11 @@ static void AddBoundaryCondition(CategoryNode *parent_node, pAttInfo sim_node,
         }
       }
       auto equation_type = GetEquationType(equations);
-      AddExpression<ScalarType, 1>(sim_node, parent_node, std::string(name),
+      AddExpression<ScalarType, 1>(sim_node, parent_node, std::move(name),
                                    std::move(geom), equation_type);
     } else {
       auto value = VectorMT::from<SIMMETRIX>(sim_node);
-      parent_node->AddModelTrait(std::string(name), std::move(geom),
+      parent_node->AddModelTrait(std::move(name), std::move(geom),
                                  std::move(value));
     }
   } else if (rep_type == Att_tensor2) {
@@ -224,14 +222,14 @@ static void AddBoundaryCondition(CategoryNode *parent_node, pAttInfo sim_node,
       return isExpression;
     }();
     if (is_expression) {
-      AddExpression<ScalarType, 2>(sim_node, parent_node, std::string(name),
+      AddExpression<ScalarType, 2>(sim_node, parent_node, std::move(name),
                                    std::move(geom), equation_type);
     }
     auto value = MatrixMT::from<SIMMETRIX>(sim_node);
-    parent_node->AddModelTrait(std::string(name), std::move(geom),
+    parent_node->AddModelTrait(std::move(name), std::move(geom),
                                std::move(value));
   } else if (rep_type == Att_void) {
-    parent_node->AddModelTrait(std::string(name), std::move(geom), VoidMT{});
+    parent_node->AddModelTrait(std::move(name), std::move(geom), VoidMT{});
   } else {
     fmt::print("Cannot add a boundary condition with the AttRepType of {}. "
                "Skipping it.\n",
@@ -262,7 +260,6 @@ static bool AttRepTypeIsCategory(AttRepType rep_type) {
 static void ParseNode(CategoryNode *parent_node, pANode sim_node, pACase cs,
                       pModelAssoc model_association) {
   auto rep_type = AttNode_repType(sim_node);
-  SimString name = AttNode_infoType(sim_node);
   if (rep_type == Att_case) {
     // get the model from the parent case and set it on the new case node
     // if the model is not set on the case, then various functions such as
@@ -283,14 +280,26 @@ static void ParseNode(CategoryNode *parent_node, pANode sim_node, pACase cs,
   SimList<pANode> children = AttNode_children(sim_node);
   if (AttRepTypeIsBC(rep_type) ||
       (rep_type == Att_void && children.Size() == 0)) {
+    auto name = std::string(SimString(AttNode_name(sim_node)));
+    auto info_type = std::string(SimString(AttNode_infoType(sim_node)));
+    if (name.empty()) {
+      name = info_type;
+    }
+    parent_node = parent_node->AddCategory(std::move(info_type));
     AddBoundaryCondition(parent_node, static_cast<pAttInfo>(sim_node),
-                         model_association);
+                         model_association, std::move(name));
   } else if (AttRepTypeIsCategory(rep_type) ||
              (rep_type == Att_void && children.Size() > 0)) {
-    parent_node = parent_node->AddCategory(std::string(name));
+
+    auto info_type = std::string(SimString(AttNode_infoType(sim_node)));
+    parent_node = parent_node->AddCategory(std::move(info_type));
     auto image_class = std::string(SimString(AttNode_imageClass(sim_node)));
     if (!image_class.empty()) {
-      parent_node = parent_node->AddCategory(image_class);
+      parent_node = parent_node->AddCategory(std::move(image_class));
+    }
+    auto name = std::string(SimString(AttNode_name(sim_node)));
+    if (!name.empty()) {
+      parent_node = parent_node->AddCategory(std::move(name));
     }
   } else {
     throw std::runtime_error(

@@ -16,8 +16,15 @@ public:
                      const std::shared_ptr<const IModelTrait> &model_trait);
 
   const std::string &GetName() const noexcept;
-  const IModelTrait *FindModelTrait(const std::string &name) const;
-  const AssociatedCategoryNode *FindCategory(const std::string &name) const;
+  const IModelTrait *FindModelTrait(const std::string &name) const noexcept;
+  const AssociatedCategoryNode *
+  FindCategory(const std::string &name) const noexcept;
+  // returns the first model trait in the category
+  const IModelTrait *GetModelTrait() const noexcept;
+  std::vector<const IModelTrait *> GetModelTraits() const noexcept;
+  std::size_t GetNumModelTraits() const noexcept;
+  const std::vector<AssociatedCategoryNode> &GetCategories() const noexcept;
+  std::size_t GetNumCategories() const noexcept;
 
 private:
   std::string name_;
@@ -46,6 +53,7 @@ private:
 
 template <typename Geometry = DimIdGeometry> class AssociatedModelTraits {
 public:
+  AssociatedModelTraits() = default;
   /*
    * Constructs the associated model traits from a category node
    * The category node is most likely a top level case.

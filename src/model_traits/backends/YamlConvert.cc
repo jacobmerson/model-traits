@@ -226,12 +226,12 @@ void convert<YAML>::decode(const ModelTraitNode &bcn, ::YAML::Node &nd,
 void convert<YAML>::decode(const CategoryNode &cn, ::YAML::Node &nd,
                            YAML *backend) {
   assert(backend != nullptr);
-  auto bcn = nd[backend->model_trait_key];
   for (const auto &bc : cn.GetModelTraitNodes()) {
-    bc.to(bcn, backend);
+    bc.to(nd, backend);
   }
   for (const auto &cat : cn.GetCategoryNodes()) {
-    nd[cat.GetName()] = cat.to(backend);
+    ::YAML::Node cat_node = nd[cat.GetName()];
+    cat.to(cat_node, backend);
   }
 }
 
@@ -244,8 +244,9 @@ void convert<YAML>::decode(const ModelTraits &mt, ::YAML::Node &nd,
   for (const auto &cs : mt.GetCases()) {
     ::YAML::Node local;
     local["name"] = cs.GetName();
-    local["default geometry type"] = backend->default_geometry_type;
-    local[backend->model_traits_prefix] = cs.to(backend);
+    ::YAML::Node model_traits = local[backend->model_traits_prefix];
+    model_traits["default geometry type"] = backend->default_geometry_type;
+    cs.to(model_traits, backend);
     cases_node.push_back(local);
   }
 }

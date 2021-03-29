@@ -14,14 +14,18 @@ model traits:
             type: scalar
             value: 2.5
           - name: "classified"
-            geometry: [[2,3]]
+            geometry: [ [ 2,3 ] ]
             type: scalar
             value: 3.5
           - name: "classified"
-            geometry: [[2,4]]
+            geometry: [ [ 2,4 ] ]
             type: scalar
             value: 4.5
           - name: "outer edge"
-            geometry: [[1,4]]
+            geometry: [ [ 1,4 ] ]
             type: vector
-            value: [1,2,3]
+            value: [ 1,2,3 ]
+          - name: "outer edge"
+            geometry: [ [ 0,1 ],[ 0,2 ],[ 0,3 ],[ 0,4 ] ]
+            type: vector
+            value: [ 4,5,6 ]

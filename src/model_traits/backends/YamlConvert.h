@@ -78,7 +78,7 @@ void convert<YAML>::decode(const GenericMT<T, 0> &bc, ::YAML::Node &nd,
   auto count = std::count(begin(eqn_name), end(eqn_name), '$');
   // if there are any variables in the name denoted by "$" it's an expression
   // otherwise it is a function type, like a lambda of some sort.
-  nd["type"] = count > 1 ? "expression" : "function";
+  nd["type"] = count > 0 ? "expression" : "function";
   nd["value"] = std::move(eqn_name);
   nd["num variables"] = T::ArgsCount();
 }

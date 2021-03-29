@@ -30,11 +30,7 @@ struct YAML {
    */
   bool write_trait_type_on_named_types = false;
 
-  /*
-   * keyword that is used to denote the section of model traits
-   */
-  std::string model_trait_key = "boundary conditions";
-  /*
+  /**
    * keyword that is used to denote the portions of the yaml file
    * that should be read by the model_traits software
    */

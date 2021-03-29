@@ -89,7 +89,7 @@ static void ParseBoundaryConditions(const ::YAML::Node &yaml_node,
           fmt::format("Geometry type {} on ModelTrait {} is invalid.",
                       geometry_type, name));
     }
-    if (!value_nd) {
+    if (!value_nd && type != "void") {
       throw std::runtime_error(
           fmt::format("No value provided for ModelTrait {}.", name));
     }
@@ -125,10 +125,10 @@ static void ParseBoundaryConditions(const ::YAML::Node &yaml_node,
 static void ParseCaseHelper(const ::YAML::Node &yaml_node,
                             CategoryNode *parent_node, YAML *backend) {
   assert(backend != nullptr);
-  for (auto &&c : yaml_node) {
+  for (auto &c : yaml_node) {
     auto key = c.first.as<std::string>();
-    if (key == backend->model_trait_key) {
-      ParseBoundaryConditions(c.second, parent_node, backend);
+    if (c.second.IsSequence()) {
+      ParseBoundaryConditions(c.second, parent_node->AddCategory(key), backend);
     } else {
       ParseCaseHelper(c.second, parent_node->AddCategory(key), backend);
     }

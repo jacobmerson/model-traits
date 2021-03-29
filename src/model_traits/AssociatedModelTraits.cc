@@ -130,7 +130,7 @@ const std::string &AssociatedCategoryNode::GetName() const noexcept {
   return name_;
 }
 const IModelTrait *
-AssociatedCategoryNode::FindModelTrait(const std::string &name) const {
+AssociatedCategoryNode::FindModelTrait(const std::string &name) const noexcept {
   auto it = model_traits_.find(name);
   if (it == end(model_traits_)) {
     return nullptr;
@@ -138,7 +138,7 @@ AssociatedCategoryNode::FindModelTrait(const std::string &name) const {
   return it->second.get();
 }
 const AssociatedCategoryNode *
-AssociatedCategoryNode::FindCategory(const std::string &name) const {
+AssociatedCategoryNode::FindCategory(const std::string &name) const noexcept {
   using std::find_if;
   auto it = find_if(begin(categories_), end(categories_),
                     [&name](const AssociatedCategoryNode &node) {
@@ -148,6 +148,28 @@ AssociatedCategoryNode::FindCategory(const std::string &name) const {
     return nullptr;
   }
   return &(*it);
+}
+const IModelTrait *AssociatedCategoryNode::GetModelTrait() const noexcept {
+  return model_traits_.begin()->second.get();
+}
+std::vector<const IModelTrait *>
+AssociatedCategoryNode::GetModelTraits() const noexcept {
+  std::vector<const IModelTrait *> traits;
+  traits.reserve(model_traits_.size());
+  for (const auto &trait : model_traits_) {
+    traits.push_back(trait.second.get());
+  }
+  return traits;
+}
+std::size_t AssociatedCategoryNode::GetNumModelTraits() const noexcept {
+  return model_traits_.size();
+}
+const std::vector<AssociatedCategoryNode> &
+AssociatedCategoryNode::GetCategories() const noexcept {
+  return categories_;
+}
+std::size_t AssociatedCategoryNode::GetNumCategories() const noexcept {
+  return categories_.size();
 }
 
 template class AssociatedModelTraits<DimIdGeometry>;
