@@ -37,7 +37,8 @@ int main(int, char **) {
   // Since adding categories to case1 will potentially invalidate the pointer,
   // we don't directly use the output of AddCategory, but instead we find the
   // category after all the other categories in case1 are added
-  auto *problem_definition = case1->FindCategoryNode("problem definition");
+  auto *problem_definition =
+      case1->FindCategoryNodeByType("problem definition");
   // add a category to the problem definition
   auto *loads = problem_definition->AddCategory("loads");
   // this time we aren't adding any more categories to the solution strategy
@@ -83,7 +84,7 @@ int main(int, char **) {
   // lets make sure we don't write outputs with a bool trait.
   // This options isn't associated with a particular geometry, so we leave the
   // geometry set empty.
-  auto *output_defn = case1->FindCategoryNode("output");
+  auto *output_defn = case1->FindCategoryNodeByType("output");
   output_defn->AddModelTrait("write to file", IdGeometrySet{}, BoolMT{false});
   // and let's set the direction of some output with a vector
   output_defn->AddModelTrait("my vector output", IdGeometrySet{8},
@@ -106,7 +107,7 @@ int main(int, char **) {
   auto *p = id_associated_traits.GetNullGeometry();
   // we put the geometry in, so we better find it
   auto *write_to_file_trait =
-      p->FindCategory("output")->FindModelTrait("write to file");
+      p->FindCategoryByType("output")->FindModelTrait("write to file");
   // now we need to cast the trait into the appropriate type and we can call it
   auto *write_to_file_trait_casted = MTCast<BoolMT>(write_to_file_trait);
 
@@ -116,7 +117,7 @@ int main(int, char **) {
 
   // now lets get the function load boundary condition and evaluate it
   auto *geom_0_2 = dim_associated_traits.Find({0, 2});
-  auto *associated_load = geom_0_2->FindCategory("loads");
+  auto *associated_load = geom_0_2->FindCategoryByType("loads");
   // cast the function to the appropriate model trait type
   const auto *function = MTCast<ScalarFunctionMT<2>>(
       associated_load->FindModelTrait("function load"));
@@ -129,11 +130,13 @@ int main(int, char **) {
   fmt::print("Evaluating function load f(1,2)={}.\n", (*function)(1, 2));
 
   // let's see what is stored in our vector output
-  assert(id_associated_traits.Find({8})->FindCategory("output")->FindModelTrait(
-             "my vector output") != nullptr);
-  const VectorMT &my_vec = (*MTCast<VectorMT>(
-      id_associated_traits.Find({8})->FindCategory("output")->FindModelTrait(
-          "my vector output")));
+  assert(id_associated_traits.Find({8})
+             ->FindCategoryByType("output")
+             ->FindModelTrait("my vector output") != nullptr);
+  const VectorMT &my_vec =
+      (*MTCast<VectorMT>(id_associated_traits.Find({8})
+                             ->FindCategoryByType("output")
+                             ->FindModelTrait("my vector output")));
   fmt::print("Vector: [{}, {}, {}].\n", my_vec(0), my_vec(1), my_vec(2));
 
   return 0;

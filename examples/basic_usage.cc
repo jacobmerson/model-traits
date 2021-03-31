@@ -35,7 +35,8 @@ int main(int, char **) {
   case1->AddCategory("problem definition");
   case1->AddCategory("output");
 
-  auto *problem_definition = case1->FindCategoryNode("problem definition");
+  auto *problem_definition =
+      case1->FindCategoryNodeByType("problem definition");
   auto *loads = problem_definition->AddCategory("loads");
   std::vector<DimIdGeometry> v = {{0, 1}, {2, 2}, {2, 3}};
   loads->AddModelTrait("load 2", v, ScalarMT{7.0});
@@ -60,7 +61,7 @@ int main(int, char **) {
   auto dim_associated_traits = AssociateModel(problem_definition);
   // now lets get the function load boundary condition and evaluate it
   const auto *geom_0_2 = dim_associated_traits->Find({0, 2});
-  const auto *associated_load = geom_0_2->FindCategory("loads");
+  const auto *associated_load = geom_0_2->FindCategoryByType("loads");
 
   const auto *functor_function = MTCast<ScalarFunctionMT<1>>(
       associated_load->FindModelTrait("functor function"));
@@ -75,7 +76,7 @@ int main(int, char **) {
 
   // let's get the other two load boundary conditions
   const auto *geom_2_2 = dim_associated_traits->Find({2, 2});
-  associated_load = geom_2_2->FindCategory("loads");
+  associated_load = geom_2_2->FindCategoryByType("loads");
   const auto *load2 =
       MTCast<ScalarMT>(associated_load->FindModelTrait("load 2"));
   const auto *load3 =

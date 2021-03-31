@@ -12,11 +12,11 @@ ModelTraits::ModelTraits(std::string &&name) : name_(std::move(name)) {}
 CategoryNode *ModelTraits::AddCase(const std::string &name) {
   auto *nd = FindCase(name);
   if (nd == nullptr) {
-    cases_.emplace_back(name);
+    cases_.emplace_back("case", name);
     return &cases_.back();
   }
   throw std::runtime_error(fmt::format(
-      "Cannot add multiple cases with the same name ({})", nd->GetName()));
+      "Cannot add multiple cases with the same name ({})", nd->GetType()));
 }
 void ModelTraits::RemoveCase(const std::string &name) {
   cases_.erase(remove_if(begin(cases_), end(cases_),

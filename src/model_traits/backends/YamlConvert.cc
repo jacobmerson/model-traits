@@ -230,8 +230,20 @@ void convert<YAML>::decode(const CategoryNode &cn, ::YAML::Node &nd,
     bc.to(nd, backend);
   }
   for (const auto &cat : cn.GetCategoryNodes()) {
-    ::YAML::Node cat_node = nd[cat.GetName()];
-    cat.to(cat_node, backend);
+    ::YAML::Node cat_node = nd[cat.GetType()];
+    int num_names_in_cat = std::count_if(
+        cn.GetCategoryNodes().begin(), cn.GetCategoryNodes().end(),
+        [&cat](const CategoryNode &cnd) {
+          return cnd.GetType() == cat.GetType();
+        });
+    ::YAML::Node local;
+    if (!cat.GetName().empty() || num_names_in_cat > 1) {
+      local["category name"] = cat.GetName();
+      cat.to(local, backend);
+      cat_node.push_back(local);
+    } else {
+      cat.to(cat_node, backend);
+    }
   }
 }
 
@@ -243,7 +255,7 @@ void convert<YAML>::decode(const ModelTraits &mt, ::YAML::Node &nd,
   auto cases_node = mtn["cases"];
   for (const auto &cs : mt.GetCases()) {
     ::YAML::Node local;
-    local["name"] = cs.GetName();
+    local["case name"] = cs.GetName();
     ::YAML::Node model_traits = local[backend->model_traits_prefix];
     model_traits["default geometry type"] = backend->default_geometry_type;
     cs.to(model_traits, backend);

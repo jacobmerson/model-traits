@@ -128,7 +128,18 @@ static void ParseCaseHelper(const ::YAML::Node &yaml_node,
   for (auto &c : yaml_node) {
     auto key = c.first.as<std::string>();
     if (c.second.IsSequence()) {
-      ParseBoundaryConditions(c.second, parent_node->AddCategory(key), backend);
+      if (!c.second[0]["category name"]) {
+        ParseBoundaryConditions(c.second, parent_node->AddCategory(key),
+                                backend);
+      } else {
+        for (const auto &named_category : c.second) {
+          auto category_name =
+              named_category["category name"].as<std::string>();
+          ParseCaseHelper(named_category,
+                          parent_node->AddCategory(key, category_name),
+                          backend);
+        }
+      }
     } else {
       ParseCaseHelper(c.second, parent_node->AddCategory(key), backend);
     }
@@ -138,7 +149,8 @@ static void ParseCaseHelper(const ::YAML::Node &yaml_node,
 static void ParseCase(const ::YAML::Node &yaml_case, ModelTraits *model_traits,
                       YAML *backend) {
   assert(backend != nullptr);
-  auto *model_case = model_traits->AddCase(yaml_case["name"].as<std::string>());
+  auto *model_case =
+      model_traits->AddCase(yaml_case["case name"].as<std::string>());
   const auto &case_traits = yaml_case[backend->model_traits_prefix];
 
   const auto &geometry_type = case_traits["default geometry type"];

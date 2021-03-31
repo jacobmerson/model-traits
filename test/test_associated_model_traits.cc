@@ -27,8 +27,8 @@ TEST_CASE("Associate Traits", "[associated]") {
     auto *cat = case1->AddCategory("category 1");
     cat->AddCategory("category 3");
     cat->AddCategory("category 2");
-    auto *right = cat->FindCategoryNode("category 3");
-    auto *left = cat->FindCategoryNode("category 2");
+    auto *right = cat->FindCategoryNodeByType("category 3");
+    auto *left = cat->FindCategoryNodeByType("category 2");
     left->AddModelTrait("base boundary condition 1",
                         IdGeometrySet({6, 8, 19, 34}), IntMT{10});
     right->AddModelTrait("base boundary condition 2",
@@ -70,11 +70,11 @@ TEST_CASE("Associate Traits", "[associated]") {
     REQUIRE(g19->FindModelTrait("base boundary condition 1") == nullptr);
     REQUIRE(g19->FindModelTrait("base boundary condition 2") == nullptr);
 
-    REQUIRE(g1->FindCategory("category 1") == nullptr);
-    auto *category1 = g19->FindCategory("category 1");
+    REQUIRE(g1->FindCategoryByType("category 1") == nullptr);
+    auto *category1 = g19->FindCategoryByType("category 1");
     REQUIRE(category1 != nullptr);
-    auto *category2 = category1->FindCategory("category 2");
-    auto *category3 = category1->FindCategory("category 3");
+    auto *category2 = category1->FindCategoryByType("category 2");
+    auto *category3 = category1->FindCategoryByType("category 3");
     REQUIRE(category2 != nullptr);
     REQUIRE(category3 != nullptr);
     auto *base_bc_1 = category2->FindModelTrait("base boundary condition 1");
@@ -142,5 +142,42 @@ TEST_CASE("Associate Traits", "[associated]") {
     auto *int_trait = MTCast<IntMT>(trait);
     REQUIRE(int_trait != nullptr);
     REQUIRE((*int_trait)() == 88);
+  }
+  SECTION("Named Categories") {
+    auto *cat1 = case1->AddCategory("category 1");
+    REQUIRE(cat1 != nullptr);
+    auto *cat1_flamingo = case1->AddCategory("category 1", "flamingo");
+    REQUIRE(cat1_flamingo != nullptr);
+    // Re-find cat 1 since it may have been invalidated
+    cat1 = case1->FindCategoryNode("category 1", "");
+    REQUIRE(cat1 != cat1_flamingo);
+    cat1->AddModelTrait("int MT", IdGeometrySet({1, 2, 3}), IntMT{1});
+    cat1_flamingo->AddModelTrait("int MT", IdGeometrySet({1, 2, 3}), IntMT{2});
+
+    AssociatedModelTraits<IdGeometry> associated_model_traits{case1};
+    REQUIRE(associated_model_traits.NumGeometricEntities() == 3);
+    const auto *g1_traits = associated_model_traits.Find({1});
+    REQUIRE(g1_traits->GetNumCategories() == 2);
+    REQUIRE(g1_traits != nullptr);
+    const auto *associated_cat1 = g1_traits->FindCategory("category 1", "");
+    REQUIRE(associated_cat1 != nullptr);
+    const auto *associated_cat1_flamingo =
+        g1_traits->FindCategory("category 1", "flamingo");
+    REQUIRE(associated_cat1_flamingo != nullptr);
+    REQUIRE(associated_cat1 != associated_cat1_flamingo);
+
+    REQUIRE(g1_traits->FindCategoryByName("flamingo") ==
+            associated_cat1_flamingo);
+    REQUIRE(g1_traits->FindCategoryByName("") == associated_cat1);
+    const auto *associated_cat1_mt = associated_cat1->GetModelTrait<IntMT>();
+    REQUIRE(associated_cat1_mt != nullptr);
+    REQUIRE((*associated_cat1_mt)() == 1);
+    const auto *associated_cat1_flamingo_mt =
+        associated_cat1_flamingo->GetModelTrait<IntMT>();
+    REQUIRE(associated_cat1_flamingo_mt != nullptr);
+    REQUIRE((*associated_cat1_flamingo_mt)() == 2);
+
+    auto category1_nodes = g1_traits->FindCategoriesByType("category 1");
+    REQUIRE(category1_nodes.size() == 2);
   }
 }

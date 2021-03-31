@@ -292,15 +292,16 @@ static void ParseNode(CategoryNode *parent_node, pANode sim_node, pACase cs,
              (rep_type == Att_void && children.Size() > 0)) {
 
     auto info_type = std::string(SimString(AttNode_infoType(sim_node)));
-    parent_node = parent_node->AddCategory(std::move(info_type));
+    auto name = std::string(SimString(AttNode_name(sim_node)));
+    parent_node =
+        parent_node->AddCategory(std::move(info_type), std::move(name));
     auto image_class = std::string(SimString(AttNode_imageClass(sim_node)));
     if (!image_class.empty()) {
       parent_node = parent_node->AddCategory(std::move(image_class));
     }
-    auto name = std::string(SimString(AttNode_name(sim_node)));
-    if (!name.empty()) {
-      parent_node = parent_node->AddCategory(std::move(name));
-    }
+    // if (!name.empty()) {
+    //  parent_node = parent_node->AddCategory(std::move(name));
+    //}
   } else {
     throw std::runtime_error(
         fmt::format("Unsupported AttRepType: {}", rep_type));
