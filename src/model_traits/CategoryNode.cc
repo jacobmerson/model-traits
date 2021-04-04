@@ -124,16 +124,37 @@ CategoryNode::FindCategoryNodesByType(const std::string &type) {
 }
 
 const ModelTraitNode *
-GetCategoryModelTraitNode(const CategoryNode *nd,
-                          const std::string &name) noexcept {
+GetCategoryModelTraitNodeByType(const CategoryNode *nd,
+                                const std::string &type) noexcept {
   if (nd == nullptr) {
     return nullptr;
   }
-  const auto *category = nd->FindCategoryNodeByType(name);
+  const auto *category = nd->FindCategoryNodeByType(type);
   if (category == nullptr) {
     return nullptr;
   }
+  const auto &model_trait_nodes = category->GetModelTraitNodes();
+  if (model_trait_nodes.size() == 0) {
+    return nullptr;
+  }
   return &category->GetModelTraitNodes().front();
+}
+
+const IModelTrait *
+GetCategoryModelTraitByType(const CategoryNode *nd,
+                            const std::string &type) noexcept {
+  if (nd == nullptr) {
+    return nullptr;
+  }
+  const auto *model_trait_node = GetCategoryModelTraitNodeByType(nd, type);
+  if (model_trait_node == nullptr) {
+    return nullptr;
+  }
+  auto &model_traits = model_trait_node->GetModelTraits();
+  if (model_traits.size() == 0) {
+    return nullptr;
+  }
+  return model_traits.front().second.get();
 }
 
 const CategoryNode *GetCategoryByType(const CategoryNode *nd,

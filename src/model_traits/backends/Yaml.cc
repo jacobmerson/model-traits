@@ -33,7 +33,7 @@ static std::shared_ptr<IModelTrait> GetExpressionPtr(const ::YAML::Node &bc) {
         FunctionMT<T, 3, dim>::template from<YAML>(bc["value"]));
   case 4:
     return ModelTraitToPtr(
-        FunctionMT<T, 3, dim>::template from<YAML>(bc["value"]));
+        FunctionMT<T, 4, dim>::template from<YAML>(bc["value"]));
   default:
     throw std::runtime_error(
         "Equations are only implemented with up to 4 arguments");
@@ -127,6 +127,9 @@ static void ParseCaseHelper(const ::YAML::Node &yaml_node,
   assert(backend != nullptr);
   for (auto &c : yaml_node) {
     auto key = c.first.as<std::string>();
+    if (key == "category name" || key == "default geometry type") {
+      continue;
+    }
     if (c.second.IsSequence()) {
       if (!c.second[0]["category name"]) {
         ParseBoundaryConditions(c.second, parent_node->AddCategory(key),

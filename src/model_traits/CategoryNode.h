@@ -118,16 +118,34 @@ protected:
 };
 
 /**
- * Gets the the first model trait on the category with the given name
+ * Gets the the first model trait node on the category with the given name
  * @param nd node to search for the category/model trait pair
- * @param name name of the category to get the model trait from
+ * @param type name of the category to get the model trait from
  * @return the first model trait on the category or nullptr if the category or
  * model trait don't exist
  */
 
 const ModelTraitNode *
-GetCategoryModelTraitNode(const CategoryNode *nd,
-                          const std::string &name) noexcept;
+GetCategoryModelTraitNodeByType(const CategoryNode *nd,
+                                const std::string &type) noexcept;
+/**
+ * Gets the the first model trait on the category with the given name
+ * @param nd node to search for the category/model trait pair
+ * @param type name of the category to get the model trait from
+ * @return the first model trait on the category or nullptr if the category or
+ * model trait don't exist
+ */
+
+const IModelTrait *
+GetCategoryModelTraitByType(const CategoryNode *nd,
+                            const std::string &type) noexcept;
+
+template <typename ModelTrait>
+const ModelTrait *
+GetCategoryModelTraitByType(const CategoryNode *nd,
+                            const std::string &type) noexcept {
+  return MTCast<ModelTrait>(GetCategoryModelTraitByType(nd, type));
+}
 /**
  * Find the category node by type. If there is more than one
  * category with a given type, you will get any of the categories with the type.
