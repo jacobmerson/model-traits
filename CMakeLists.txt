@@ -64,6 +64,9 @@ if (BUILD_TESTING)
     add_subdirectory(test)
 endif ()
 
-install(FILES ModelTraitsConfig.cmake
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cmake/ModelTraitsConfig.cmake.in
+               ${CMAKE_CURRENT_BINARY_DIR}/cmake/ModelTraitsConfig.cmake
+               @ONLY)
+install(FILES
+        ${CMAKE_CURRENT_BINARY_DIR}/cmake/ModelTraitsConfig.cmake
         DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/ModelTraits)
-
