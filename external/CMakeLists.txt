@@ -2,8 +2,9 @@
 add_subdirectory(exprtk)
 
 set_directory_properties(PROPERTIES EXCLUDE_FROM_ALL YES)
+set(YAML_CPP_BUILD_TESTS OFF CACHE BOOL "")
 
-if (${BUILD_EXTERNAL})
+if (${MODEL_TRAITS_BUILD_EXTERNAL})
     include(FetchContent)
     set(FMT_INSTALL ON CACHE INTERNAL "")
     FetchContent_Declare(fmt
@@ -13,9 +14,10 @@ if (${BUILD_EXTERNAL})
     FetchContent_Declare(catch2
             GIT_REPOSITORY https://github.com/catchorg/Catch2.git
             GIT_TAG 037ddbc75cc5e58b93cf5a010a94b32333ad824d)
-
     FetchContent_MakeAvailable(fmt catch2)
-    if (${ENABLE_YAML})
+    set(CMAKE_MODULE_PATH
+      ${CMAKE_MODULE_PATH} "${catch2_SOURCE_DIR}/extras/" PARENT_SCOPE)
+    if (${MODEL_TRAITS_ENABLE_YAML})
         set(YAML_CPP_INSTALL ON CACHE INTERNAL "")
         FetchContent_Declare(yaml-cpp
                 GIT_REPOSITORY https://github.com/jbeder/yaml-cpp.git

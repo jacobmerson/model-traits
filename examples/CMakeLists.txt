@@ -1,8 +1,8 @@
-if (NOT ${BUILD_EXTERNAL})
+if (NOT ${MODEL_TRAITS_BUILD_EXTERNAL})
     find_package(fmt REQUIRED)
 endif ()
 
-if (${ENABLE_SIMMETRIX} AND ${ENABLE_YAML})
+if (${MODEL_TRAITS_ENABLE_SIMMETRIX} AND ${MODEL_TRAITS_ENABLE_YAML})
     add_executable(smd2yaml smd2yaml.cc)
     target_link_libraries(smd2yaml PUBLIC ModelTraits::ModelTraits ModelTraits::IO)
 
@@ -14,7 +14,7 @@ if (${ENABLE_SIMMETRIX} AND ${ENABLE_YAML})
             )
 endif ()
 
-if (${ENABLE_YAML})
+if (${MODEL_TRAITS_ENABLE_YAML})
     add_executable(yaml_with_backend yaml_with_backend.cc)
     target_link_libraries(yaml_with_backend PUBLIC ModelTraits::ModelTraits ModelTraits::IO fmt::fmt)
     install(TARGETS yaml_with_backend
@@ -31,7 +31,7 @@ install(TARGETS basic_usage core_usage
         DESTINATION ${CMAKE_INSTALL_BINDIR}
         )
 
-if (${ENABLE_SCOREC})
+if (${MODEL_TRAITS_ENABLE_SCOREC})
     find_package(SCOREC CONFIG REQUIRED)
     if (${SCOREC_FOUND})
         add_executable(pumi pumi.cc)

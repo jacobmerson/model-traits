@@ -1,5 +1,5 @@
 
-if (NOT ${BUILD_EXTERNAL})
+if (NOT ${MODEL_TRAITS_BUILD_EXTERNAL})
     find_package(fmt REQUIRED)
 endif ()
 

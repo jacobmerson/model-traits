@@ -1,7 +1,10 @@
 cmake_minimum_required(VERSION 3.14)
-project(ModelTraits VERSION 0.0.1 LANGUAGES CXX)
-include(CTest)
+project(ModelTraits VERSION 0.1.1 LANGUAGES CXX)
 
+# don't build TESTS unless model-traits is the top level package
+if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
+  include(CTest)
+endif()
 # Set the language standard to C++14
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -43,22 +46,22 @@ include(GNUInstallDirs)
 set(CMAKE_INSTALL_DOCDIR ${CMAKE_INSTALL_DATAROOTDIR}/doc/${PROJECT_NAME})
 
 
-option(ENABLE_SIMMETRIX "Build with Simmetrix support" OFF)
-message(STATUS "ENABLE_SIMMETRIX=${ENABLE_SIMMETRIX}")
-option(ENABLE_YAML "Build with YAML support" ON)
-message(STATUS "ENABLE_YAML=${ENABLE_YAML}")
-option(ENABLE_SCOREC "Build the pumi example" OFF)
-message(STATUS "ENABLE_SCOREC=${ENABLE_YAML}")
-option(BUILD_EXTERNAL "build external libraries" ON)
-message(STATUS "BUILD_EXTERNAL=${BUILD_EXTERNAL}")
+option(MODEL_TRAITS_ENABLE_SIMMETRIX "Build with Simmetrix support" OFF)
+message(STATUS "MODEL_TRAITS_ENABLE_SIMMETRIX=${MODEL_TRAITS_ENABLE_SIMMETRIX}")
+option(MODEL_TRAITS_ENABLE_YAML "Build with YAML support" ON)
+message(STATUS "MODEL_TRAITS_ENABLE_YAML=${MODEL_TRAITS_ENABLE_YAML}")
+option(MODEL_TRAITS_ENABLE_SCOREC "Build the pumi example" OFF)
+message(STATUS "MODEL_TRAITS_ENABLE_SCOREC=${MODEL_TRAITS_ENABLE_SCOREC}")
+option(MODEL_TRAITS_BUILD_EXTERNAL "build external libraries" ON)
+message(STATUS "MODEL_TRAITS_BUILD_EXTERNAL=${MODEL_TRAITS_BUILD_EXTERNAL}")
 
 add_subdirectory(external)
 add_subdirectory(src)
 add_subdirectory(examples)
 
-if (BUILD_TESTING)
-    include(CTest)
-    if (NOT ${BUILD_EXTERNAL})
+# don't build TESTS unless model-traits is the top level package
+if (CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME AND BUILD_TESTING)
+    if (NOT ${MODEL_TRAITS_BUILD_EXTERNAL})
         find_package(Catch2 REQUIRED)
     endif ()
     add_subdirectory(test)
