@@ -1,5 +1,5 @@
-#ifndef BC_TYPE_TRAITS_H__
-#define BC_TYPE_TRAITS_H__
+#ifndef MODEL_TRAITS_TYPE_TRAITS_H_
+#define MODEL_TRAITS_TYPE_TRAITS_H_
 #include <type_traits>
 
 namespace mt {

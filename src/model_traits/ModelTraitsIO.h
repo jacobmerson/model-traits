@@ -1,5 +1,5 @@
-#ifndef BC_MODEL_TRAITS_IO_H__
-#define BC_MODEL_TRAITS_IO_H__
+#ifndef MODEL_TRAITS_MODEL_TRAITS_IO_H_
+#define MODEL_TRAITS_MODEL_TRAITS_IO_H_
 
 #include "ModelTraits.h"
 #include <fstream>

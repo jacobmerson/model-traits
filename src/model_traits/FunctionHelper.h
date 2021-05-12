@@ -1,5 +1,5 @@
-#ifndef BC_FUNCTION_HELPER_H__
-#define BC_FUNCTION_HELPER_H__
+#ifndef MODEL_TRAITS_FUNCTION_HELPER_H_
+#define MODEL_TRAITS_FUNCTION_HELPER_H_
 
 namespace mt {
 namespace detail {

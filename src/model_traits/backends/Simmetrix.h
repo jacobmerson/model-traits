@@ -1,5 +1,5 @@
-#ifndef BC_BACKEND_SIMMETRIX_H__
-#define BC_BACKEND_SIMMETRIX_H__
+#ifndef MODEL_TRAITS_BACKEND_SIMMETRIX_H_
+#define MODEL_TRAITS_BACKEND_SIMMETRIX_H_
 #include "model_traits/ModelTraits.h"
 namespace mt {
 struct SIMMETRIX {};

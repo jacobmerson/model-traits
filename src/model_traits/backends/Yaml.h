@@ -1,5 +1,5 @@
-#ifndef BC_BACKEND_YAML_CPP_H__
-#define BC_BACKEND_YAML_CPP_H__
+#ifndef MODEL_TRAITS_BACKEND_YAML_CPP_H_
+#define MODEL_TRAITS_BACKEND_YAML_CPP_H_
 #include <functional>
 #include <string>
 

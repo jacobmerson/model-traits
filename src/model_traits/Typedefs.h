@@ -1,5 +1,5 @@
-#ifndef BC_TYPEDEFS_H__
-#define BC_TYPEDEFS_H__
+#ifndef MODEL_TRAITS_TYPEDEFS_H_
+#define MODEL_TRAITS_TYPEDEFS_H_
 #include <string>
 #include <type_traits>
 

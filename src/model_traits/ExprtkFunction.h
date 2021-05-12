@@ -1,5 +1,5 @@
-#ifndef BC_EXPRTK_FUNCTION_H__
-#define BC_EXPRTK_FUNCTION_H__
+#ifndef MODEL_TRAITS_EXPRTK_FUNCTION_H_
+#define MODEL_TRAITS_EXPRTK_FUNCTION_H_
 #include "Typedefs.h"
 #include <array>
 #include <memory>

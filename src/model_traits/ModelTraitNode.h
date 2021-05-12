@@ -1,5 +1,5 @@
-#ifndef BC_BC_NODE_H__
-#define BC_BC_NODE_H__
+#ifndef MODEL_TRAITS_MODEL_TRAITS_NODE_H_
+#define MODEL_TRAITS_MODEL_TRAITS_NODE_H_
 #include "Convert.h"
 #include "GeometrySet.h"
 #include "ModelTrait.h"

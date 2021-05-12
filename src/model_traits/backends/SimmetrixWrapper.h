@@ -1,5 +1,5 @@
-#ifndef BC_SIM_WRAPPER_H__
-#define BC_SIM_WRAPPER_H__
+#ifndef MODEL_TRAITS_SIM_WRAPPER_H_
+#define MODEL_TRAITS_SIM_WRAPPER_H_
 
 #include <SimAttDef.h>
 #include <SimAttribute.h>

@@ -1,5 +1,5 @@
-#ifndef BC_NAMED_FUNCTION_H__
-#define BC_NAMED_FUNCTION_H__
+#ifndef MODEL_TRAITS_NAMED_FUNCTION_H_
+#define MODEL_TRAITS_NAMED_FUNCTION_H_
 #include <functional>
 #include <string>
 

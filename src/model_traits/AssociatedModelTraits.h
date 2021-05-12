@@ -1,5 +1,5 @@
-#ifndef BC_CLASSIFIED_MODEL_TRAITS_H__
-#define BC_CLASSIFIED_MODEL_TRAITS_H__
+#ifndef MODEL_TRAITS_CLASSIFIED_MODEL_TRAITS_H_
+#define MODEL_TRAITS_CLASSIFIED_MODEL_TRAITS_H_
 #include "CategoryNode.h"
 #include "GeometrySet.h" // DimIdGeometry
 #include "ModelTrait.h"

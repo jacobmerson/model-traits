@@ -1,5 +1,5 @@
-#ifndef BC_BACKEND_YAML_CPP_CONVERT_H__
-#define BC_BACKEND_YAML_CPP_CONVERT_H__
+#ifndef MODEL_TRAITS_BACKEND_YAML_CPP_CONVERT_H_
+#define MODEL_TRAITS_BACKEND_YAML_CPP_CONVERT_H_
 #include "model_traits/ExprtkFunction.h"
 #include "model_traits/ModelTrait.h"
 #include "model_traits/ModelTraitsIO.h"

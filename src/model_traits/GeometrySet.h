@@ -1,5 +1,5 @@
-#ifndef BC_GEOMETRY_H__
-#define BC_GEOMETRY_H__
+#ifndef MODEL_TRAITS_GEOMETRY_H_
+#define MODEL_TRAITS_GEOMETRY_H_
 
 #include "Convert.h"
 #include "Typedefs.h"
