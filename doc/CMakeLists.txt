@@ -1,0 +1,6 @@
+option(MODEL_TRAITS_BUILD_DOCS "build project documentation" OFF)
+message(STATUS "MODEL_TRAITS_BUILD_DOCS=${MODEL_TRAITS_BUILD_DOCS}")
+if(MODEL_TRAITS_BUILD_DOCS)
+  find_package(Doxygen REQUIRED)
+  doxygen_add_docs(doc ${PROJECT_SOURCE_DIR}/src ${PROJECT_SOURCE_DIR}/examples ${PROJECT_SOURCE_DIR}/test )
+endif()

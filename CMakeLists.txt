@@ -53,11 +53,11 @@ message(STATUS "MODEL_TRAITS_ENABLE_YAML=${MODEL_TRAITS_ENABLE_YAML}")
 option(MODEL_TRAITS_ENABLE_SCOREC "Build the pumi example" OFF)
 message(STATUS "MODEL_TRAITS_ENABLE_SCOREC=${MODEL_TRAITS_ENABLE_SCOREC}")
 option(MODEL_TRAITS_BUILD_EXTERNAL "build external libraries" ON)
-message(STATUS "MODEL_TRAITS_BUILD_EXTERNAL=${MODEL_TRAITS_BUILD_EXTERNAL}")
 
 add_subdirectory(external)
 add_subdirectory(src)
 add_subdirectory(examples)
+add_subdirectory(doc)
 
 # don't build TESTS unless model-traits is the top level package
 if (CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME AND BUILD_TESTING)
