@@ -1,7 +1,7 @@
 model traits:
   name: pumi model
   cases:
-    - name: "case 1"
+    - case name: "case 1"
       model traits:
         default geometry type: dimension id
         boundary conditions:

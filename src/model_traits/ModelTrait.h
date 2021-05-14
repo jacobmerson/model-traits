@@ -21,13 +21,15 @@ using MatrixMT = GenericMT<ScalarType, 2>;
 using VectorMT = GenericMT<ScalarType, 1>;
 class VoidMT;
 
-// typedef to define the function boundary condition types
-// T is the return type of the function, NARG is the number of
-// arguments that the function takes (ScalarType), and dim is the
-// dimension of the boundary condition:
-// dim=0: Scalar,Int, bool
-// dim=1: vector
-// dim=2: matrix
+/**
+ * typedef to define the function boundary condition types
+ * T is the return type of the function, NARG is the number of
+ * arguments that the function takes (ScalarType), and dim is the
+ * dimension of the boundary condition:
+ * dim=0: Scalar,Int, bool
+ * dim=1: vector
+ * dim=2: matrix
+ */
 template <typename T, int NARG, int dim = 0>
 using FunctionMT =
     GenericMT<NamedFunction<FunctionT<T, ScalarType, NARG>>, dim>;
@@ -297,6 +299,10 @@ static_assert(IsFunctionMT<FunctionMT<double, 1, 0>>::value,
 static_assert(!IsFunctionMT<int>::value,
               "IsFunctionMT should return false for non FunctionMT types");
 
+/**
+ * \brief Cast IModelTrait to desired type
+ * Convenience function to downcast an IModelTrait to the desired concrete ModelTrait type
+ */
 template <typename ModelTrait> const ModelTrait *MTCast(const IModelTrait *mt) {
   return dynamic_cast<const ModelTrait *>(mt);
 }

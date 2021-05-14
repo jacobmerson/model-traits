@@ -158,8 +158,8 @@ const CategoryNode *GetCategoryByType(const CategoryNode *nd,
                                       const std::string &type) noexcept;
 /**
  * Get all of the categories with a given type
- * @param type
- * @return
+ * @param type the type of the category node
+ * @return vector of pointers to category nodes with the given type
  */
 const std::vector<const CategoryNode *>
 GetCategoriesByType(const CategoryNode *, const std::string &type);

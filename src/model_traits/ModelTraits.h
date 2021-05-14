@@ -29,14 +29,34 @@ public:
    * INode. If the case does exist, the pointer to the case is returned.
    */
   CategoryNode *AddCase(const std::string &name);
+  /**
+   * @brief Find the pointer to the case object
+   * @param [in] name
+   * @return pointer to the case or nullptr if it doesn't exist
+   */
   const CategoryNode *FindCase(const std::string &name) const noexcept;
+  /**
+   * @brief Find the pointer to the case object
+   * @param [in] name
+   * @return pointer to the case or nullptr if it doesn't exist
+   */
   CategoryNode *FindCase(const std::string &name) noexcept;
   /**
-   * Removes a case from ModelTraits by it's name
+   * @brief Removes a case from ModelTraits by it's name
+   * @param [in] name
    */
   void RemoveCase(const std::string &name);
+  /**
+   * @brief Get a vector of all cases in the analysis
+   */
   const std::vector<CategoryNode> &GetCases() const;
+  /**
+   * @brief get the number of cases in the analysis
+   */
   int NumCases();
+  /**
+   * @brief get the name of the analysis
+   */
   const std::string &GetName() const noexcept;
 
 protected:

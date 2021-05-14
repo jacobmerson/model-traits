@@ -4,6 +4,9 @@
 #include <string>
 
 namespace mt {
+/**
+ * YAML Backend policy class
+ */
 struct YAML {
   /**
    * A function pointer that maps the name of a model trait to its associated

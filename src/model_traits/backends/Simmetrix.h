@@ -2,6 +2,9 @@
 #define MODEL_TRAITS_BACKEND_SIMMETRIX_H_
 #include "model_traits/ModelTraits.h"
 namespace mt {
+/**
+ * @brief Simmetrix backend policy
+ */
 struct SIMMETRIX {};
 
 // Simmetrix backend specializes reading from file since it cannot be read

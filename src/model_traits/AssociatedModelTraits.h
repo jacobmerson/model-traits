@@ -113,7 +113,14 @@ private:
 };
 
 /**
- * Factory function to create the associated model traits.
+ * @brief Factory function to create the associated model traits.
+ *
+ * This function generates the associated model traits from a unassociated
+ * category node. Unlike the unassociated categories, the assocated categories
+ * only contain a single geometry type
+ *
+ * @tparam Geom type of geometry that associated model traits should hold.
+ * @param category_node a pointer to the unassociated category node to associate
  */
 template <typename Geom = DimIdGeometry>
 std::unique_ptr<AssociatedModelTraits<Geom>>
@@ -127,17 +134,15 @@ AssociateModel(const CategoryNode *category_node) {
  * @return the first model trait on the category or nullptr if the category or
  * model trait don't exist
  */
-
 const IModelTrait *
 GetCategoryModelTraitByType(const AssociatedCategoryNode *nd,
                             const std::string &type) noexcept;
 /**
- *
  * @tparam ModelTrait type to cast the model trait to
  * @param nd node to search for the category/model trait pair
  * @param type the type of the category to get the model trait from
  * @return the first model trait on the category or nullptr if the category or
- * model trait don't exist
+ *         model trait don't exist
  */
  template <typename ModelTrait>
  const ModelTrait *
@@ -146,7 +151,7 @@ GetCategoryModelTraitByType(const AssociatedCategoryNode *nd,
   return MTCast<ModelTrait>(GetCategoryModelTraitByType(nd, type));
 }
 /**
- *
+ * @brief finds the first category node with a given type
  * @param nd category node to search for the subcategory
  * @param type type of the category to find
  * @return category or nullptr if the category doesn't exist
@@ -155,12 +160,32 @@ const AssociatedCategoryNode *
 GetCategoryByType(const AssociatedCategoryNode *nd,
                   const std::string &type) noexcept;
 
+/**
+ * @brief find the category node by its name
+ * @param nd category node to search for the subcategory
+ * @param name name of the category to find
+ * @return category or nullptr if the category doesn't exist
+ */
 const AssociatedCategoryNode *
 GetCategoryByName(const AssociatedCategoryNode *nd,
                   const std::string &name) noexcept;
+
+/**
+ * @brief find a category node with a given name and type
+ * @param nd category node to search for the subcategory
+ * @param type type of category node to find
+ * @param name name of the category node to find
+ * @return category or nullptr if the category doesn't exist
+ */
 const AssociatedCategoryNode *GetCategory(const AssociatedCategoryNode *nd,
                                           const std::string &type,
                                           const std::string &name) noexcept;
+/**
+ * @brief finds all category nodes with a given type
+ * @param nd category node to search for the subcategory
+ * @param type type of the category to find
+ * @return vector of category nodes with the given type
+ */
 std::vector<const AssociatedCategoryNode *>
 GetCategoriesByType(const AssociatedCategoryNode *nd, const std::string &type);
 /**
