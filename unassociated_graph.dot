@@ -1,0 +1,36 @@
+strict digraph {
+  simulation [label="Ligament Simulation"]
+  micro_cnvg_tol [shape=record,label="{|Microscale Convergence | Null Geometry | Value: 1E-6}"];
+  macro_cnvg_tol [shape=record,label="{|Macroscale Convergence | Null Geometry | Value: 1E-6}"];
+  max_tsteps [shape=record,label="{|Max Timesteps | Null Geometry | Value: 10}"];
+  case1_bc [label="Boundary Conditions"];
+  case2_bc [label="Boundary Conditions"];
+  case1_fix_x [shape=record,label="{Fix x| x displacement | Face 0 | 0}"];
+  case1_encastre [shape=record,label="{Encastre | displacement | Point 0 | [0,0,0]}"];
+  case1_displacement [shape=record,label="{Load RHS | x displacement | Point 0| 5}"];
+  case2_fix_x [shape=record,label="{Fix x| x displacement | Face 0 | 0}"];
+  case2_encastre [shape=record,label="{Encastre | displacement | Point 0 | [0,0,0]}"];
+  case2_displacement [shape=record,label="{Load RHS | x displacement | Point 0| -5}"];
+  case1 [label="Case\n\"Extension\""]
+  case2 [label="Case\n\"Compression\""]
+  microscale [label="type: Microscale"];
+  macroscale [label="type: Macroscale"];
+  solver_setup [label="type: Solver Setup"];
+
+  simulation -> {case1,case2};
+  case1 -> solver_setup;
+  case2 -> solver_setup;
+  solver_setup -> {microscale, macroscale};
+  microscale -> micro_cnvg_tol;
+  macroscale -> macro_cnvg_tol;
+  macroscale ->max_tsteps;
+  case1->case1_bc;
+  case2 -> case2_bc;
+  case1_bc -> case1_fix_x;
+  case1_bc -> case1_encastre;
+  case1_bc -> case1_displacement;
+
+  case2_bc -> case2_fix_x;
+  case2_bc -> case2_encastre;
+  case2_bc -> case2_displacement;
+}

@@ -1,0 +1,27 @@
+strict digraph {
+  micro_cnvg_tol [shape=record,label="{Microscale Convergence | 1E-6}"];
+  macro_cnvg_tol [shape=record,label="{Macroscale Convergence | 1E-6}"];
+  max_tsteps [shape=record,label="{Max Timesteps | 10}"];
+  case2_fix_x [shape=record,label="{Fix x| x displacement | 0}"];
+  case2_encastre [shape=record,label="{Encastre | displacement | [0,0,0]}"];
+  case2_displacement [shape=record,label="{Load RHS | x displacement | -5}"];
+  solver_setup [label="Solver Setup"];
+  face0 [label="Face 0"];
+  point0 [label="Point 0"];
+  face1 [label="Face 1"];
+  null_geom [label="Null"];
+  face0_bc [label="Boundary Conditions"];
+  point0_bc [label="Boundary Conditions"];
+  face1_bc [label="Boundary Conditions"];
+  microscale [label="Microscale"];
+  macroscale [label="Macroscale"];
+
+  null_geom -> solver_setup;
+  solver_setup -> {microscale, macroscale};
+  microscale -> micro_cnvg_tol;
+  macroscale-> macro_cnvg_tol;
+  macroscale->max_tsteps;
+  face0->face0_bc->case2_fix_x;
+  point0->point0_bc->case2_encastre;
+  face1->face1_bc->case2_displacement;
+}
