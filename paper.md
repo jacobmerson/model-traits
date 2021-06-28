@@ -8,7 +8,7 @@ authors:
   - name: Jacob Merson
     orcid: 0000-0002-6813-6532
     affiliation: 1
-  - name: Mark Shephard
+  - name: Mark S. Shephard
     affiliation: 1
 affiliations:
   - name: Rensselaer Polytechnic Institute
@@ -35,9 +35,9 @@ This section will describe some of the major features of `model-traits`. The goa
 
 The first graph representation, also called the unassociated graph, is optimized for building a model where it is important to be able to add a single attribute definition to multiple geometric entities at a time \autoref{fig:unassociated}. The associated representation of the graph is optimized for geometric entity lookup which is typically done during the setup phase of an analysis case to be executed by a selected code. \autoref{fig:associated}.
 
-![Unassociated graph representation of an example multiscale finite element simulation.\label{fig:unassociated}](unassociated_graph.pdf)
+![Unassociated graph representation of an example multiscale finite element simulation. Node types are listed on all nodes. If a node has an optional name it is surrounded in quotations.\label{fig:unassociated}](unassociated_graph.pdf)
 
-![Associated Graph representation of the "uniaxial compression" analysis case.\label{fig:associated}](associated_graph.pdf)
+![Associated Graph representation of the "uniaxial compression" analysis case. Node types are listed on all nodes. If a node has an optional name it is surrounded in quotations.\label{fig:associated}](associated_graph.pdf)
 
 The library provides a YAML reader and writer and a smd (Simmetrix native attribute file) reader. The implementations of these readers and writer use the extensible IO interface and can be used as an example for alternative IO formats. To add an IO format the user only needs to provide template specializations for the `Read` and `Write` functions which are visible in the `mt` namespace. Additionally, `model-traits` supports the use of arbitrary geometric entity types which do not require wrapper classes or any class inheritance.
 
