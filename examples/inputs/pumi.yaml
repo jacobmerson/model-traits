@@ -5,6 +5,14 @@ model traits:
       model traits:
         default geometry type: dimension id
         boundary conditions:
+          - name: "mesh"
+            type: string
+            value: inputs/pumi.smb
+            geometry: []
+          - name: "model"
+            type: string
+            value: inputs/pumi.dmg
+            geometry: []
           - name: "classified"
             geometry: [[2,1]]
             type: scalar

@@ -42,6 +42,8 @@ if (${MODEL_TRAITS_ENABLE_SCOREC})
     endif ()
 endif ()
 
+file(COPY inputs DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+
 #install(TARGETS
 #        DESTINATION ${CMAKE_INSTALL_BINDIR}
 #        )
