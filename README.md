@@ -1,6 +1,7 @@
 # Model Traits Library
 
 [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
+[![Linux-build](https://github.com/jacobmerson/model-traits/actions/workflows/linux.yml/badge.svg)](https://github.com/jacobmerson/model-traits/actions/workflows/linux.yml)
 
 This is a simple library for dealing with applying simulation information onto a model very flexible way. Simulation
 information may consist of boundary conditions, but can also refer to other data that may need to be queried during a
