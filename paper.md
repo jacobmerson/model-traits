@@ -46,6 +46,6 @@ During the design phase a trade off between having an open set of IO backends or
 Expressions can be any invocable type that returns a double and takes up to 4 double arguments and can be converted to a string through `to_string` for serialization. This interface is enabled by the `NamedFunction` class which uses type erasure (similar to `std::function`) to provide a single interface type which does not require inheritance. It is constructible by any invocable which can be converted to a string through `to_string`. Additional constructors are provided which can be used to name an invocable which does not provide a `to_string` method such as a lambda or function pointer. For string based expressions the exprtk library is used for parsing and evaluation [@partowExprtk2021]. The `ExprtkFunction` class is a functor that wraps the exprtk interface and is compatible with `NamedFunction`.
 
 # Acknowledgments
-This work was supported in part by the National Institutes of Health (NIH) through Grand No. U01 AT010326-06. This material is based in part upon work supported by the National Science Foundation Graduate Research Fellowship under Grant No. DGE-1744655.
+This work was supported in part by the National Institutes of Health (NIH) through Grant No. U01 AT010326-06. This material is based in part upon work supported by the National Science Foundation Graduate Research Fellowship under Grant No. DGE-1744655.
 
 # References
