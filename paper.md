@@ -11,7 +11,7 @@ authors:
   - name: Mark S. Shephard
     affiliation: 1
 affiliations:
-  - name: Rensselaer Polytechnic Institute
+  - name: Rensselaer Polytechnic Institute, Troy NY, USA
     index: 1
 date: 12 May 2021
 bibliography: paper.bib
