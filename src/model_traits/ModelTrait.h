@@ -107,7 +107,7 @@ public:
   using type = T;
   static constexpr int dim = 2;
   GenericMT() noexcept = default;
-  GenericMT(OrdinalType nrows, OrdinalType ncols) : data_(nrows * ncols) {}
+  GenericMT(OrdinalType nrows, OrdinalType ncols) : data_(nrows * ncols), ncols_(ncols) {}
   // not noexcept because copying d in the parameter can throw
   explicit GenericMT(std::vector<std::vector<T>> d) {
     ncols_ = d[0].size();
@@ -146,7 +146,7 @@ public:
   using type = NamedFunction<R(Args...)>;
   static constexpr int dim = 2;
   GenericMT() noexcept = default;
-  GenericMT(OrdinalType nrows, OrdinalType ncols) : data_(nrows * ncols) {}
+  GenericMT(OrdinalType nrows, OrdinalType ncols) : data_(nrows * ncols), ncols_(ncols) {}
   // not noexcept because copying d in the parameter can throw
   explicit GenericMT(std::vector<std::vector<type>> d) {
     ncols_ = d[0].size();
