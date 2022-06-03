@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.14)
-project(ModelTraits VERSION 0.1.1 LANGUAGES CXX)
+project(ModelTraits VERSION 0.2.1 LANGUAGES CXX)
 
 # don't build TESTS unless model-traits is the top level package
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
