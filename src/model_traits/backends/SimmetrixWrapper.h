@@ -3,8 +3,6 @@
 
 #include <SimAttDef.h>
 #include <SimAttribute.h>
-#include <SimError.h>
-#include <SimErrorCodes.h>
 #include <SimUtil.h>
 
 #include <fmt/format.h>

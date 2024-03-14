@@ -13,7 +13,7 @@ if (${MODEL_TRAITS_BUILD_EXTERNAL})
 
     FetchContent_Declare(catch2
             GIT_REPOSITORY https://github.com/catchorg/Catch2.git
-            GIT_TAG 037ddbc75cc5e58b93cf5a010a94b32333ad824d)
+            GIT_TAG v3.5.3)
     FetchContent_MakeAvailable(fmt catch2)
     set(CMAKE_MODULE_PATH
       ${CMAKE_MODULE_PATH} "${catch2_SOURCE_DIR}/extras/" PARENT_SCOPE)

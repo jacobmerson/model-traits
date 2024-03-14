@@ -3,8 +3,9 @@
 #include "model_traits/ExprtkFunction.h"
 #include "model_traits/GeometrySet.h"
 #include "model_traits/ModelTraitsIO.h"
+#include <SimInfo.h>
+#include <SimInfoCodes.h>
 #include <SimAttribute.h>
-#include <SimError.h>
 #include <SimModel.h>
 #include <SimUtil.h>
 #include <algorithm>
@@ -376,11 +377,11 @@ std::unique_ptr<ModelTraits> ReadFromFile(const std::string &filename,
       }
     }
     return mt;
-  } catch (pSimError err) {
+  } catch (pSimInfo err) {
     fmt::print("SimModSuite error caught:\n");
-    fmt::print("\tError code: {}\n", SimError_code(err));
-    fmt::print("\tError string: {}\n", SimError_toString(err));
-    SimError_delete(err);
+    fmt::print("\tError code: {}\n", SimInfo_code(err));
+    fmt::print("\tError string: {}\n", SimInfo_toString(err));
+    SimInfo_delete(err);
   } catch (std::exception &e) {
     fmt::print("Exception: {}\n", e.what());
   } catch (...) {
