@@ -33,9 +33,10 @@ install(TARGETS basic_usage core_usage
 
 if (${MODEL_TRAITS_ENABLE_SCOREC})
     find_package(SCOREC CONFIG REQUIRED)
+    find_package(MPI REQUIRED)
     if (${SCOREC_FOUND})
         add_executable(pumi pumi.cc)
-        target_link_libraries(pumi SCOREC::core SCOREC::apf SCOREC::gmi ModelTraits::ModelTraits ModelTraits::IO fmt::fmt)
+        target_link_libraries(pumi SCOREC::core SCOREC::apf SCOREC::gmi ModelTraits::ModelTraits ModelTraits::IO fmt::fmt MPI::MPI_CXX)
         install(TARGETS pumi
                 DESTINATION ${CMAKE_INSTALL_BINDIR}
                 )
